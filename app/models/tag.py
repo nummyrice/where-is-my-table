@@ -11,7 +11,7 @@ class Tag(db.Model):
     updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
 
     # associations
-    reservation = db.relationship("Reservation", secondary=reservation_tags, back_populates="tags")
+    reservations = db.relationship("Reservation", secondary=reservation_tags, back_populates="tags")
     waitlist = db.relationship("Waitlist", secondary=waitlist_tags, back_populates="tags")
 
 
