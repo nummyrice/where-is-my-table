@@ -1,15 +1,25 @@
 from .db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.sql import func
+
 
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(40), nullable=False, unique=True)
+    name = db.Column(db.String(40), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
+    phone_number = db.Column(db.String(255), nullable=False, unique=True)
+    notes = db.Column(db.Text)
     hashed_password = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
+
+    # associations
+    reservations = db.relationship("Reservation", back_populates="users", cascade="all, delete")
+    waitlist = db.relationship("Waitlist", back_populates='users', cascade="all, delete")
 
     @property
     def password(self):
@@ -25,6 +35,11 @@ class User(db.Model, UserMixin):
     def to_dict(self):
         return {
             'id': self.id,
-            'username': self.username,
-            'email': self.email
+            'name': self.name,
+            'email': self.email,
+            'phone_number': self.phone_number,
+            'notes': self.notes,
+            'hashed_password': self.hashed_password,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
         }
