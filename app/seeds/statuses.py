@@ -1,7 +1,11 @@
 from app.models import db, Status
-from wheres_my_table.app.models import reservation
-
 def seed_statuses():
+    available = Status(
+        name='Available'
+    )
+    pending = Status(
+        name='Pending'
+    )
     reserved = Status(
         name='Reserved'
     )
@@ -26,7 +30,8 @@ def seed_statuses():
     seated = Status(
         name="Seated"
     )
-
+    db.session.add(available)
+    db.session.add(pending)
     db.session.add(reserved)
     db.session.add(left_message)
     db.session.add(confirmed)

@@ -1,3 +1,4 @@
+from sqlalchemy.orm import backref
 from .db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -18,8 +19,8 @@ class User(db.Model, UserMixin):
     updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
 
     # associations
-    reservations = db.relationship("Reservation", back_populates="users", cascade="all, delete")
-    waitlist = db.relationship("Waitlist", back_populates='users', cascade="all, delete")
+    reservations = db.relationship("Reservation", back_populates="guest", cascade="all, delete")
+    waitlist = db.relationship("Waitlist", back_populates='guest', cascade="all, delete")
 
     @property
     def password(self):

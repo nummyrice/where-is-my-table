@@ -1,8 +1,8 @@
-"""initial
+"""full migration
 
-Revision ID: 1446244679a7
+Revision ID: 13ef4bb35bad
 Revises: 
-Create Date: 2021-12-16 02:36:29.453401
+Create Date: 2021-12-16 18:53:26.174946
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1446244679a7'
+revision = '13ef4bb35bad'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -63,30 +63,30 @@ def upgrade():
     )
     op.create_table('waitlist',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('guest_id', sa.Integer(), nullable=True),
     sa.Column('status_id', sa.Integer(), nullable=True),
     sa.Column('party_size', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['statuses.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('reservation_tags',
-    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('reservation_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['reservation_id'], ['reservations.id'], ),
-    sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], )
     )
     op.create_table('waitlist_tags',
-    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('waitlist_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
-    sa.ForeignKeyConstraint(['waitlist_id'], ['waitlist.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['waitlist_id'], ['waitlist.id'], )
     )
     # ### end Alembic commands ###
 

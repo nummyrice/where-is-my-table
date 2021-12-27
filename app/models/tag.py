@@ -15,13 +15,13 @@ class Tag(db.Model):
     waitlist = db.relationship("Waitlist", secondary=waitlist_tags, back_populates="tags")
 
 
-def to_dict(self):
-    return {
-        "id": self.id,
-        "name": self.name,
-        "waitlist_id": self.waitlist_id,
-        "reservation_id": self.reservation_id,
-        'created_at': self.created_at,
-        'updated_at': self.updated_at
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "waitlist_id": self.waitlist_id,
+            "reservation_id": self.reservation_id,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
 
-    }
+        }

@@ -10,7 +10,7 @@ class Status(db.Model):
     updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
 
     # Associations
-    reservations = db.relationship("Reservation", back_populates="statuses")
+    reservations = db.relationship("Reservation", back_populates="status")
 
     def to_dict(self):
         return {

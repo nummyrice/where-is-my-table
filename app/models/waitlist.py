@@ -6,7 +6,7 @@ class Waitlist(db.Model):
     __tablename__ = "waitlist"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    guest_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     status_id= db.Column(db.Integer, db.ForeignKey('statuses.id'))
     party_size=db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
@@ -21,7 +21,7 @@ class Waitlist(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
+            "guest_id": self.guest_id,
             "status_id": self.status_id,
             "party_size": self.party_size,
             'created_at': self.created_at,
