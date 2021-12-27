@@ -10,7 +10,6 @@ class Reservation(db.Model):
     party_size = db.Column(db.Integer)
     reservation_time = db.Column(db.DateTime)
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'))
-    lock_time = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
     updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
 
@@ -28,7 +27,6 @@ class Reservation(db.Model):
             "party_size": self.party_size,
             "reservation_time": self.reservation_time,
             "status_id": self.status_id,
-            "lock_time": self.lock_time,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

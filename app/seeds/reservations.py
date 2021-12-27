@@ -52,7 +52,7 @@ def seed_reservations():
     reservation_7 = Reservation(
         guest_id = 1,
         party_size = 4,
-        reservation_time = datetime(2021, 12, 17, 45, 0, 0),
+        reservation_time = datetime(2021, 12, 17, 17, 45, 0, 0),
         status_id = 2
     )
     db.session.add(reservation_1)

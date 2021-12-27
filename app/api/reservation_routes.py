@@ -1,9 +1,12 @@
 from flask import Blueprint, request
+from flask_login import current_user
 from app.models import db, Reservation
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
+from app.forms import ReservationForm
+from .auth_routes import validation_errors_to_error_messages
 
 reservation_routes = Blueprint('reservations', __name__)
 
@@ -37,9 +40,9 @@ def get_available_times(begin_date, end_date):
     return available_times
 
 
-# get all reservations for today's date
+# GET AVAILABLE TIMES
 @reservation_routes.route('/', methods=['POST'])
-def get_reservations():
+def todays_available_times():
     data = request.json
     beginning_date = data['client_date']
     print('DATES: ', parser.isoparse(beginning_date))
@@ -49,15 +52,64 @@ def get_reservations():
     return available_times
 
 
-# set/check lock for reservation
-@reservation_routes.route('/lock', methods=['PUT'])
+# CREATE RESERVATION TIME AND SET PENDING
+@reservation_routes.route('/lock', methods=['POST'])
 def reservation_lock():
     data = request.json
-    reservation = Reservation.query.get(data['lock_reservation'])
-    if not reservation:
-        return "reservation not found", 404
+    target_datetime = parser.isoparse(data['lock_reservation'])
+    reservation = db.session.query(Reservation).filter(Reservation.reservation_time == target_datetime).one_or_none()
+    if reservation:
+        pending_time = datetime.now() - reservation.updated_at
+        if reservation.status_id == 2 and (pending_time.total_seconds / 60) < 10:
+            return {"result": "time unavailable"}, 409
+        elif reservation.status_id == 2 and (pending_time.total_seconds / 60) > 10:
+            reservation.guest_id = current_user.id
+            db.session.commit()
+            return {"result": "set pending"}, 200
     else:
-        res_dict = reservation.to_dict()
-        if res_dict["status_id"] == 2 and res_dict["lock_time"]:
-            print("reservation: ", reservation.to_dict())
-            return {"reservation": reservation}
+        pending_res = Reservation(
+            guest_id= current_user.id,
+            party_size= 1,
+            reservation_time= target_datetime,
+            status_id= 2,
+        )
+        db.session.add(pending_res)
+        db.session.commit()
+        return {"result": "set pending"}, 201
+
+
+# SUBMIT RESERVATION
+@reservation_routes.route('/submit', methods=['PUT'])
+def reservation_submit():
+    # call new message form
+    form = ReservationForm
+    # check csrf
+    form['csrf_token'].data = request.cookies['csrf_token']
+    # if validate on submit
+    if form.validate_on_submit():
+        reservation_time = form.data['reservation_time']
+        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time).one_or_none()
+        if  reservation_exists:
+            res_updated_at = reservation_exists.updated_at
+            pending_status = datetime.now() - res_updated_at
+            if reservation_exists.status_id == 2 and (pending_status.total_seconds / 60) < 10 and reservation_exists.guest_id != form.data['guest_id']:
+                return {"result": "time unavailable"}, 400
+
+            elif (reservation_exists.status == 2 and (pending_status.total_seconds / 60) > 10) or (reservation_exists.status == 2 and (pending_status.total_seconds / 60) > 10 and reservation_exists.guest_id == form.data['guest_id']):
+                reservation_exists['guest_id'] = form.data['guest_id']
+                reservation_exists['status_id'] = 3
+                reservation_exists['party_size'] = form.data['party_size']
+                db.session.commit()
+                return {'result': "succesfully reserved"}, 200
+        else:
+            reservation = Reservation(
+                    guest_id = form.data['guest_id'],
+                    pary_size = form.data['party_size'],
+                    status_id = 3,
+                    reservation_time = reservation_time,
+                )
+            db.session.add(reservation)
+            db.session.commit()
+            return {'result': "successfully reserved"}, 201
+
+    return {'errors': validation_errors_to_error_messages(form.errors)}, 400
