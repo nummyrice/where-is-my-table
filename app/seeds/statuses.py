@@ -30,6 +30,9 @@ def seed_statuses():
     seated = Status(
         name="Seated"
     )
+    cancelled = Status(
+        name="Cancelled"
+    )
     db.session.add(available)
     db.session.add(pending)
     db.session.add(reserved)
@@ -40,6 +43,7 @@ def seed_statuses():
     db.session.add(arrived)
     db.session.add(parially_seated)
     db.session.add(seated)
+    db.session.add(cancelled)
 
     db.session.commit()
 
