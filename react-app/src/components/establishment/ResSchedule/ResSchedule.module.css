@@ -1,0 +1,27 @@
+/* RES SCHEDULE*/
+
+.res_schedule {
+    grid-area: schedule;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 30px 1fr 30px;
+    grid-template-areas:
+    "time"
+    "schedule"
+    "bottom";
+}
+
+.time_scroll {
+    grid-area: time;
+}
+
+.schedule_scroll {
+    grid-area: schedule;
+    background-color: blue;
+
+}
+
+.footer_options {
+    grid-area: bottom;
+
+}

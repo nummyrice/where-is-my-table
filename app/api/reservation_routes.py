@@ -16,31 +16,29 @@ closing_time = 9
 # query all the current reservations for that date sorted chronologically
 def get_available_times(begin_date, end_date):
     end_date = end_date.isoformat()
-    # print('DATES_______: ', begin_date, end_date)
     todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(begin_date, end_date)).all()
-    # print('DATABASE QUERY: ', todays_res)
-    available_times = {}
+    available_times = []
     target_time = parser.isoparse(begin_date)
     closing_time = parser.isoparse(end_date)
-    # print('TARGET AND CLOSING_________: ', target_time, closing_time)
-    index = 0
     while target_time < closing_time:
         is_available = True
         for reservation in todays_res:
             booked_reservation_time = reservation.reservation_time
-            # print("RESERVATION TIME____________", booked_reservation_time, target_time)
             if booked_reservation_time == target_time:
                 is_available = False
                 break
         if is_available:
-            available_times[index] = target_time.isoformat()
-            index = index + 1
+            available_times.append({
+                "party_size": None,
+                "datetime": target_time.isoformat()
+                })
         target_time = target_time + relativedelta(hours=1)
-    # print('AVAILABLE TIMES_____: ', )
+    # print('AVAILABLE TIMES_____: ', available_times )
     return { "available_times": available_times, "todays_res": todays_res }
 
+
 # GET AVAILABLE TIMES
-@reservation_routes.route('/', methods=['POST'])
+@reservation_routes.route('', methods=['POST'])
 def todays_available_times():
     data = request.json
     beginning_date = data['client_date']
