@@ -10,7 +10,7 @@ const ResSchedule =({selectedDate}) => {
     useEffect(() => {
         // todo: startDate must be the date set by the calender component and must be prop threaded to this point
         // const startDate = new Date('December 28, 2021 08:00:00')
-        console.log("selected date in ResSchedule component: ", selectedDate)
+        // console.log("selected date in ResSchedule component: ", selectedDate)
         fetch('/api/reservations', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
@@ -22,13 +22,13 @@ const ResSchedule =({selectedDate}) => {
         }).catch((e) => {
             console.error(e)
         })
-    },[])
+    },[selectedDate])
 
     // console.log('AVAILABLE TIMES AND RESERVATIONS OBJECTS: ', availableTimes, reservations)
 
     // SET 24 TEMPLATE COLUMNS
     const hourColumns = Array(24).fill(0).map((_, hour) => {
-        const date = new Date()
+        const date = new Date(selectedDate)
         date.setHours(hour, 0, 0, 0)
         return date
     })
@@ -50,6 +50,7 @@ const ResSchedule =({selectedDate}) => {
             scheduleColumn
         )
     })
+
 
     console.log('MODEL ARRAY: ', resScheduleModel);
 

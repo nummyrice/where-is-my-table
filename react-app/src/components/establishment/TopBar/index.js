@@ -8,17 +8,25 @@ import { ReactComponent as Calendar } from './assets/calendar-check-regular.svg'
 
 
 
-const TopBar = ({setSelectedDate}) => {
+const TopBar = ({setSelectedDate, selectedDate}) => {
 
     return(
         <div className={style.top_bar}>
             <div className={style.restaurant_title}>{'Village Baker'}</div>
             <div className={style.center_options}>
-                <LeftArrow className={style.back_date}/>
-                <div className={style.todays_date}>{"Today's Date"}</div>
+                <LeftArrow onClick={() => {
+                    const yesterday = new Date(selectedDate)
+                    yesterday.setDate(selectedDate.getDate() - 1)
+                    setSelectedDate(yesterday)
+                }} className={style.back_date}/>
+                <div className={style.todays_date}>{selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
                 <Calendar className={style.calendar}/>
                 <div className={style.dining_period}>{'Dinner'}</div>
-                <RightArrow className={style.forward_date}/>
+                <RightArrow onClick={() => {
+                    const yesterday = new Date(selectedDate)
+                    yesterday.setDate(selectedDate.getDate() + 1)
+                    setSelectedDate(yesterday)
+                }} className={style.forward_date}/>
             </div>
             <Settings className={style.establishment_settings}/>
         </div>

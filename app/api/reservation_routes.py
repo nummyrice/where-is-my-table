@@ -10,15 +10,12 @@ from .auth_routes import validation_errors_to_error_messages
 
 reservation_routes = Blueprint('reservations', __name__)
 
-opening_time = 10
-closing_time = 9
-
 # query all the current reservations for that date sorted chronologically
 def get_available_times(begin_date, end_date):
     end_date = end_date.isoformat()
     todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(begin_date, end_date)).all()
     available_times = []
-    target_time = parser.isoparse(begin_date)
+    target_time = parser.isoparse(begin_date).replace(hour=0, minute=0, second=0, microsecond=0)
     closing_time = parser.isoparse(end_date)
     while target_time < closing_time:
         is_available = True
@@ -33,7 +30,7 @@ def get_available_times(begin_date, end_date):
                 "datetime": target_time.isoformat()
                 })
         target_time = target_time + relativedelta(hours=1)
-    # print('AVAILABLE TIMES_____: ', todays_res )
+    print('AVAILABLE TIMES_____: ', available_times )
     return { "available_times": available_times, "todays_res": [reservation.to_dict() for reservation in todays_res] }
 
 
@@ -45,7 +42,7 @@ def todays_available_times():
     print('DATES: ', parser.isoparse(beginning_date))
     ending_date = parser.isoparse(beginning_date) + relativedelta(days=1)
     data = get_available_times(beginning_date, ending_date)
-    print('RESERVATION__________: ', data['todays_res'][0])
+    # print('RESERVATION__________: ', data['todays_res'][0])
     return data
 
 

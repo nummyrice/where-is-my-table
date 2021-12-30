@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import style from "./Establishment.module.css";
-import { Route, Redirect } from 'react-router-dom';
-import ResSchedule from './ResSchedule'
-import TopBar from './TopBar'
+// import { Route, Redirect } from 'react-router-dom';
+import ResSchedule from './ResSchedule';
+import TopBar from './TopBar';
+import LeftPanel from './LeftPanel';
 
 
 
@@ -14,8 +15,8 @@ const Establishment = () => {
 
     return (
        <div className={style.establishment}>
-            <TopBar setSelectedDate={setSelectedDate}/>
-            <div className={style.left_panel}></div>
+            <TopBar setSelectedDate={setSelectedDate} selectedDate={selectedDate}/>
+            <LeftPanel selectedDate={selectedDate}/>
             <ResSchedule selectedDate={selectedDate}/>
        </div>
     )
