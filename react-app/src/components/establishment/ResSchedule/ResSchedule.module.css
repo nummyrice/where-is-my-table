@@ -4,24 +4,93 @@
     grid-area: schedule;
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 30px 1fr 30px;
+    grid-template-rows: 1fr 30px;
     grid-template-areas:
-    "time"
     "schedule"
     "bottom";
 }
 
-.time_scroll {
+/* .time_scroll {
     grid-area: time;
-}
+} */
 
 .schedule_scroll {
     grid-area: schedule;
-    background-color: blue;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    overflow-x: scroll;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.column_time {
+    font-family: sans-serif;
+    width: 100px;
+    text-align: center;
+}
+
+.booked_reservation {
+    background-color: #5394cd;
+    /* padding: 5px; */
+    width: 100px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    margin: 3px;
+    color: black;
+    padding: 4px;
 
 }
 
 .footer_options {
     grid-area: bottom;
+
+}
+
+.booked_party {
+    display: flex;
+    align-items: center;
+}
+
+/* .booked_party * {
+    color: black;
+} */
+
+.booked_party .party_size_icon {
+    color: black;
+}
+
+.available_party {
+    display: flex;
+    align-items: center;
+
+}
+
+.party_size_icon{
+    height: 10px;
+    /* width: 5px; */
+    margin: 3px;
+    color: white;
+}
+
+.guest {
+
+}
+.table_name {
+
+}
+
+.available_time_card {
+    border: 2px solid white;
+    width: 100px;
+    height: 70px;
+    margin: 3px;
+    padding: 4px;
 
 }

@@ -29,12 +29,12 @@ def get_available_times(begin_date, end_date):
                 break
         if is_available:
             available_times.append({
-                "party_size": None,
+                "party_size": 4,
                 "datetime": target_time.isoformat()
                 })
         target_time = target_time + relativedelta(hours=1)
-    # print('AVAILABLE TIMES_____: ', available_times )
-    return { "available_times": available_times, "todays_res": todays_res }
+    # print('AVAILABLE TIMES_____: ', todays_res )
+    return { "available_times": available_times, "todays_res": [reservation.to_dict() for reservation in todays_res] }
 
 
 # GET AVAILABLE TIMES
@@ -45,6 +45,7 @@ def todays_available_times():
     print('DATES: ', parser.isoparse(beginning_date))
     ending_date = parser.isoparse(beginning_date) + relativedelta(days=1)
     data = get_available_times(beginning_date, ending_date)
+    print('RESERVATION__________: ', data['todays_res'][0])
     return data
 
 

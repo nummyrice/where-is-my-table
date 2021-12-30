@@ -24,9 +24,12 @@ class Reservation(db.Model):
         return {
             "id": self.id,
             "guest_id": self.guest_id,
+            "guest": self.guest.to_dict(),
             "party_size": self.party_size,
-            "reservation_time": self.reservation_time,
+            "reservation_time": self.reservation_time.isoformat(),
             "status_id": self.status_id,
+            "status": self.status.to_dict(),
+            "tags": [tag.to_dict() for tag in self.tags],
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

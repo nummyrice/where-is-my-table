@@ -1,5 +1,7 @@
 from app.models import db, Reservation
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 
 def seed_reservations():
 
@@ -55,6 +57,18 @@ def seed_reservations():
         reservation_time = datetime(2021, 12, 17, 17, 45, 0, 0),
         status_id = 2
     )
+    target_date = datetime(2021, 12, 28, 8, 0, 0)
+    end_date = datetime(2021, 12, 31, 8, 0, 0)
+    while target_date < end_date:
+        new_reservation = Reservation(
+            guest_id = 1,
+            party_size = 4,
+            reservation_time = target_date,
+            status_id = 3
+        )
+        db.session.add(new_reservation)
+        target_date = target_date + relativedelta(hours=1)
+
     db.session.add(reservation_1)
     db.session.add(reservation_2)
     db.session.add(reservation_3)

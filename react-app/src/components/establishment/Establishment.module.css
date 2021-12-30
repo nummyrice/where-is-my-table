@@ -15,10 +15,12 @@
     border: 5px solid white;
 }
 
-.top_bar {
+/* .top_bar {
     grid-area: top;
-}
+    background-color: #262626;
+} */
 
 .left_panel {
     grid-area: panel;
+    background-color: #262626;
 }

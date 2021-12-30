@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import style from "./Establishment.module.css";
 import { Route, Redirect } from 'react-router-dom';
 import ResSchedule from './ResSchedule'
+import TopBar from './TopBar'
 
 
 
 const Establishment = () => {
     const user = useSelector(state => state.session.user)
+    const today = new Date()
+    const [selectedDate, setSelectedDate] = useState(today)
 
     return (
        <div className={style.establishment}>
-            <div className={style.top_bar}></div>
+            <TopBar setSelectedDate={setSelectedDate}/>
             <div className={style.left_panel}></div>
-            <ResSchedule/>
+            <ResSchedule selectedDate={selectedDate}/>
        </div>
     )
 }
