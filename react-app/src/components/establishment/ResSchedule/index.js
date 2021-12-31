@@ -3,28 +3,23 @@ import style from "./ResSchedule.module.css";
 import { ReactComponent as UserIcon }from './assets/user-solid.svg'
 
 const ResSchedule =({selectedDate}) => {
-    const [availableTimes, setAvailableTimes] = useState();
+    const [availableTables, setavailableTables] = useState();
     const [reservations, setReservations] = useState();
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
     useEffect(() => {
-        // todo: startDate must be the date set by the calender component and must be prop threaded to this point
-        // const startDate = new Date('December 28, 2021 08:00:00')
-        // console.log("selected date in ResSchedule component: ", selectedDate)
-        fetch('/api/reservations', {
+        fetch('/api/reservations/today', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({"client_date": selectedDate.toISOString()})
         }).then(async (response) => {
             const data = await response.json()
-            setAvailableTimes(data.available_times)
-            setReservations(data.todays_res)
+            setavailableTables(data.availability)
+            setReservations(data.reservations)
         }).catch((e) => {
             console.error(e)
         })
     },[selectedDate])
-
-    // console.log('AVAILABLE TIMES AND RESERVATIONS OBJECTS: ', availableTimes, reservations)
 
     // SET 24 TEMPLATE COLUMNS
     const hourColumns = Array(24).fill(0).map((_, hour) => {
@@ -38,19 +33,18 @@ const ResSchedule =({selectedDate}) => {
         const scheduleColumn = {
             timeMarker: datetime,
             reservations: reservations?.filter((reservation) => {
-                const reservationDate = Date.parse(reservation.reservation_time)
+                const reservationDate = new Date(reservation.reservation_time)
                 return reservationDate >= datetime && reservationDate < hourColumns[index + 1]
             }),
-            availableTimes: availableTimes?.filter((timeslotObj, index) => {
-                const availableTime = Date.parse(timeslotObj.datetime)
-                return availableTime >= datetime && availableTime < hourColumns[index + 1]
+            availableTables: availableTables?.filter((tableTimeSlot, index) => {
+                const availableDatetime = new Date(tableTimeSlot.datetime)
+                return availableDatetime >= datetime && availableDatetime < hourColumns[index + 1]
             })
         }
         return(
             scheduleColumn
         )
     })
-
 
     console.log('MODEL ARRAY: ', resScheduleModel);
 
@@ -80,16 +74,17 @@ const ResSchedule =({selectedDate}) => {
                                 </div>
                            )
                         })}
-                        {column.availableTimes?.length > 0 && column.availableTimes.map((availableTime, index) => {
+                        {column.availableTables?.length > 0 && column.availableTables.map((availableTable, index) => {
                         return(
                             <div key={index} className={style.available_time_card}>
                                 <div className={style.available_party}>
                                     <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
                                     <div className={style.party_size}>
-                                        {availableTime.party_size}
+                                        {`${availableTable.table.min_seat} - ${availableTable.table.max_seat}`}
                                     </div>
                             </div>
                                 <div className={style.table_name}>
+                                    {availableTable.table.table_name}
                                 </div>
                             </div>
                         )

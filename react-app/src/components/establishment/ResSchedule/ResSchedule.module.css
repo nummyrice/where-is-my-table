@@ -8,6 +8,8 @@
     grid-template-areas:
     "schedule"
     "bottom";
+    overflow-y: scroll;
+
 }
 
 /* .time_scroll {
@@ -92,5 +94,7 @@
     height: 70px;
     margin: 3px;
     padding: 4px;
+    color: white;
+    font-family: sans-serif;
 
 }

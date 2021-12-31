@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_login import current_user, login_required
-from app.models import db, Reservation
+from app.models import db, Reservation, Table
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -10,40 +10,56 @@ from .auth_routes import validation_errors_to_error_messages
 
 reservation_routes = Blueprint('reservations', __name__)
 
-# query all the current reservations for that date sorted chronologically
-def get_available_times(begin_date, end_date):
-    end_date = end_date.isoformat()
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(begin_date, end_date)).all()
-    available_times = []
-    target_time = parser.isoparse(begin_date).replace(hour=0, minute=0, second=0, microsecond=0)
-    closing_time = parser.isoparse(end_date)
-    while target_time < closing_time:
-        is_available = True
-        for reservation in todays_res:
-            booked_reservation_time = reservation.reservation_time
-            if booked_reservation_time == target_time:
-                is_available = False
-                break
-        if is_available:
-            available_times.append({
-                "party_size": 4,
-                "datetime": target_time.isoformat()
-                })
-        target_time = target_time + relativedelta(hours=1)
-    print('AVAILABLE TIMES_____: ', available_times )
-    return { "available_times": available_times, "todays_res": [reservation.to_dict() for reservation in todays_res] }
+# generate table availability (accepts isodate string)
+def get_availability(client_datetime):
+    end_datetime = client_datetime + relativedelta(days=1)
+    # query the database for all reservations for 24 hour period indicated by isodate string
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_datetime)).all()
+    # query database for all tables
+    tables = db.session.query(Table).all()
+    availability = []
+    for hour in range(12, 24, 1):
+    # iterate over tables
+        for table in tables:
+        # for each table create a datetime object for each hour
+            available_time = client_datetime.replace(hour=hour)
+        # if this time does not match any reservation for a table that was already placed
+            if len(todays_res):
+                for reservation in todays_res:
+                    if not (reservation.reservation_time == available_time and reservation.table_id == table.id):
+                        available_table = {
+                            "datetime": available_time.isoformat(),
+                            "table": table.to_dict()
+                        }
+                        availability.append(available_table)
+            else:
+                available_table = {
+                            "datetime": available_time.isoformat(),
+                            "table": table.to_dict()
+                        }
+                availability.append(available_table)
+        # print('RESERVATION__________: ', availability)
+    return { "availability": availability, "reservations": [reservation.to_dict() for reservation in todays_res] }
 
-
-# GET AVAILABLE TIMES
-@reservation_routes.route('', methods=['POST'])
-def todays_available_times():
+# GET TODAYS AVAILABILITY
+@reservation_routes.route('/today', methods=['POST'])
+def todays_available_tables():
     data = request.json
-    beginning_date = data['client_date']
-    print('DATES: ', parser.isoparse(beginning_date))
-    ending_date = parser.isoparse(beginning_date) + relativedelta(days=1)
-    data = get_available_times(beginning_date, ending_date)
-    # print('RESERVATION__________: ', data['todays_res'][0])
+    client_date = parser.isoparse(data['client_date'])
+    data = get_availability(client_date)
     return data
+
+# GET WEEKS AVAILABILITY
+@reservation_routes.route('/seven-day', methods=['POST'])
+def weeks_available_tables():
+    data = request.json
+    client_date = parser.isoparse(data['client_date'])
+    seven_day_availability = []
+    for date_increase in range(6):
+        next_day = client_date + relativedelta(days=date_increase)
+        todays_tables = get_availability(next_day)
+        seven_day_availability.append({"date": next_day, 'availability': todays_tables['availability']})
+    return {'sevenDayAvailability': seven_day_availability}
 
 
 # CREATE RESERVATION TIME AND SET PENDING

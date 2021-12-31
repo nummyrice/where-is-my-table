@@ -1,0 +1,65 @@
+.modal_background {
+position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0px;
+  left: 0px;
+  /* width: 100vw;
+    height: 100vw; */
+  background-color: rgba(8, 9, 9, 0.8);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+    display: grid;
+    grid-template-columns: 180px 180px 180px 380px;
+    grid-template-rows: 40px 600px;
+    grid-template-areas:
+    ". title title x"
+    "date party time guest";
+    background-color: #dedede;
+    border-radius: 3.5px;
+}
+
+.title {
+    grid-area: title;
+    color: black;
+    font-family: sans-serif;
+    /* font-weight: bold; */
+    align-self: center;
+    justify-self: center;
+}
+
+.icon {
+    grid-area: x;
+    height: 25px;
+    color: black;
+    justify-self: end;
+    align-self: center;
+    margin-right: 8px;
+}
+
+.date {
+    grid-area: date;
+    background-color: #272a2d;
+    border-right: 1px solid black;
+}
+
+.party_size {
+    grid-area: party;
+    background-color: #272a2d;
+    border-right: 1px solid black;
+}
+
+.time {
+    grid-area: time;
+    background-color: #272a2d;
+
+}
+
+.add_guest_component {
+    grid-area: guest
+}

@@ -1,8 +1,8 @@
 """Initial migration.
 
-Revision ID: c99423e54200
+Revision ID: 14de17345ee2
 Revises: 
-Create Date: 2021-12-27 20:26:30.938128
+Create Date: 2021-12-30 17:14:25.650619
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c99423e54200'
+revision = '14de17345ee2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,6 +25,15 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
+    )
+    op.create_table('tables',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('table_name', sa.String(length=120), nullable=False),
+    sa.Column('min_seat', sa.Integer(), nullable=False),
+    sa.Column('max_seat', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('tags',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -53,11 +62,13 @@ def upgrade():
     sa.Column('guest_id', sa.Integer(), nullable=True),
     sa.Column('party_size', sa.Integer(), nullable=True),
     sa.Column('reservation_time', sa.DateTime(), nullable=True),
+    sa.Column('table_id', sa.Integer(), nullable=True),
     sa.Column('status_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['statuses.id'], ),
+    sa.ForeignKeyConstraint(['table_id'], ['tables.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('waitlist',
@@ -98,5 +109,6 @@ def downgrade():
     op.drop_table('reservations')
     op.drop_table('users')
     op.drop_table('tags')
+    op.drop_table('tables')
     op.drop_table('statuses')
     # ### end Alembic commands ###

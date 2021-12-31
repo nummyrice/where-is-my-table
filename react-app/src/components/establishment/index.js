@@ -11,6 +11,7 @@ import LeftPanel from './LeftPanel';
 const Establishment = () => {
     const user = useSelector(state => state.session.user)
     const today = new Date()
+    today.setHours(0,0,0,0)
     const [selectedDate, setSelectedDate] = useState(today)
 
     return (

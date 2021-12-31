@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import style from "./LeftPanel.module.css";
+import AddReservation from '../AddReservation';
 import { ReactComponent as WaitlistIcon } from './assets/user-clock-solid.svg';
 import { ReactComponent as BookIcon } from './assets/book-open-solid.svg';
 import { ReactComponent as LeftCaret } from './assets/caret-left-solid.svg';
 import { ReactComponent as DownCaret } from './assets/caret-down-solid.svg'
+import { getSevenDayAvailability } from '../../../store/sevenDayAvailability.js';
+
 
 
 const LeftPanel = ({selectedDate}) => {
+    const dispatch = useDispatch();
     const [viewBooked, setViewBooked] = useState(false);
     const [viewWaitlist, setViewWaitlist] = useState(false);
+    const [showMakeRes, setShowMakeRes] = useState(false);
+    const [showAddWait, setShowAddWait] = useState(false);
     return (
         <div className={style.left_panel}>
+            {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}
             <input className={style.search}></input>
             <div className={style.filter_bar}>
                 <div className={style.sort_by}>Sort By</div>
@@ -18,7 +26,10 @@ const LeftPanel = ({selectedDate}) => {
             </div>
             <div className={style.booked_bar}>
                 <div className={style.label}> Booked </div>
-                <div className={style.add_button}>
+                <div onClick={() => {
+                    setShowMakeRes(true)
+                    dispatch(getSevenDayAvailability(selectedDate))
+                    }} className={style.add_button}>
                     <BookIcon className={style.icon}/>
                     <div className={style.label}> Add </div>
                 </div>
@@ -27,7 +38,7 @@ const LeftPanel = ({selectedDate}) => {
             </div>
             <div className={style.waitlist_bar}>
                 <div className={style.label}> Waitlist </div>
-                <div className={style.add_button}>
+                <div onClick={() => {setShowAddWait(true)}} className={style.add_button}>
                     <WaitlistIcon className={style.icon}/>
                     <div className={style.label}> Add </div>
                 </div>
