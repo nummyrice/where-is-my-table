@@ -27,8 +27,9 @@ const LeftPanel = ({selectedDate}) => {
             <div className={style.booked_bar}>
                 <div className={style.label}> Booked </div>
                 <div onClick={() => {
-                    setShowMakeRes(true)
-                    dispatch(getSevenDayAvailability(selectedDate))
+                    dispatch(getSevenDayAvailability(selectedDate)).then( () => {
+                        setShowMakeRes(true)
+                    })
                     }} className={style.add_button}>
                     <BookIcon className={style.icon}/>
                     <div className={style.label}> Add </div>

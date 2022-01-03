@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     # associations
     reservations = db.relationship("Reservation", back_populates="guest", cascade="all, delete")
     waitlist = db.relationship("Waitlist", back_populates='guest', cascade="all, delete")
+    # tags = db.relationship()
 
     @property
     def password(self):
@@ -54,4 +55,5 @@ class User(db.Model, UserMixin):
             'notes': self.notes,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
+            'tags': ['test']
         }

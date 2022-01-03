@@ -42,24 +42,88 @@ position: fixed;
     margin-right: 8px;
 }
 
+/* DATE COLUMN */
 .date {
     grid-area: date;
     background-color: #272a2d;
     border-right: 1px solid black;
+    overflow-y: scroll;
+
 }
 
+.date_cell {
+    position: relative;
+    display: flex;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    color: white;
+    font-family: sans-serif;
+    height: 60px;
+    width: 180px;
+    justify-content: center;
+    align-items: center;
+}
+
+.weekday {
+    position: absolute;
+    left: 15px;
+}
+
+/* TIME COLUMN */
+.time {
+    grid-area: time;
+    background-color: #272a2d;
+    overflow-y: scroll;
+}
+
+.time_cell {
+    /* text-align: center;
+    vertical-align: middle;
+    line-height: 60px; */
+    text-align: center;
+    vertical-align: middle;
+    line-height: 30px;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    height: 60px;
+    width: 180px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.time_text {
+
+}
+
+.table {
+    text-align: center;
+    vertical-align: middle;
+    line-height: 30px;
+    text-transform:uppercase;
+    font-size: small;
+}
+
+/* PARTY COLUMN */
 .party_size {
     grid-area: party;
     background-color: #272a2d;
     border-right: 1px solid black;
+    overflow-y: scroll;
 }
 
-.time {
-    grid-area: time;
-    background-color: #272a2d;
-
+.party_cell {
+    text-align: center;
+    vertical-align: middle;
+    line-height: 60px;
+    font-family: sans-serif;
+    height: 60px;
+    width: 180px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
 }
 
+/* GUEST COLUMN */
 .add_guest_component {
     grid-area: guest
 }

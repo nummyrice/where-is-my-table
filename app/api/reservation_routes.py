@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_login import current_user, login_required
 from app.models import db, Reservation, Table
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
 from app.forms import ReservationForm, EditReservationForm
