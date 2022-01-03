@@ -4,8 +4,11 @@ import style from "./AddGuest.module.css";
 import {ReactComponent as CheckCircle} from './assets/check-circle-solid.svg';
 import {ReactComponent as Circle} from  './assets/circle-regular.svg';
 import {ReactComponent as EditIcon} from './assets/edit-regular.svg';
+// import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
+// import validator from 'validator';
 
-const AddGuest = () => {
+const AddGuest = ({selectDateIndex, selectTimeIndex, partySize}) => {
+    const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
     const [selectedGuest, setSelectedGuest] = useState();
@@ -19,11 +22,21 @@ const AddGuest = () => {
     const [editTagsField, setEditTagsField] = useState(false);
 
     // controlled inputs
-    const [name, setName] = useState();
-    const [tags, setTags] = useState();
-    const [notes, setNotes] = useState();
-    const [phoneNumber, setPhoneNumber] = useState();
-    const [email, setEmail] = useState();
+    const [name, setName] = useState('');
+    const [tags, setTags] = useState('');
+    const [notes, setNotes] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
+
+    // errors
+    const [errors, setErrors] = useState([]);
+
+    // confirm modal
+    const [showModal, setShowModal] = useState(false);
+
+    console.log('DATE INDEX : ', selectDateIndex)
+    console.log('TIME INDEX : ', selectTimeIndex)
+    console.log('PARTY: ', partySize)
 
     const handleSearch =  useCallback(async () => {
         const response = await fetch('/api/guests', {
@@ -43,6 +56,98 @@ const AddGuest = () => {
     const handleNameSelect = (guest) => {
         setSelectedGuest(guest)
         setSearchInput(guest.name)
+    }
+
+    // new guest validate
+    const validateNewGuest = () => {
+        const errors = [];
+        if (!selectedGuest && !name) {
+            let trimmedName = name.trim();
+            if (trimmedName.length > 40 || trimmedName.length < 1) errors.push("name must be greater than one and less than forty characters");
+        };
+        if (!selectedGuest && !tags) {
+            const tagArray = tags.split('');
+            if (tagArray.some((tag) => {
+                let trimmedTag = tag.trim()
+                return trimmedTag.length > 40
+            })) {
+                errors.push("individual tags must be less than forty characters and seperated by spaces")
+            };
+        };
+        if (!selectedGuest && !notes) {
+            let trimmedNotes = notes.trim();
+            if (trimmedNotes.length > 500) errors.push("notes must be less than five-hundred characters");
+        };
+        if (!selectedGuest && !phoneNumber) {
+            let trimmedPhone = phoneNumber.replace(/\D/g,'');
+            if (trimmedPhone.length < 10 || trimmedPhone.length > 11) errors.push("phone numbers must only include numbers and must be include area code");
+        };
+        if (!selectedGuest && !email) {
+            if (!String(email)
+            .toLowerCase()
+            .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            )) {
+                errors.push("email must follow standard format")
+            }
+        };
+        console.log(errors);
+        return errors;
+    }
+
+
+    // guest update validate
+    const validateGuestUpdate = () => {
+        const errors = [];
+        if (selectedGuest && editNameField) {
+            let trimmedName = name.trim();
+        if (trimmedName.length > 40 || trimmedName.length < 1) errors.push("name must be greater than one and less than forty characters");
+        };
+        if (selectedGuest && editTagsField) {
+            const tagArray = tags.split('');
+        if (tagArray.some((tag) => {
+            let trimmedTag = tag.trim()
+            return trimmedTag.length > 40
+        })) {
+            errors.push("individual tags must be less than forty characters and seperated by spaces")
+        };
+        };
+        if (selectedGuest && editNotesField) {
+            let trimmedNotes = notes.trim();
+        if (trimmedNotes.length > 500) errors.push("notes must be less than five-hundred characters");
+        };
+        if (selectedGuest && editNumberField) {
+            let trimmedPhone = phoneNumber.replace(/\D/g,'');
+            if (trimmedPhone.length < 10 || trimmedPhone.length > 11) errors.push("phone numbers must only include numbers and must be include area code");
+        };
+        if (selectedGuest && editEmailField) {
+            if (!String(email)
+        .toLowerCase()
+        .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )) {
+            errors.push("email must follow standard format")
+        };
+        };
+        return errors;
+    }
+
+    const validateDate = () => {
+        const errors = [];
+        if (new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() < new Date().getTime()) errors.push("reservation time has already passed, please adjust your date and/or time")
+        return errors;
+    }
+    const validateNameAndPhone = () => {
+        const errors = [];
+        let trimmedName = name.trim();
+        if (trimmedName.length > 40 || trimmedName.length < 1) errors.push("name must be greater than one and less than forty characters");
+        let trimmedPhone = phoneNumber.replace(/\D/g,'');
+        if (trimmedPhone.length < 10 || trimmedPhone.length > 11) errors.push("phone numbers must only include numbers and must be include area code");
+        return errors.length < 1
+    }
+
+    const handleSubmit = () => {
+
     }
     return(
         <div className={style.add_guest}>
@@ -129,9 +234,9 @@ const AddGuest = () => {
                                         </>
                                     )
                                 })}</div>
-                                <input className={style.tag_input}></input>
+                                <input  value={tags} placeholder={"enter tags seperated by a space"} onChange={(e)=>{setTags(e.target.value)}} className={style.tag_input}></input>
                             </>}
-                            {!selectedGuest &&<input className={style.tag_input}></input>}
+                            {!selectedGuest &&<input value={tags} onChange={(e)=>{setTags(e.target.value)}} placeholder={"enter tags seperated by a space"} className={style.tag_input}></input>}
                         </div>
                         <div className={style.notes_block}>
                             <label>NOTES</label>
@@ -147,7 +252,7 @@ const AddGuest = () => {
                             <>
                                 <input onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input}></input>
                             </>}
-                            {!selectedGuest  && <input onChange={(e) => {setName(e.target.value)}} value={notes} className={style.notes_input}></input>}
+                            {!selectedGuest  && <input onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input}></input>}
                         </div>
                         <div className={style.contact_label}>Contact Info</div>
                         <div className={style.phone_block}>
@@ -185,8 +290,47 @@ const AddGuest = () => {
                     </div>
 
                 </form>}
-                {selectedGuest  && <div  onClick={() => { console.log('clicked on reserve a table')}} className={style.place_reservation_button}>{'Reserve Table'}</div>}
-                {!selectedGuest && <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>}
+                {(selectedGuest || validateNameAndPhone()) && <div  onClick={() => {
+                    const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate());
+                    setErrors(errors);
+                    setShowModal(true);
+                    }} className={style.place_reservation_button}>{'Reserve Table'}</div>}
+                {(!selectedGuest && !validateNameAndPhone()) && <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>}
+                {showModal && <div className={style.modal_background}>
+                        <div className={style.error_submission_modal}>
+                            <div className={style.title_bar}>{errors.length < 1 ? "Confirm Reservation" : "It seems there is an issue..."}</div>
+                            {!errors.length && <ul className={style.reservation_details}>
+                                <li>Your reservation:</li>
+                                <li>{`${partySize} ${partySize === 1 ? 'Guest' : 'Guests'}`}</li>
+                                <li>{`at ${new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}`}</li>
+                                <li>{`on ${new Date(sevenDayAvailability[selectDateIndex].date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}`}</li>
+                                <li> {`for ${selectedGuest ? selectedGuest.name : name}`}</li>
+                                </ul>}
+                            {errors.length && <div className={style.errors}>
+                                <div className={style.error_message}></div>
+                                {errors.map((error)=>{
+                                    return(
+                                        <>
+                                        <div className={style.error_description}>{error}</div>
+                                        </>
+                                    )
+                                })}
+                                </div>}
+                                {!errors.length && <div className={style.button_area}>
+                                <div onClick={()=>{
+                                        handleSubmit()
+                                        }} className={style.confirm_button}>Confirm Reservation</div>
+                                <div onClick={()=>{
+                                        setShowModal(false)
+                                        setErrors([])}} className={style.return_button}>Return</div>
+                                    </div>}
+                            {errors.length && <div className={style.button_area}>
+                                    <div onClick={()=>{
+                                        setShowModal(false)
+                                        setErrors([])}} className={style.return_button}>Return</div>
+                                </div>}
+                        </div>
+                    </div>}
             </div>
         </div>
     )

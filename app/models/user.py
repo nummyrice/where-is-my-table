@@ -55,5 +55,5 @@ class User(db.Model, UserMixin):
             'notes': self.notes,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'tags': ['test']
+            'tags': [{"tag_id": 2, "name": "test"}]
         }

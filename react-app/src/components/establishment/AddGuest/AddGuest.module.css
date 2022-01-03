@@ -227,6 +227,7 @@
 }
 .tag_input {
     margin-left: 10px;
+    width: 240px;
 }
 
 .notes_block {
@@ -332,3 +333,112 @@ margin-left: 10px;
     margin-left: auto;
     margin-right: 8px;
 }
+
+
+/* MODAL*/
+.modal_background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    left: 0px;
+    /* width: 100vw;
+        height: 100vw; */
+    background-color: rgba(8, 9, 9, 0.8);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error_submission_modal {
+    background-color: #272a2d;
+    height: 400px;
+    width: 700px;
+    display: grid;
+    grid-template-columns: 350px 350px;
+    grid-template-rows: 40px 100px 400px;
+    grid-template-areas:
+    "bar bar"
+    "description description"
+    "buttons buttons";
+    border-radius: 2px;
+    font-family: sans-serif;
+}
+
+.title_bar{
+    grid-area: bar;
+    text-align: center;
+    font-family: sans-serif;
+    vertical-align: middle;
+    line-height: 40px;
+    background-color: #dedede;
+    color: black;
+
+}
+
+.reservation_details {
+    grid-area: description;
+    height: 200px;
+    width: 400px;
+    background-color: grey;
+    justify-self: center;
+    border-radius: 2px;
+    margin-top: 30px;
+    text-align: center;
+    font-size: 22px;
+}
+.button_area {
+    grid-area: buttons;
+    align-self: center;
+    justify-self: center;
+}
+.return_button {
+    color: #333;
+    border: 1px solid grey;
+    border-bottom: 5px solid grey;
+    background-color: #fff;
+    font-size: 12px;
+    margin: 5px;
+    padding: 1px 7px 1px 7px;
+    display: inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    position: relative;
+    top: 0px;
+}
+
+.confirm_button {
+    color: #333;
+    border: 1px solid #55b68a;
+    border-bottom: 5px solid #55b68a;
+    background-color: #fff;
+    font-size: 12px;
+    margin: 5px;
+    padding: 1px 7px 1px 7px;
+    display: inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    position: relative;
+    top: 0px;
+}
+
+.confirm_button:hover,
+.return_button:hover{
+    cursor: hand;
+    cursor: pointer;
+    }
+
+.confirm_button:active,
+.return_button:hover{
+    border-bottom: 3px solid #999;
+    top: 3px;
+    }
