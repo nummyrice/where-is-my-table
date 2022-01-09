@@ -27,6 +27,7 @@ class Reservation(db.Model):
             "id": self.id,
             "guest_id": self.guest_id,
             "guest": self.guest.name,
+            "guest_info": self.guest.to_safe_dict(),
             "party_size": self.party_size,
             "reservation_time": self.reservation_time.isoformat(),
             "table_id": self.table_id,

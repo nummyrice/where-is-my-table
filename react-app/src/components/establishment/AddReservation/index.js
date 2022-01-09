@@ -4,13 +4,11 @@ import style from './AddReservation.module.css';
 import {ReactComponent as X} from './assets/times-solid.svg';
 import AddGuest from '../AddGuest';
 
-const AddReservation = ({setShowMakeRes}) => {
+const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) => {
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [selectDateIndex, setselectDateIndex] = useState(0)
     const [selectTimeIndex, setselectTimeIndex] = useState(0)
     const [partySize, setPartySize] = useState(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.max_seat)
-
-
 
     // RETURNS ARRAY OF GUEST NUM FOR TABLE
     const tableCapacity = (function getCapacity() {
@@ -23,12 +21,13 @@ const AddReservation = ({setShowMakeRes}) => {
         return guestNum;
     })()
 
-
     return (
         <div className={style.modal_background}>
             <div className={style.modal}>
-                <div className={style.title}>Make a Reservation</div>
-                <X onClick={() => {setShowMakeRes(false)}} className={style.icon}/>
+                {!editReservation && <div className={style.title}>Make a Reservation</div>}
+                {editReservation && <div className={style.title}>{`Edit Reservation: ${new Date(editReservation.reservation_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} ${new Date(editReservation.reservation_time).toLocaleDateString()}`}</div>}
+                {editReservation && <X onClick={() => {setEditReservation('')}} className={style.icon}/>}
+                {!editReservation && <X onClick={() => {setShowMakeRes(false)}} className={style.icon}/>}
                 <div className={style.date}>
                     <div className={style.top_scroll_space}></div>
                 {sevenDayAvailability && sevenDayAvailability.map((day, index) => {
@@ -80,7 +79,7 @@ const AddReservation = ({setShowMakeRes}) => {
                     })}
                     <div className={style.bottom_scroll_space}></div>
                 </div>
-                <AddGuest selectDateIndex={selectDateIndex} selectTimeIndex={selectTimeIndex} partySize={partySize}/>
+                <AddGuest editReservation={editReservation} setEditReservation={setEditReservation} setShowMakeRes={setShowMakeRes} selectDateIndex={selectDateIndex} selectTimeIndex={selectTimeIndex} partySize={partySize}/>
             </div>
         </div>
     )

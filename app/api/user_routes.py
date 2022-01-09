@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required
 from app.models import db, User
-from app.forms import GuestForm, EditUserForm
+from app.forms import UpdateGuestForm, EditUserForm
 from .auth_routes import validation_errors_to_error_messages
 
 
@@ -26,7 +26,7 @@ def user(id):
 #ADD GUEST
 @user_routes.route('/add-guest', methods=['POST'])
 def add_guest():
-    form = GuestForm()
+    form = UpdateGuestForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
         # create user

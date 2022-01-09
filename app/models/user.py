@@ -11,7 +11,7 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
-    email = db.Column(db.String(255), unique=True)
+    email = db.Column(db.String(255))
     phone_number = db.Column(db.String(255), nullable=False, unique=True)
     notes = db.Column(db.Text)
     hashed_password = db.Column(db.String(255))
@@ -54,6 +54,5 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'created_at': self.created_at,
-            'updated_at': self.updated_at,
-            'tags': [{"tag_id": 2, "name": "test"}]
+            'updated_at': self.updated_at
         }

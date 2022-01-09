@@ -160,25 +160,24 @@
 }
 
 .form_title {
-    height: 50px;
+    height: 40px;
     font-family: sans-serif;
     background-color: #f6f6f6;
     color: #979797;
     width: 380px;
     text-align: center;
     vertical-align: middle;
-    line-height: 50px;
+    line-height: 40px;
 }
 
 .details_inputs {
     width: 350px;
-    height: 350px;
+    height: 270px;
     display: flex;
     flex-direction: column;
     background-color: white;
     font-family: sans-serif;
     border: 2px solid rgb(169, 169, 169);
-
 }
 
 .details_inputs label {
@@ -187,7 +186,7 @@
 
 .name_block {
     width: 350px;
-    height: 80px;
+    height: 60px;
     display: flex;
     align-items: center;
 
@@ -204,37 +203,18 @@
 .guest_name,
 .guest_notes,
 .guest_email,
-.guest_phone,
-.guest_tag {
+.guest_phone {
     color: #979797;
     margin-left: 20px;
 }
-.tags_block {
+
+
+.notes_block {
     width: 346px;
     height: 100px;
     display: flex;
     align-items: center;
     background-color: #f7f7f7;
-}
-
-.tags_block label {
-    margin-left: 20px;
-}
-
-.guest_tag {
-    color: #979797;
-
-}
-.tag_input {
-    margin-left: 10px;
-    width: 240px;
-}
-
-.notes_block {
-    width: 350px;
-    height: 150px;
-    display: flex;
-    align-items: center;
 }
 
 .notes_block label {
@@ -244,7 +224,7 @@
 .notes_input {
     margin-left: 10px;
     width: 250px;
-    height: 80px;
+    height: 60px;
 }
 
 .guest_notes {
@@ -256,27 +236,28 @@
 
 .contact_label {
     width: 350px;
-    height: 40px;
+    height: 30px;
     color: black;
     text-align: center;
     vertical-align: middle;
-    line-height: 50px;
+    line-height: 30px;
     border-top: 2px solid rgb(169, 169, 169);
     /* padding: 10px; */
 }
 
 .phone_block {
-    width: 350px;
-    height: 80px;
+    width: 346px;
+    height: 60px;
     display: flex;
     align-items: center;
+    background-color: #f7f7f7;
 
 
 
 }
 
 .phone_block label {
-margin-left: 10px;
+    margin-left: 10px;
 }
 
 .phone_input {
@@ -285,7 +266,7 @@ margin-left: 10px;
 
 .email_block {
     width: 350px;
-    height: 80px;
+    height: 60px;
     display: flex;
     align-items: center;
 
@@ -297,6 +278,50 @@ margin-left: 10px;
 
 .email_input {
     margin-left: 10px;
+}
+
+.tag_section {
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    align-items: center;
+
+}
+
+.tag_section_title {
+    height: 40px;
+    font-family: sans-serif;
+    background-color: #f6f6f6;
+    color: #979797;
+    width: 380px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 40px;
+}
+
+.tags_block {
+    width: 346px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background-color: #f7f7f7;
+    border: 2px solid rgb(169, 169, 169);
+
+}
+
+.tags_block label {
+    margin-left: 10px;
+    color: black;
+
+}
+
+.guest_tag {
+    color: #979797;
+
+}
+.tag_input {
+    margin-left: 10px;
+    width: 240px;
 }
 
 /* PLACE RESERVATION BUTTON */

@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
-from app.forms import ReservationForm, EditReservationForm
+from app.forms import ReservationForm, UpdateReservationForm
 from .auth_routes import validation_errors_to_error_messages
 
 reservation_routes = Blueprint('reservations', __name__)
@@ -13,16 +13,18 @@ reservation_routes = Blueprint('reservations', __name__)
 # generate table availability (accepts isodate string)
 def get_availability(client_datetime):
     end_datetime = client_datetime + relativedelta(days=1)
+    print('RANGE DATETIME: ', client_datetime, end_datetime)
     # query the database for all reservations for 24 hour period indicated by isodate string
     todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_datetime)).all()
     # query database for all tables
     tables = db.session.query(Table).all()
     availability = []
-    for hour in range(12, 24, 1):
+    available_time = client_datetime + relativedelta(hours=7)
+    for hour in range(13):
     # iterate over tables
-        for table in tables:
         # for each table create a datetime object for each hour
-            available_time = client_datetime.replace(hour=hour)
+        available_time = available_time + relativedelta(hours=1)
+        for table in tables:
         # if this time does not match any reservation for a table that was already placed
             if len(todays_res):
                 for reservation in todays_res:
@@ -38,7 +40,6 @@ def get_availability(client_datetime):
                             "table": table.to_dict()
                         }
                 availability.append(available_table)
-        # print('RESERVATION__________: ', availability)
     return { "availability": availability, "reservations": [reservation.to_dict() for reservation in todays_res] }
 
 # GET TODAYS AVAILABILITY
@@ -92,7 +93,7 @@ def reservation_lock():
 
 
 # SUBMIT RESERVATION
-@reservation_routes.route('/submit', methods=['POST'])
+@reservation_routes.route('/new', methods=['POST'])
 def reservation_submit():
     # call new message form
     form = ReservationForm()
@@ -100,37 +101,41 @@ def reservation_submit():
     form['csrf_token'].data = request.cookies['csrf_token']
     # if validate on submit
     if form.validate_on_submit():
-        reservation_time = form.data['reservation_time']
+        reservation_time = parser.parse(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time).one_or_none()
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
             if reservation_exists.status_id == 2 and (pending_status.total_seconds() / 60) < 10 and reservation_exists.guest_id != form.data['guest_id']:
-                return {"result": "time unavailable"}, 400
+                return {"errors": ["time unavailable, please choose a different time"]}, 400
             elif (reservation_exists.status == 2 and (pending_status.total_seconds() / 60) > 10) or (reservation_exists.status == 2 and (pending_status.total_seconds() / 60) > 10 and reservation_exists.guest_id == form.data['guest_id']):
                 reservation_exists['guest_id'] = form.data['guest_id']
                 reservation_exists['status_id'] = 3
                 reservation_exists['party_size'] = form.data['party_size']
+                reservation_exists['table_id'] = form.data['table_id']
                 db.session.commit()
                 return {'result': "succesfully reserved"}, 200
+            else:
+                return {"errors": ["time unavailable, please choose a different time"]}, 400
         else:
             reservation = Reservation(
                     guest_id = form.data['guest_id'],
                     party_size = form.data['party_size'],
                     status_id = 3,
                     reservation_time = reservation_time,
+                    table_id = form.data['table_id']
                 )
             db.session.add(reservation)
             db.session.commit()
-            return {'result': "successfully reserved"}, 201
+            return {'result': "successfully reserved", 'newReservation': reservation.to_dict()}, 201
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 
-# EDIT RESERVATION
-@reservation_routes.route('/edit', methods=['PUT'])
+# UPDATE RESERVATION
+@reservation_routes.route('/update', methods=['PUT'])
 def edit_reservation():
-    form = EditReservationForm()
+    form = UpdateReservationForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
         reservation_time = parser.isoparse(form.data['reservation_time'])
@@ -140,13 +145,14 @@ def edit_reservation():
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
         if not reservation_exists or reservation_exists and reservation_exists.status_id == 2 and (pending_status / 60) > 10:
-            res_to_edit = db.session.query(Reservation).get(form.data['id'])
+            res_to_edit = db.session.query(Reservation).get(form.data['reservation_id'])
             res_to_edit.guest_id = form.data['guest_id']
             res_to_edit.party_size = form.data['party_size']
             res_to_edit.reservation_time = reservation_time
+            res_to_edit.table_id = form.data['table_id']
             db.session.commit()
             return {"result": "successfully updated"}
-        return {'result': "reservation already exists for this time"}
+        return {'errors': ["reservation already exists for this time"]}, 400
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
