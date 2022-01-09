@@ -1,0 +1,204 @@
+/* RES SCHEDULE*/
+
+.res_schedule {
+    grid-area: schedule;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 1fr 30px;
+    grid-template-areas:
+    "schedule"
+    "bottom";
+    overflow-y: scroll;
+
+}
+
+/* .time_scroll {
+    grid-area: time;
+} */
+
+.schedule_scroll {
+    grid-area: schedule;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    overflow-x: scroll;
+    /* height: 100%; */
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    /* height: 100%; */
+    /* position: relative; */
+    /* flex-grow: 100; */
+    position: relative;
+
+}
+
+.column_time {
+    font-family: sans-serif;
+    width: 100px;
+    text-align: center;
+}
+
+.booked_reservation_card {
+    background-color: #5394cd;
+    /* padding: 5px; */
+    width: 100px;
+    /* height: 500px; */
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    margin: 3px;
+    color: black;
+    padding: 4px;
+    border: 2px solid white;
+    align-self: stretch;
+
+}
+
+.guest {
+
+}
+
+.table_name {
+
+}
+
+.footer_options {
+    grid-area: bottom;
+
+}
+
+.booked_party {
+    display: flex;
+    align-items: center;
+}
+
+/* .booked_party * {
+    color: black;
+} */
+
+.booked_party .party_size_icon {
+    color: black;
+}
+
+.available_party {
+    display: flex;
+    align-items: center;
+
+}
+
+.party_size_icon{
+    height: 10px;
+    /* width: 5px; */
+    margin: 3px;
+    color: white;
+}
+
+.guest {
+
+}
+.table_name {
+
+}
+
+.available_time_card {
+    border: 2px solid white;
+    width: 100px;
+    height: 400px;
+    margin: 3px;
+    padding: 4px;
+    color: white;
+    font-family: sans-serif;
+
+}
+
+/* HOVER INFO */
+.booked_hover_info_card {
+    visibility: hidden;
+
+}
+
+.booked_reservation_card:hover + .booked_hover_info_card,
+.booked_hover_info_card:hover{
+    visibility: visible;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 500px;
+    background-color: #434343;
+    position: absolute;
+    left: 103px;
+    z-index: 100;
+    font-family: sans-serif;
+}
+
+.hover_table_title {
+    align-self: center;
+    text-transform: uppercase;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    vertical-align: middle;
+
+}
+
+.table_details {
+    margin: 0px 20px 0px 20px;
+    background-color: #e9e9e9;
+    padding: 10px;
+    color: black;
+}
+
+.hover_guest_title {
+    align-self: center;
+    text-transform: uppercase;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    vertical-align: middle;
+
+}
+
+.guest_details {
+    margin: 0px 20px 0px 20px;
+    background-color: #e9e9e9;
+    padding: 10px;
+    color: black;
+}
+
+.edit_reservation_button {
+    color: #333;
+    border: 3px solid #55b68a;
+    border-bottom: 10px solid #55b68a;
+    background-color: #fff;
+    font-size: 18px;
+    padding: 1px 7px 1px 7px;
+    display: inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    position: relative;
+    top: 0px;
+    margin: 20px;
+    width: 100px;
+    align-self: center;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.edit_reservation_button:hover{
+    cursor: hand;
+    cursor: pointer;
+    }
+
+.edit_reservation_button:active{
+    border-bottom: 3px solid #999;
+    top: 3px;
+    margin-bottom: 27px;
+    }

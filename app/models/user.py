@@ -11,7 +11,7 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
-    email = db.Column(db.String(255), unique=True)
+    email = db.Column(db.String(255))
     phone_number = db.Column(db.String(255), nullable=False, unique=True)
     notes = db.Column(db.Text)
     hashed_password = db.Column(db.String(255))
@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     # associations
     reservations = db.relationship("Reservation", back_populates="guest", cascade="all, delete")
     waitlist = db.relationship("Waitlist", back_populates='guest', cascade="all, delete")
+    # tags = db.relationship()
 
     @property
     def password(self):
@@ -41,6 +42,17 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'hashed_password': self.hashed_password,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
+
+    def to_safe_dict(self):
+        return {
+            "id": self.id,
+            'name': self.name,
+            'email': self.email,
+            'phone_number': self.phone_number,
+            'notes': self.notes,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

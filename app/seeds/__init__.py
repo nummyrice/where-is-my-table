@@ -5,6 +5,7 @@ from .tags import seed_tags, undo_tags
 from .reservations import seed_reservations, undo_reservations
 from .waitlist import seed_waitlist, undo_waitlist
 from .join_tags import seed_tagged_reservations, seed_tagged_waitlist, undo_tagged_reservations, undo_tagged_waitlist
+from .tables import seed_tables, undo_seed_tables
 
 # Creates a seed group to hold our commands
 # So we can type `flask seed --help`
@@ -14,6 +15,7 @@ seed_commands = AppGroup('seed')
 # Creates the `flask seed all` command
 @seed_commands.command('all')
 def seed():
+    seed_tables()
     seed_users()
     seed_statuses()
     seed_tags()
@@ -28,6 +30,7 @@ def seed():
 # Creates the `flask seed undo` command
 @seed_commands.command('undo')
 def undo():
+    undo_seed_tables()
     undo_users()
     undo_statuses()
     undo_tags()

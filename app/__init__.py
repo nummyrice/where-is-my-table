@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -9,6 +10,8 @@ from .models import db, User, Reservation
 from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
 from .api.reservation_routes import reservation_routes
+from .api.guest_routes import guest_routes
+from .api.tag_routes import tag_routes
 
 from .seeds import seed_commands
 
@@ -33,6 +36,8 @@ app.config.from_object(Config)
 app.register_blueprint(user_routes, url_prefix='/api/users')
 app.register_blueprint(auth_routes, url_prefix='/api/auth')
 app.register_blueprint(reservation_routes, url_prefix='/api/reservations')
+app.register_blueprint(guest_routes, url_prefix='/api/guests')
+app.register_blueprint(tag_routes, url_prefix='/api/tags')
 
 db.init_app(app)
 Migrate(app, db)

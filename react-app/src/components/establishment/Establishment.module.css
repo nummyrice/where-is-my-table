@@ -1,0 +1,26 @@
+/*ESTABLISHMENT*/
+.establishment {
+    background-color: black;
+    height: 100vh;
+    width: 100vw;
+    display:grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas:
+    "top top"
+    "panel schedule"
+}
+
+.top_bar .left_panel .schedule {
+    border: 5px solid white;
+}
+
+/* .top_bar {
+    grid-area: top;
+    background-color: #262626;
+} */
+
+/* .left_panel {
+    grid-area: panel;
+    background-color: #262626;
+} */

@@ -19,8 +19,6 @@ class Tag(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "waitlist_id": self.waitlist_id,
-            "reservation_id": self.reservation_id,
             'created_at': self.created_at,
             'updated_at': self.updated_at
 
