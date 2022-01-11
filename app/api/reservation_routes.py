@@ -102,7 +102,7 @@ def reservation_submit():
     # if validate on submit
     if form.validate_on_submit():
         reservation_time = parser.parse(form.data['reservation_time'])
-        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time).one_or_none()
+        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
@@ -139,7 +139,7 @@ def edit_reservation():
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
         reservation_time = parser.isoparse(form.data['reservation_time'])
-        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time).one_or_none()
+        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
         pending_status = None
         if reservation_exists:
             res_updated_at = reservation_exists.updated_at
@@ -155,6 +155,18 @@ def edit_reservation():
         return {'errors': ["reservation already exists for this time"]}, 400
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
+
+# UPDATE RESERVATION STATUS
+@reservation_routes.route('/status/update', methods=['PUT'])
+def edit_status():
+    data = request.json
+    try:
+        reservation = db.session.query(Reservation).get(data['reservation_id'])
+        reservation.status_id = data['status_id']
+        db.session.commit()
+        return {"result": "successfully updated reservation status", "reservation": reservation.to_dict()}
+    except:
+        return {"errors": "there was a server error updating the reservation status"}
 
 
 # DELETE RESERVATION

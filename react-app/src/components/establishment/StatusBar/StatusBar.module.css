@@ -1,0 +1,57 @@
+.status_bar {
+    background-color: white;
+    display: flex;
+    height: 80px;
+    border: 2px solid grey;
+}
+.status_bar > div {
+    width: 70px;
+    border: 1px solid #dbdbdb;
+    justify-content: center;
+    /* align-items: center;
+    line-height: 30px;
+    align-content: middle; */
+
+}
+
+.status_bar > div:hover, .status_bar > div:hover > .txt {
+    cursor: pointer;
+    background-color: black;
+    color: white;
+}
+
+.txt {
+    font-size: 50%;
+    margin-left: 10%;
+}
+
+.status_reserved > .icon,
+.status_lm > .icon{
+    color: #5493cd;
+}
+
+.status_ps > .icon,
+.status_s > .icon {
+    color: #10bc35;
+}
+
+.status_ca > .icon,
+.status_late > .icon {
+    color: #ee4266;
+}
+
+.status_a > .icon,
+.status_pa > .icon {
+    color: #ffd23f;
+}
+
+.icon {
+    height: 50%;
+    margin-left: 10%;
+    margin-top: 4%;
+}
+
+.selected, .selected > .txt {
+    background-color: black;
+    color: white;
+}
