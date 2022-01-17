@@ -4,16 +4,19 @@ fake = Faker()
 
 # Adds a demo user, you can add other users here if you want
 def seed_users():
-    demo = User(
-        name='Demo', email='demo@aa.io', phone_number='555-555-5555', notes='loves to order dessert, always comes on Sunday', password='password1')
+    establishment_demo = User(
+        name='Restaurant', email='establishment_demo@aa.io', phone_number='5555555555', notes='loves to order dessert, always comes on Sunday', password='password1')
     marnie = User(
-        name='marnie', email='marnie@aa.io', phone_number='777-777-7777', notes='allergy to shellfish, notify the manager', password='password2')
+        name='marnie', email='marnie@aa.io', phone_number='7777777777', notes='allergy to shellfish, notify the manager', password='password2')
     bobbie = User(
-        name='bobbie', email='bobbie@aa.io', phone_number='999-999-9999', notes='hard of hearing; must sit somewhere quiet', password='password3')
+        name='bobbie', email='bobbie@aa.io', phone_number='9999999999', notes='hard of hearing; must sit somewhere quiet', password='password3')
+    guest_demo = User(
+        name='DemoGuest', email='guest_demo@aa.io', phone_number='6666666666', notes='great guest; please give complimentary appetizer each visit', password='password4')
 
-    db.session.add(demo)
+    db.session.add(establishment_demo)
     db.session.add(marnie)
     db.session.add(bobbie)
+    db.session.add(guest_demo)
 
     db.session.commit()
 
@@ -21,7 +24,7 @@ def seed_users():
         additional_User = User(
             name= f"{fake.first_name()}{x}",
             email = f"{x}{fake.profile()['mail']}",
-            phone_number = fake.phone_number(),
+            phone_number = fake.msisdn()[3:],
             notes = fake.paragraph(nb_sentences=3),
             hashed_password = f"password{x}",
         )

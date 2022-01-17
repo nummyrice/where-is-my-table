@@ -26,14 +26,18 @@ def get_availability(client_datetime):
         available_time = available_time + relativedelta(hours=1)
         for table in tables:
         # if this time does not match any reservation for a table that was already placed
+            table_available = True
             if len(todays_res):
                 for reservation in todays_res:
-                    if not (reservation.reservation_time == available_time and reservation.table_id == table.id):
+                    if reservation.reservation_time == available_time and reservation.table_id == table.id:
+                        table_available = False
+                if table_available:
                         available_table = {
                             "datetime": available_time.isoformat(),
                             "table": table.to_dict()
                         }
                         availability.append(available_table)
+
             else:
                 available_table = {
                             "datetime": available_time.isoformat(),

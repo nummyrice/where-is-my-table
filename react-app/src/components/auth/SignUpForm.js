@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 import { signUp } from '../../store/session';
+import style from './auth.module.css';
 
 const SignUpForm = () => {
   const [errors, setErrors] = useState([]);
@@ -9,6 +10,7 @@ const SignUpForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
+  const [phone, setPhone] = useState('');
   const user = useSelector(state => state.session.user);
   const dispatch = useDispatch();
 
@@ -38,22 +40,26 @@ const SignUpForm = () => {
     setRepeatPassword(e.target.value);
   };
 
+  const updatePhone = (e) => {
+    setPhone(e.target.value)
+  }
+
   if (user) {
     return <Redirect to='/' />;
   }
 
   return (
-    <form onSubmit={onSignUp}>
+    <form id={style.signup_block} onSubmit={onSignUp}>
       <div>
         {errors.map((error, ind) => (
           <div key={ind}>{error}</div>
         ))}
       </div>
       <div>
-        <label>User Name</label>
+        <label>Name</label>
         <input
           type='text'
-          name='username'
+          name='name'
           onChange={updateUsername}
           value={username}
         ></input>
@@ -65,6 +71,15 @@ const SignUpForm = () => {
           name='email'
           onChange={updateEmail}
           value={email}
+        ></input>
+      </div>
+      <div>
+        <label>Phone Number</label>
+        <input
+          type='tel'
+          name='phone_number'
+          onChange={updatePhone}
+          value={phone}
         ></input>
       </div>
       <div>
