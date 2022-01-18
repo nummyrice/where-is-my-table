@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField
 from wtforms.validators import DataRequired, ValidationError, Length, Optional
 from app.models import User, db
-from .signup_form import user_exists, username_exists, phone_num_exists, validate_phone
+from .signup_form import user_exists, username_exists, phone_num_exists
 from sqlalchemy.exc import SQLAlchemyError
 
 def confirm_guest_exists(form, field):
