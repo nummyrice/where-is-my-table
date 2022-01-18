@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext} from 'react';
 import { EstablishmentContext } from '..';
+import Settings from '../Settings';
 import style from './TopBar.module.css';
-import { ReactComponent as Settings } from './assets/cogs-solid.svg';
+import { ReactComponent as SettingsIcon } from './assets/cogs-solid.svg';
 import { ReactComponent as RightArrow } from './assets/arrow-right-solid.svg';
 import { ReactComponent as LeftArrow } from './assets/arrow-left-solid.svg';
 import { ReactComponent as Calendar } from './assets/calendar-check-regular.svg';
@@ -10,8 +11,9 @@ import 'react-dates/lib/css/_datepicker.css';
 import moment from 'moment';
 
 const TopBar = () => {
-    const [showDatePicker, setShowDatePicker] = useState(false)
-    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext)
+    const [showPanel, setShowPanel] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
     return(
         <div className={style.top_bar}>
             <div className={style.restaurant_title}>{'Village Baker'}</div>
@@ -40,7 +42,9 @@ const TopBar = () => {
                     setSelectedDate(yesterday)
                 }} className={style.forward_date}/>
             </div>
-            <Settings className={style.establishment_settings}/>
+            <SettingsIcon onClick={()=>setShowPanel(!showPanel)} className={style.establishment_settings}/>
+            {showPanel &&
+            <Settings/>}
         </div>
     )
 }

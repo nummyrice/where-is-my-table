@@ -26,7 +26,7 @@ def seed_users():
             email = f"{x}{fake.profile()['mail']}",
             phone_number = fake.msisdn()[3:],
             notes = fake.paragraph(nb_sentences=3),
-            hashed_password = f"password{x}",
+            password = f"password{x}",
         )
         db.session.add(additional_User)
 

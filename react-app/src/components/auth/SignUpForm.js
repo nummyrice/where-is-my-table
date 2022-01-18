@@ -1,31 +1,50 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect } from 'react-router-dom';
-import { signUp } from '../../store/session';
+import { signUp, claimUser } from '../../store/session';
 import style from './auth.module.css';
 
 const SignUpForm = () => {
   const [errors, setErrors] = useState([]);
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [updateUser, setUpdateUser] = useState('');
   const user = useSelector(state => state.session.user);
   const dispatch = useDispatch();
 
   const onSignUp = async (e) => {
     e.preventDefault();
     if (password === repeatPassword) {
-      const data = await dispatch(signUp(username, email, password));
+      const data = await dispatch(signUp(name, email, password, phone));
+      if (data && data.find((errorMessage) => errorMessage.split(' ')[2] === '200')) {
+        const userToClaimString = data.find((errorMessage) => errorMessage.split(' ')[2] === '200')
+        const userId = userToClaimString.split(' ')[3];
+        const userName = userToClaimString.split(' ')[4];
+        setName(userName);
+        const errorArray = userToClaimString.split(' ').slice(6)
+        setErrors([errorArray.join(' ')]);
+        setUpdateUser(userId);
+      } else if (data) {
+        setErrors(data)
+      }
+    }
+  };
+
+  const onClaimUser = async (e) => {
+    e.preventDefault();
+    if (password === repeatPassword) {
+      const data = await dispatch(claimUser(updateUser, email, password));
       if (data) {
         setErrors(data)
       }
     }
   };
 
-  const updateUsername = (e) => {
-    setUsername(e.target.value);
+  const updateName = (e) => {
+    setName(e.target.value);
   };
 
   const updateEmail = (e) => {
@@ -49,10 +68,10 @@ const SignUpForm = () => {
   }
 
   return (
-    <form id={style.signup_block} onSubmit={onSignUp}>
+    <form id={style.signup_block} onSubmit={updateUser ? onClaimUser : onSignUp}>
       <div>
         {errors.map((error, ind) => (
-          <div key={ind}>{error}</div>
+          <div className={style.error} key={ind}>{error}</div>
         ))}
       </div>
       <div>
@@ -60,8 +79,8 @@ const SignUpForm = () => {
         <input
           type='text'
           name='name'
-          onChange={updateUsername}
-          value={username}
+          onChange={updateName}
+          value={name}
         ></input>
       </div>
       <div>
@@ -101,7 +120,16 @@ const SignUpForm = () => {
           required={true}
         ></input>
       </div>
-      <button type='submit'>Sign Up</button>
+      {updateUser &&
+      <>
+        <p>Would you like to claim the account with this phone number?</p>
+        <button type='submit'>Claim and Update User</button>
+        <button onClick={() => {
+          setPhone('');
+          setUpdateUser('');
+        }} type='button'>Cancel and Change Number</button>
+      </>}
+      {!updateUser && <button type='submit'>Sign Up</button>}
     </form>
   );
 };

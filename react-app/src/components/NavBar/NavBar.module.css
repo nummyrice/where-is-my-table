@@ -2,10 +2,10 @@
 .navbar_main {
     background-color: #ebf2fa;
     display: grid;
-    grid-template-columns: 8rem auto 8rem;
+    grid-template-columns: 8rem auto 8rem 8rem 8rem;
     grid-template-rows: 60px;
     grid-template-areas:
-    "logo empty dropdown";
+    "logo empty guest establishment dropdown";
     position: relative;
 }
 
@@ -19,6 +19,72 @@ img {
     height: 70px;
 }
 
+/* DEMO GUEST */
+#demo_guest {
+    grid-area: guest;
+}
+
+#demo_guest svg {
+    color: #465775;
+    height: 50px;
+    margin: 5px auto auto auto;
+    display: block;
+}
+
+#demo_guest div {
+    font-family: sans-serif;
+    font-weight: bold;
+    -webkit-text-stroke: 1px #ebf2fa;
+    position: relative;
+    bottom: 40px;
+    left: 20px;
+    color: black;
+}
+
+#demo_guest:hover {
+    background-color: #465775;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+#demo_guest:hover svg {
+    color: #ebf2fa;
+}
+
+/* DEMO ESTABLISHMENT */
+#demo_establishment {
+    grid-area: establishment;
+}
+
+#demo_establishment svg {
+    color: #ef6f6c;
+    height: 50px;
+    margin: 5px auto auto auto;
+    display: block;
+}
+
+#demo_establishment div {
+    font-family: sans-serif;
+    font-weight: bold;
+    -webkit-text-stroke: 1px #ebf2fa;
+    position: relative;
+    bottom: 50px;
+    left: 30px;
+    color: black;
+}
+
+#demo_establishment:hover {
+    background-color: #ef6f6c;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+#demo_establishment:hover svg {
+    color: #ebf2fa;
+
+}
+
+/* DROP DOWN */
 .dropdown_icon {
     height: 50px;
     color: #0db171;

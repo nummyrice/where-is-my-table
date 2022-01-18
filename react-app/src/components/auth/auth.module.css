@@ -62,3 +62,7 @@
 #signup_block * {
     margin: 3px;
 }
+
+.error {
+    color: #e71d36;
+}

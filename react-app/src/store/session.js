@@ -24,11 +24,12 @@ export const authenticate = () => async (dispatch) => {
     if (data.errors) {
       return;
     }
-  
+
     dispatch(setUser(data));
   }
 }
 
+// LOGIN
 export const login = (email, password) => async (dispatch) => {
   const response = await fetch('/api/auth/login', {
     method: 'POST',
@@ -40,8 +41,8 @@ export const login = (email, password) => async (dispatch) => {
       password
     })
   });
-  
-  
+
+
   if (response.ok) {
     const data = await response.json();
     dispatch(setUser(data))
@@ -57,6 +58,7 @@ export const login = (email, password) => async (dispatch) => {
 
 }
 
+// LOGOUT
 export const logout = () => async (dispatch) => {
   const response = await fetch('/api/auth/logout', {
     headers: {
@@ -69,20 +71,21 @@ export const logout = () => async (dispatch) => {
   }
 };
 
-
-export const signUp = (username, email, password) => async (dispatch) => {
+// SIGNUP
+export const signUp = (name, email, password, phone_number) => async (dispatch) => {
   const response = await fetch('/api/auth/signup', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      username,
+      name,
       email,
       password,
+      phone_number
     }),
   });
-  
+
   if (response.ok) {
     const data = await response.json();
     dispatch(setUser(data))
@@ -97,6 +100,36 @@ export const signUp = (username, email, password) => async (dispatch) => {
   }
 }
 
+// CLAIM USER
+export const claimUser = (id, email, password) => async (dispatch) => {
+  const response = await fetch('/api/users/claim', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id,
+      email,
+      password
+    }),
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    dispatch(setUser(data))
+    return null;
+  } else if (response.status < 500) {
+    const data = await response.json();
+    if (data.errors) {
+      return data.errors;
+    }
+  } else {
+    return ['An error occured. Please try again.']
+  }
+
+}
+
+// REDUCER
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case SET_USER:
