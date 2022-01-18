@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField
 from wtforms.validators import DataRequired, ValidationError, Optional
 from app.models import User
-import phonenumbers
+# import phonenumbers
 
 
 def user_exists(form, field):
@@ -20,17 +20,17 @@ def username_exists(form, field):
     if user:
         raise ValidationError('name is already in use.')
 
-def validate_phone(form, field):
-    if len(field.data) > 16:
-        raise ValidationError('Invalid phone number.')
-    try:
-        input_number = phonenumbers.parse(field.data)
-        if not (phonenumbers.is_valid_number(input_number)):
-            raise ValidationError('Invalid phone number.')
-    except:
-        input_number = phonenumbers.parse("+1"+field.data)
-        if not (phonenumbers.is_valid_number(input_number)):
-            raise ValidationError('Invalid phone number.')
+# def validate_phone(form, field):
+#     if len(field.data) > 16:
+#         raise ValidationError('Invalid phone number.')
+#     try:
+#         input_number = phonenumbers.parse(field.data)
+#         if not (phonenumbers.is_valid_number(input_number)):
+#             raise ValidationError('Invalid phone number.')
+#     except:
+#         input_number = phonenumbers.parse("+1"+field.data)
+#         if not (phonenumbers.is_valid_number(input_number)):
+#             raise ValidationError('Invalid phone number.')
 
 def phone_num_exists(form, field):
     # Checking if phone number exists
