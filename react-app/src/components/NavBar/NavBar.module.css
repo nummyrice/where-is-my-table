@@ -1,0 +1,137 @@
+
+.navbar_main {
+    background-color: #ebf2fa;
+    display: grid;
+    grid-template-columns: 8rem auto 8rem 8rem 8rem;
+    grid-template-rows: 60px;
+    grid-template-areas:
+    "logo empty guest establishment dropdown";
+    position: relative;
+}
+
+.home_navlink {
+    grid-area: logo;
+    align-self: center;
+    justify-self: center;
+}
+
+img {
+    height: 70px;
+}
+
+/* DEMO GUEST */
+#demo_guest {
+    grid-area: guest;
+}
+
+#demo_guest svg {
+    color: #465775;
+    height: 50px;
+    margin: 5px auto auto auto;
+    display: block;
+}
+
+#demo_guest div {
+    font-family: sans-serif;
+    font-weight: bold;
+    -webkit-text-stroke: 1px #ebf2fa;
+    position: relative;
+    bottom: 40px;
+    left: 20px;
+    color: black;
+}
+
+#demo_guest:hover {
+    background-color: #465775;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+#demo_guest:hover svg {
+    color: #ebf2fa;
+}
+
+/* DEMO ESTABLISHMENT */
+#demo_establishment {
+    grid-area: establishment;
+}
+
+#demo_establishment svg {
+    color: #ef6f6c;
+    height: 50px;
+    margin: 5px auto auto auto;
+    display: block;
+}
+
+#demo_establishment div {
+    font-family: sans-serif;
+    font-weight: bold;
+    -webkit-text-stroke: 1px #ebf2fa;
+    position: relative;
+    bottom: 50px;
+    left: 30px;
+    color: black;
+}
+
+#demo_establishment:hover {
+    background-color: #ef6f6c;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+#demo_establishment:hover svg {
+    color: #ebf2fa;
+
+}
+
+/* DROP DOWN */
+.dropdown_icon {
+    height: 50px;
+    color: #0db171;
+    /* align-self: center;
+    justify-self: center; */
+    margin: 5px auto auto 30px;
+
+}
+
+.ul_flex {
+    display: none;
+    position: absolute;
+    right: 0px;
+    top: 60px;
+    width: 25%;
+    background-color: #ebf2fa;
+    border: 1px solid #427aa1;
+    z-index: 1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    /* padding: 10px; */
+
+}
+
+li {
+    padding: 20px;
+    border-bottom: 1px solid #427aa1;
+    height: 10px;
+    width: auto;
+    font-size: 20px;
+    line-height: 10px;
+    font-family: sans-serif;
+    text-decoration: none;
+}
+
+/* .dropdown_icon:hover + .ul_flex,
+.ul_flex:hover {
+    cursor: pointer;
+    display: block;
+} */
+#drop_down {
+    grid-area: dropdown;
+    justify-content: center;
+
+}
+
+#drop_down:hover + .ul_flex,
+.ul_flex:hover {
+    cursor: pointer;
+    display: block;
+}

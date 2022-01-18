@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required
 from app.models import db, User
-from app.forms import UpdateGuestForm, EditUserForm
+from app.forms import UpdateGuestForm, EditUserForm, ClaimUserForm
 from .auth_routes import validation_errors_to_error_messages
 
 
@@ -43,6 +43,19 @@ def add_guest():
         return {"result": "succesfully added guest", "guest": new_guest.to_dict()}
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
+# CLAIM USER
+@user_routes.route('/claim', methods=['PUT'])
+def claim_user():
+    form = ClaimUserForm()
+    form['csrf_token'].data = request.cookies['csrf_token']
+    if form.validate_on_submit():
+        claimed_user = db.session.query(User).get(form.data['id'])
+        claimed_user.password = form.data['password']
+        if form.data['email']:
+            claimed_user.email = form.data['email']
+        db.session.commit()
+        return {'result': "successfully claimed user", "user": claimed_user.to_safe_dict()}
+    return {"errors": validation_errors_to_error_messages(form.errors)}, 400
 
 #EDIT USER
 @user_routes.route('/edit', methods=['PUT'])

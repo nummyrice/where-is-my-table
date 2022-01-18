@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useSelector } from 'react-redux';
+import { EstablishmentContext } from '..';
 import style from "./AddGuest.module.css";
 import {ReactComponent as CheckCircle} from './assets/check-circle-solid.svg';
 import {ReactComponent as Circle} from  './assets/circle-regular.svg';
@@ -11,8 +12,10 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
-    const [selectedGuest, setSelectedGuest] = useState(editReservation.guest_info || 0);
+    const [selectedGuest, setSelectedGuest] = useState(editReservation?.guest_info || 0);
     const [searchResults, setSearchResults] = useState([]);
+    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext)
+
 
     // edit buttons
     const [editNameField, setEditNameField] = useState(false);
@@ -556,6 +559,9 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                                         else {
                                             setShowModal(false)
                                             setEditReservation('')
+                                            const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
+                                            reservedDate.setHours(0,0,0,0)
+                                            setSelectedDate(reservedDate)
                                         }
                                         }} className={style.confirm_button}>Confirm Reservation</div>}
                                 {!editReservation && <div onClick={async ()=>{
@@ -565,6 +571,9 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                                         else {
                                             setShowModal(false)
                                             setShowMakeRes(false)
+                                            const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
+                                            reservedDate.setHours(0,0,0,0)
+                                            setSelectedDate(reservedDate)
                                         }
                                         }} className={style.confirm_button}>Confirm Reservation</div>}
                                 <div onClick={()=>{

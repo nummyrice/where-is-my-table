@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField
-from wtforms.validators import DataRequired, Email, ValidationError
+from wtforms import StringField, IntegerField
+from wtforms.validators import DataRequired, ValidationError, Optional
 from app.models import User
 import phonenumbers
 
@@ -36,8 +36,10 @@ def phone_num_exists(form, field):
     # Checking if phone number exists
     phone_number = field.data
     user = User.query.filter(User.phone_number == phone_number).first()
-    if user:
+    if user and user.to_dict()['hashed_password']:
         raise ValidationError('Phone number is already in use.')
+    if user and not user.to_dict()['hashed_password']:
+        raise ValidationError(f"200 {user.to_safe_dict()['id']} {user.to_safe_dict()['name']} This phone number exists, but is not attached to an account.")
 
 
 class SignUpForm(FlaskForm):
@@ -47,3 +49,9 @@ class SignUpForm(FlaskForm):
     password = StringField('password', validators=[DataRequired()])
     notes = StringField('notes')
     phone_number = StringField('phone_number', validators=[DataRequired(), phone_num_exists])
+
+
+class ClaimUserForm(FlaskForm):
+    id = IntegerField('id', validators=[DataRequired()])
+    email = StringField('email', validators=[Optional(), user_exists])
+    password = StringField('password', validators=[DataRequired()])

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
-from app.models import Tag, db, reservation_tags
+from app.models import Tag, db, reservation_tags, Reservation
 from app.forms import NewTagsForm
 from .auth_routes import validation_errors_to_error_messages
 
@@ -15,17 +15,20 @@ def add_tags():
     if form.validate_on_submit():
         reservation_id = form.data['reservation_id']
         list_of_tags = form.data['tags'].split()
+        target_res = db.session.query(Reservation).get(reservation_id)
         for tag in list_of_tags:
             lowercase_tag = tag.lower()
             try:
                 tag_exists = db.session.query(Tag).filter(Tag.name == lowercase_tag).one_or_none()
                 if tag_exists:
-                    reservation_tags.insert().values(reservation_id=reservation_id, tag_id=tag_exists.id)
+                    target_res.tags.append(tag_exists)
                 else:
                     new_tag = Tag(name=lowercase_tag)
                     db.session.add(new_tag)
                     db.session.commit()
-                    reservation_tags.insert().values(reservation_id=reservation_id, tag_id=new_tag.id)
+                    target_res.tags.append(new_tag)
+                db.session.add(target_res)
+                db.session.commit()
             except:
                 return {"errors": ["there was an error adding your tag to the database. please try again"]}, 400
         return {"result": 'succsesfully applied tags'}

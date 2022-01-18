@@ -1,15 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {useDispatch} from 'react-redux';
+import { EstablishmentContext } from '..';
 import style from "./ResSchedule.module.css";
 import { ReactComponent as UserIcon }from './assets/user-solid.svg';
 import AddReservation from '../AddReservation';
+import StatusBar from '../StatusBar';
 import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 
-const ResSchedule =({selectedDate}) => {
+const ResSchedule =() => {
+    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
     const dispatch = useDispatch();
     const [availableTables, setavailableTables] = useState();
     const [reservations, setReservations] = useState();
     const [editReservation, setEditReservation] = useState('')
+
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
     useEffect(() => {
@@ -32,21 +36,17 @@ const ResSchedule =({selectedDate}) => {
         date.setHours(hour, 0, 0, 0)
         return date
     })
-// console.log('hour columns: ', hourColumns)
+
     // SET 24 SCHEDULE MODEL
     const resScheduleModel = hourColumns.map((datetime, hourIndex) => {
-        // console.log('AVAILABILITY: ', availableTables)
         const scheduleColumn = {
             timeMarker: datetime,
             reservations: reservations?.filter((reservation) => {
                 const reservationDate = new Date(reservation.reservation_time)
-                // console.log('RESERVATION DATE: ', reservationDate, datetime, reservationDate >= datetime, reservationDate < datetime, reservationDate - datetime)
                 return reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]
             }),
             availableTables: availableTables?.filter((tableTimeSlot) => {
                 const availableDatetime = new Date(tableTimeSlot.datetime)
-                // console.log('COMPARISON TIMES: ', datetime, hourColumns[hourIndex + 1])
-                // console.log('AVAILABLE DATE: ', availableDatetime, 'GREATER THAN: ', datetime, 'WITH INDEX: ', index, availableDatetime >= datetime, availableDatetime < datetime, availableDatetime - datetime, 'LESS THAN: ', hourColumns[hourIndex + 1])
                 return availableDatetime >= datetime && availableDatetime < hourColumns[hourIndex + 1]
             })
         }
@@ -92,6 +92,7 @@ const ResSchedule =({selectedDate}) => {
                                         <div className={style.hover_tags}>{reservation.tags.reduce((prev, curr) => {
                                             return prev + ', ' + curr.name
                                         }, '')}</div>
+                                        <StatusBar reservationId={reservation.id} statusId={reservation.status_id}/>
                                     </div>
                                     <div className={style.hover_guest_title}>Guest Info</div>
                                     <div className={style.guest_details}>
@@ -119,7 +120,8 @@ const ResSchedule =({selectedDate}) => {
                                     <div className={style.party_size}>
                                         {`${availableTable.table.min_seat} - ${availableTable.table.max_seat}`}
                                     </div>
-                            </div>
+                                </div>
+                                <div className={style.spacer}></div>
                                 <div className={style.table_name}>
                                     {availableTable.table.table_name}
                                 </div>

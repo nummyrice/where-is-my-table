@@ -1,0 +1,16 @@
+#settings_panel {
+    /* height: 80vh; */
+    /* width: 400px; */
+    position: absolute;
+    right: 0px;
+    top: 60px;
+    background-color:#262626;
+    z-index: 1;
+    padding: 40px;
+
+}
+
+#settings_panel > div {
+    font-size: 20px;
+    margin-bottom: 20px;
+}

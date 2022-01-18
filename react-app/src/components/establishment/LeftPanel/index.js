@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { EstablishmentContext } from '..';
 import { useDispatch } from 'react-redux';
 import style from "./LeftPanel.module.css";
 import AddReservation from '../AddReservation';
@@ -10,12 +11,14 @@ import { getSevenDayAvailability } from '../../../store/sevenDayAvailability.js'
 
 
 
-const LeftPanel = ({selectedDate}) => {
+const LeftPanel = () => {
     const dispatch = useDispatch();
     const [viewBooked, setViewBooked] = useState(false);
     const [viewWaitlist, setViewWaitlist] = useState(false);
     const [showMakeRes, setShowMakeRes] = useState(false);
     const [showAddWait, setShowAddWait] = useState(false);
+    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
+
     return (
         <div className={style.left_panel}>
             {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}

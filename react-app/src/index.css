@@ -68,7 +68,7 @@ div#root {
   overflow: hidden;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
-  background-color: rgb(54, 57, 63);
+  background-color: #05668d;
   color: rgb(254, 254, 254);
 }
 ::-webkit-scrollbar {
