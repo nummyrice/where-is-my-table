@@ -107,6 +107,7 @@ def reservation_submit():
     if form.validate_on_submit():
         reservation_time = parser.parse(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
+        print('RESERVATION_____________: ', reservation_exists)
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
