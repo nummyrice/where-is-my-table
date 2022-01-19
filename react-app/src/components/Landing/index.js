@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import GuestReserveModal from '../GuestReserveModal';
 import style from './Landing.module.css';
 import bread from './assets/bread.png';
 import chili from './assets/chili.png';
@@ -18,6 +19,7 @@ const Landing = () => {
     const [availableTables, setavailableTables] = useState([]);
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [dateArray, setDateArray] = useState([])
+    const [showGuestReserveModal, setShowGuestReserveModal] = useState(false);
 
     const getSevenDays = (date) => {
         const result = [date];
@@ -85,12 +87,21 @@ const Landing = () => {
                     </div>
                     {!availableTables.length && <div> No tables available. Please select a new date.</div>}
                     {availableTables.length && <div id={style.availability_grid}>
-                        {availableTables.map((table, index)=>{
+                        {availableTables.map((table, reservationId)=>{
                             return(
-                            <div id={index} className={style.avail_table_cell}>
+                            <>
+                            <div onClick={() => setShowGuestReserveModal(reservationId)} id={reservationId} className={style.avail_table_cell}>
                                 <div>{new Date(table.datetime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
                                 <div>{table.table.table_name}</div>
-                            </div>)
+                            </div>
+                            {showGuestReserveModal === reservationId &&
+                            <GuestReserveModal
+                                availableTableTime={table}
+                                setShowGuestReserveModal={setShowGuestReserveModal}
+                                selectedDate={selectedDate}
+                                setSelectedDate={setSelectedDate}
+                                />}
+                            </>)
                         })}</div>}
                 </div>
             </div>
