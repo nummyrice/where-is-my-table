@@ -209,3 +209,8 @@
     top: 3px;
     margin-bottom: 27px;
 }
+
+.footer_options {
+    background-color: #222222;
+    font-family: sans-serif;
+}

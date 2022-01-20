@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getSelectedDateAvailability } from '../../store/selectedDateAvailability';
 import style from "./Establishment.module.css";
 // import { Route, Redirect } from 'react-router-dom';
 import ResSchedule from './ResSchedule';
@@ -9,10 +10,18 @@ import LeftPanel from './LeftPanel';
 export const EstablishmentContext = createContext();
 
 const Establishment = () => {
-    const user = useSelector(state => state.session.user)
+    const dispatch = useDispatch()
+    // const user = useSelector(state => state.session.user)
     const today = new Date()
     today.setHours(0,0,0,0)
     const [selectedDate, setSelectedDate] = useState(today)
+    useEffect(() => {
+        dispatch(getSelectedDateAvailability(selectedDate.toISOString())).then((data)=>{
+            console.log("DATA: ", data)
+        }
+
+        )
+    }, [selectedDate, dispatch])
 
     return (
         <EstablishmentContext.Provider value={{selectedDate, setSelectedDate}}>

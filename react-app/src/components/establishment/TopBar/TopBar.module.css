@@ -26,10 +26,12 @@
     height: 40px;
     width:100px;
     font-size: 12px;
-    padding: 4px;
-    margin: 4px;
+    padding: 0px 0px 0px 15px;
     font-weight: bold;
-
+    line-height: 40px;
+    text-align: middle;
+    text-justify: center;
+    margin: 0px 4px 0px 4px;
 }
 
 .forward_date,
@@ -43,7 +45,9 @@
     height: 30px;
     margin: 8px
 }
-
+.forward_date:hover,
+.back_date:hover,
+.calendar:hover,
 .establishment_settings:hover {
     cursor: pointer;
     color: grey;

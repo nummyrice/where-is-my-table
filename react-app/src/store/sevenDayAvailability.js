@@ -5,10 +5,8 @@ const setSevenDayAvailability = (availability) => ({
     payload: availability
 });
 
-// GET AVAILABLE TABLES FOR TODAY
-
+// GET AVAILABLE TABLES
 export const getSevenDayAvailability = (client_date) => async (dispatch) => {
-    console.log('DATA_____', client_date)
     const response = await fetch('/api/reservations/seven-day', {
         method: 'POST',
         headers: {
