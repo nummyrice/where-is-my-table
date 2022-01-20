@@ -54,6 +54,14 @@ def todays_available_tables():
     data = get_availability(client_date)
     return data
 
+# GET SELECTED DATE AVAILABILITY
+@reservation_routes.route('selected-date', methods=['POST'])
+def selected_dates_available_tables():
+    data = request.json
+    selected_date = parser.isoparse(data['selected_date'])
+    data = get_availability(selected_date)
+    return {'selectedDateAvailability': data}
+
 # GET WEEKS AVAILABILITY
 @reservation_routes.route('/seven-day', methods=['POST'])
 def weeks_available_tables():

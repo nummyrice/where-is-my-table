@@ -113,27 +113,33 @@ const ResSchedule =() => {
                            )
                         })}
                         {column.availableTables?.length > 0 && column.availableTables.map((availableTable, index) => {
-                        return(
-                            <div key={index} className={style.available_time_card}>
-                                <div className={style.available_party}>
-                                    <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
-                                    <div className={style.party_size}>
-                                        {`${availableTable.table.min_seat} - ${availableTable.table.max_seat}`}
+                            const tableTime  = new Date(availableTable.datetime);
+                            if (tableTime > new Date()) {
+                                return(
+                                    <div key={index} className={style.available_time_card}>
+                                        <div className={style.available_party}>
+                                            <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
+                                            <div className={style.party_size}>
+                                                {`${availableTable.table.min_seat} - ${availableTable.table.max_seat}`}
+                                            </div>
+                                        </div>
+                                        <div className={style.spacer}></div>
+                                        <div className={style.table_name}>
+                                            {availableTable.table.table_name}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={style.spacer}></div>
-                                <div className={style.table_name}>
-                                    {availableTable.table.table_name}
-                                </div>
-                            </div>
-                        )
-                        })}
+                                )
+                            } else {
+                                return(null)
+                            }
+                            })
+                        }
                     </div>
                 )
             })}
             </div>
 
-            <div className={style.footer_options}></div>
+            <div className={style.footer_options}>Options Not Yet Added</div>
         </div>
     )
 }

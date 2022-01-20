@@ -3,11 +3,13 @@ import { EstablishmentContext } from '..';
 import { useDispatch } from 'react-redux';
 import style from "./LeftPanel.module.css";
 import AddReservation from '../AddReservation';
+import ResList from './ResList';
 import { ReactComponent as WaitlistIcon } from './assets/user-clock-solid.svg';
 import { ReactComponent as BookIcon } from './assets/book-open-solid.svg';
 import { ReactComponent as LeftCaret } from './assets/caret-left-solid.svg';
 import { ReactComponent as DownCaret } from './assets/caret-down-solid.svg'
 import { getSevenDayAvailability } from '../../../store/sevenDayAvailability.js';
+import { getSelectedDateAvailability } from '../../../store/selectedDateAvailability';
 
 
 
@@ -40,6 +42,7 @@ const LeftPanel = () => {
                 {viewBooked && <DownCaret onClick={() => {setViewBooked(false)}} className={style.icon}/>}
                 {!viewBooked && <LeftCaret onClick={() => {setViewBooked(true)}} className={style.icon}/>}
             </div>
+            {viewBooked && <ResList/>}
             <div className={style.waitlist_bar}>
                 <div className={style.label}> Waitlist </div>
                 <div onClick={() => {setShowAddWait(true)}} className={style.add_button}>

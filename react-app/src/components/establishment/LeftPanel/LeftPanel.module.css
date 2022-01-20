@@ -41,3 +41,30 @@
     justify-content: space-evenly;
     cursor: pointer;
 }
+
+
+/* RESERVATION ENTRIES*/
+
+.res_entry {
+    display: grid;
+    grid-template-columns: 50px 200px 50px;
+    grid-template-rows: 100px;
+    grid-template-areas:
+    "icon info edit";
+}
+
+#status_icon {
+    grid-area: icon;
+}
+
+#res_info_sec {
+    grid-area: info;
+}
+
+#edit_button {
+    grid-area: edit;
+}
+
+#no_res_message {
+
+}

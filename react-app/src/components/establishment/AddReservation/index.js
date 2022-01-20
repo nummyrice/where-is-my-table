@@ -6,8 +6,12 @@ import AddGuest from '../AddGuest';
 
 const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) => {
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
+    const initialTimeIndex = sevenDayAvailability[0].availability.findIndex((table) => {
+        const tableTime = new Date(table.datetime);
+        return tableTime > new Date();
+    })
     const [selectDateIndex, setselectDateIndex] = useState(0)
-    const [selectTimeIndex, setselectTimeIndex] = useState(0)
+    const [selectTimeIndex, setselectTimeIndex] = useState(initialTimeIndex)
     const [partySize, setPartySize] = useState(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.max_seat)
 
     // RETURNS ARRAY OF GUEST NUM FOR TABLE
@@ -67,15 +71,19 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) =
                     {sevenDayAvailability[selectDateIndex]?.availability.length > 0 && sevenDayAvailability[selectDateIndex].availability.map((availableTime, index) => {
                         const datetime = new Date(availableTime.datetime);
                         const localTimeString = datetime.toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' });
-                        return (
-                            <div onClick={() => {
-                                setselectTimeIndex(index)
-                                setPartySize(sevenDayAvailability[selectDateIndex].availability[index].table.min_seat)
-                            }} key={index}className={new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() === datetime.getTime() &&  sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.table_name === availableTime.table.table_name ? style.time_cell_select : style.time_cell}>
-                                 <div className={style.time_text}>{localTimeString}</div>
-                                <div className={style.table}>{availableTime.table.table_name}</div>
-                            </div>
-                        )
+                        if (datetime > new Date()) {
+                            return (
+                                <div onClick={() => {
+                                    setselectTimeIndex(index)
+                                    setPartySize(sevenDayAvailability[selectDateIndex].availability[index].table.min_seat)
+                                }} key={index}className={new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() === datetime.getTime() &&  sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.table_name === availableTime.table.table_name ? style.time_cell_select : style.time_cell}>
+                                    <div className={style.time_text}>{localTimeString}</div>
+                                    <div className={style.table}>{availableTime.table.table_name}</div>
+                                </div>
+                            )
+                        } else {
+                            return(null);
+                        }
                     })}
                     <div className={style.bottom_scroll_space}></div>
                 </div>
