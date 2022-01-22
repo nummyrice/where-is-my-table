@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import { useDispatch } from 'react-redux';
+import { updateAndSetStatus } from '../../../store/selectedDateAvailability';
 import style from './StatusBar.module.css'
 import { ReactComponent as CancelIcon } from './assets/times-circle-regular.svg';
 import { ReactComponent as LateIcon } from './assets/exclamation-circle-solid.svg';
@@ -9,23 +11,14 @@ import { ReactComponent as SeatedIcon } from './assets/check-circle-solid.svg';
 import { ReactComponent as ReservedIcon } from './assets/circle-solid.svg';
 import { ReactComponent as LeftMessageIcon } from './assets/spinner-solid.svg';
 
-const StatusBar = ({reservationId, statusId}) => {
+const StatusBar = ({reservationId, statusId, setShowStatusBar}) => {
+    const dispatch = useDispatch();
     const [selectedStatus, setSelectedStatus] = useState(statusId)
-    const handleStatusChange = async (newStatusId) => {
-        if (newStatusId !== selectedStatus) {
-            const response = await fetch('/api/reservations/status/update', {
-                method: 'PUT',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({"reservation_id": reservationId, "status_id": newStatusId})
-            })
-
-            const data = await response.json();
-
-            if (data.result) {
-                setSelectedStatus(data.reservation.status_id);
-            }
-            return data;
-        }
+    const handleStatusChange = (newStatusId) => {
+       dispatch(updateAndSetStatus(reservationId, newStatusId)).then((data)=>{
+        setSelectedStatus(data.reservation.status_id);
+        setShowStatusBar(false);
+       });
     }
     // TODO: add confirmation modal when cancelled status is selected. Cancel should lock all status changes and rerender ResSchedule
     return(
