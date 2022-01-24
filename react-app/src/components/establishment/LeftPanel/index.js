@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import style from "./LeftPanel.module.css";
 import AddReservation from '../AddReservation';
 import ResList from './ResList';
+import AddWaitlist from '../AddWaitlist';
 import { ReactComponent as WaitlistIcon } from './assets/user-clock-solid.svg';
 import { ReactComponent as BookIcon } from './assets/book-open-solid.svg';
 import { ReactComponent as LeftCaret } from './assets/caret-left-solid.svg';
@@ -18,7 +19,8 @@ const LeftPanel = () => {
     const [viewBooked, setViewBooked] = useState(false);
     const [viewWaitlist, setViewWaitlist] = useState(false);
     const [showMakeRes, setShowMakeRes] = useState(false);
-    const [showAddWait, setShowAddWait] = useState(false);
+    const [showAddWaitlist, setShowAddWaitlist] = useState(false);
+    const [editWaitlist, setEditWaitlist] = useState(null);
     const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
 
     return (
@@ -45,10 +47,15 @@ const LeftPanel = () => {
             {viewBooked && <ResList/>}
             <div className={style.waitlist_bar}>
                 <div className={style.label}> Waitlist </div>
-                <div onClick={() => {setShowAddWait(true)}} className={style.add_button}>
+                <div onClick={() => {setShowAddWaitlist(true)}} className={style.add_button}>
                     <WaitlistIcon className={style.icon}/>
                     <div className={style.label}> Add </div>
                 </div>
+                {showAddWaitlist && <AddWaitlist
+                editWaitlist={editWaitlist}
+                setEditWaitlist={setEditWaitlist}
+                setShowAddWaitlist={setShowAddWaitlist}
+                />}
                 {viewWaitlist && <DownCaret onClick={() => {setViewWaitlist(false)}} className={style.icon}/>}
                 {!viewWaitlist && <LeftCaret onClick={() => {setViewWaitlist(true)}} className={style.icon}/>}
             </div>

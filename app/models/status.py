@@ -11,6 +11,7 @@ class Status(db.Model):
 
     # Associations
     reservations = db.relationship("Reservation", back_populates="status")
+    waitlist = db.relationship('Waitlist', back_populates="status")
 
     def to_dict(self):
         return {

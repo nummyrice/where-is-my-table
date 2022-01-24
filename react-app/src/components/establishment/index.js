@@ -1,6 +1,7 @@
 import React, { useState, useEffect, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSelectedDateAvailability } from '../../store/selectedDateAvailability';
+import { getSelectedDateWaitlist } from '../../store/selectedDateWaitlist';
 import style from "./Establishment.module.css";
 // import { Route, Redirect } from 'react-router-dom';
 import ResSchedule from './ResSchedule';
@@ -17,10 +18,12 @@ const Establishment = () => {
     const [selectedDate, setSelectedDate] = useState(today)
     useEffect(() => {
         dispatch(getSelectedDateAvailability(selectedDate.toISOString())).then((data)=>{
-            console.log("DATA: ", data)
+            console.log("Availability DATA: ", data)
         }
-
         )
+        dispatch(getSelectedDateWaitlist(selectedDate.toISOString())).then((data) => {
+            console.log("Waitlist DATA", data)
+        })
     }, [selectedDate, dispatch])
 
     return (

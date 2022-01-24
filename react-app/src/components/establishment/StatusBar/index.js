@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch } from 'react-redux';
 import { updateAndSetStatus } from '../../../store/selectedDateAvailability';
 import style from './StatusBar.module.css'
@@ -17,12 +17,32 @@ const StatusBar = ({reservationId, statusId, setShowStatusBar}) => {
     const handleStatusChange = (newStatusId) => {
        dispatch(updateAndSetStatus(reservationId, newStatusId)).then((data)=>{
         setSelectedStatus(data.reservation.status_id);
-        setShowStatusBar(false);
+        if (setShowStatusBar) {
+            setShowStatusBar(null);
+        }
        });
     }
+
+    const popoverElementRef = useRef(null);
+    useEffect(()=>{
+        const handleOnClick = (event) => {
+            const target = event.target;
+            if (popoverElementRef.current != null && target instanceof Element) {
+                if (!popoverElementRef.current.contains(target) && popoverElementRef.current !== target) {
+                    if (setShowStatusBar) {
+                        setShowStatusBar(null);
+                    }
+                }
+            }
+        }
+        document.addEventListener('click', handleOnClick)
+        return () => {
+            document.removeEventListener('click', handleOnClick)
+        }
+    }, [setShowStatusBar])
     // TODO: add confirmation modal when cancelled status is selected. Cancel should lock all status changes and rerender ResSchedule
     return(
-        <div className={style.status_bar}>
+        <div  className={style.status_bar}>
             <div className={selectedStatus === 3 ? style.selected : style.status_reserved}
             onClick={() => {
                 handleStatusChange(3);

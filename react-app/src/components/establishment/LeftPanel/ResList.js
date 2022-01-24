@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useContext } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { EstablishmentContext } from '..';
 import StatusBar from '../StatusBar';
+import AddReservation from '../AddReservation';
+import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 import style from './LeftPanel.module.css';
 import { ReactComponent as EditIcon } from './assets/chevron-right-solid.svg';
 import { ReactComponent as CancelIcon } from '../StatusBar//assets/times-circle-regular.svg';
@@ -13,8 +16,11 @@ import { ReactComponent as ReservedIcon } from '../StatusBar//assets/circle-soli
 import { ReactComponent as LeftMessageIcon } from '../StatusBar//assets/spinner-solid.svg';
 
 const ResList = () => {
+    const dispatch = useDispatch();
     const selectedDateRes = useSelector(state => state.selectedDateAvailability.reservations)
-    const [showStatusBar, setShowStatusBar] = useState(false);
+    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
+    const [showStatusBar, setShowStatusBar] = useState(null);
+    const [editReservation, setEditReservation] = useState('')
     return(
         <div id={style.scroll_res_list}>
             {selectedDateRes.length > 0 &&
@@ -24,36 +30,46 @@ const ResList = () => {
                         <div key={reservation.id} className={style.res_entry}>
                             <div id={style.status_icon}>
                                 {reservation.status_id === 3 &&
-                                    <ReservedIcon className={style.icon_blue} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <ReservedIcon title="Reserved" className={style.icon_blue} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 4 &&
-                                    <LeftMessageIcon className={style.icon_blue} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <LeftMessageIcon title="Left Message" className={style.icon_blue} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 6 &&
-                                    <LateIcon className={style.icon_red} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <LateIcon title="Late" className={style.icon_red} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 7 &&
-                                    <PAIcon className={style.icon_yellow} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <PAIcon  title="Partially Arrived" className={style.icon_yellow} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 8 &&
-                                    <ArrivedIcon className={style.icon_yellow} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <ArrivedIcon  title="Arrived" className={style.icon_yellow} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 9 &&
-                                    <PSIcon className={style.icon_green} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <PSIcon  title="Partially Seated" className={style.icon_green} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 10 &&
-                                    <SeatedIcon className={style.icon_green} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <SeatedIcon  title="Seated" className={style.icon_green} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
                                 {reservation.status_id === 11 &&
-                                    <CancelIcon className={style.icon_red} onClick={()=>setShowStatusBar(!showStatusBar)}/>
+                                    <CancelIcon  title="Cancelled" className={style.icon_red} onClick={()=>setShowStatusBar(showStatusBar ? null : reservation.id)}/>
                                 }
-                                {showStatusBar &&
+                                {showStatusBar === reservation.id &&
                                     <div id={style.status_sizer}>
                                         <StatusBar setShowStatusBar={setShowStatusBar} reservationId={reservation.id} statusId={reservation.status_id}/>
                                     </div> }
                             </div>
-                            <div id={style.res_info_sec}>{reservation.guest}</div>
-                            <div id={style.edit_button}><EditIcon id={style.edit_icon}/></div>
+                            <div id={style.res_info_sec}>
+                                <div>{reservation.guest}</div>
+                                <div id={style.table_name}>{reservation.table.table_name}</div>
+                                <div>{new Date(reservation.reservation_time).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
+                                <div id={style.party_size}>{`Guests: ${reservation.party_size}`}</div>
+                            </div>
+                            <div onClick={()=>{
+                                        dispatch(getSevenDayAvailability(selectedDate)).then(() =>
+                                            {setEditReservation(reservation)}
+                                        )
+                                        }}id={style.edit_button}><EditIcon id={style.edit_icon}/></div>
+                            {editReservation && <AddReservation setEditReservation={setEditReservation} editReservation={editReservation}/>}
                         </div>
                     )
                 })

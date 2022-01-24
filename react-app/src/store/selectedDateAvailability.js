@@ -35,7 +35,6 @@ export const updateAndSetStatus = (reservationId, newStatusId) => async (dispatc
 
     if (response.ok) {
         dispatch(setStatus(data.reservation))
-        console.log('MADE IT TO UPDATE AND SET STATUS')
     }
     return data;
 }
@@ -48,9 +47,8 @@ export default function reducer(state = initialState, action) {
         case UPDATE_STATUS:
             const newReservations = [...state.reservations];
             const resIndex = newReservations.findIndex((reservation)=> reservation.id === action.payload.id);
-            const updatedReservations = newReservations.splice(resIndex, 1, action.payload);
-            const newState = {...state, reservations: updatedReservations};
-            console.log("action payload", newState)
+            newReservations.splice(resIndex, 1, action.payload);
+            const newState = {...state, reservations: newReservations};
             return newState;
         default:
             return state;
