@@ -3,11 +3,13 @@ import thunk from 'redux-thunk';
 import session from './session';
 import sevenDayAvailability from './sevenDayAvailability';
 import selectedDateAvailability from './selectedDateAvailability';
+import selectedDateWaitlist from './selectedDateWaitlist';
 
 const rootReducer = combineReducers({
   session,
   sevenDayAvailability,
-  selectedDateAvailability
+  selectedDateAvailability,
+  selectedDateWaitlist
 });
 
 

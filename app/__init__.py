@@ -12,6 +12,7 @@ from .api.auth_routes import auth_routes
 from .api.reservation_routes import reservation_routes
 from .api.guest_routes import guest_routes
 from .api.tag_routes import tag_routes
+from .api.waitlist_routes import waitlist_routes
 
 from .seeds import seed_commands
 
@@ -38,6 +39,7 @@ app.register_blueprint(auth_routes, url_prefix='/api/auth')
 app.register_blueprint(reservation_routes, url_prefix='/api/reservations')
 app.register_blueprint(guest_routes, url_prefix='/api/guests')
 app.register_blueprint(tag_routes, url_prefix='/api/tags')
+app.register_blueprint(waitlist_routes, url_prefix='/api/waitlist')
 
 db.init_app(app)
 Migrate(app, db)
