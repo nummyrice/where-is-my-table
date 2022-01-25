@@ -26,7 +26,7 @@
     padding: 40px;
 }
 
-span svg {
+#guest_res_header svg {
     height: 40px;
     color: #455775;
     margin-right: 10px;
@@ -37,7 +37,7 @@ form:first-child span span {
     text-transform: capitalize;
 }
 
-form > div {
+#guest_res_modal > div {
     margin-bottom: 10px;
     margin-left: 40px;
 }
@@ -48,7 +48,8 @@ form > div {
 
 }
 
-label {
+#party_label,
+#name_label {
     margin-right: 5px;
 }
 

@@ -5,14 +5,21 @@ import style from "./AddGuest.module.css";
 import {ReactComponent as CheckCircle} from './assets/check-circle-solid.svg';
 import {ReactComponent as Circle} from  './assets/circle-regular.svg';
 import {ReactComponent as EditIcon} from './assets/edit-regular.svg';
+import ConfirmWaitlistModal from './ConfirmWaitlistModal';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
-const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize}) => {
+const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, estimatedWait}) => {
+    const selectedGuestCheck = (function() {
+        if (editReservation) return editReservation.guest_info;
+        if (editWaitlist) return editWaitlist.guest_info;
+        return null;
+    })()
+    console.log('edit waitlist: ', editWaitlist)
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
-    const [selectedGuest, setSelectedGuest] = useState(editReservation?.guest_info || 0);
+    const [selectedGuest, setSelectedGuest] = useState(selectedGuestCheck);
     const [searchResults, setSearchResults] = useState([]);
     const {setSelectedDate, selectedDate} = useContext(EstablishmentContext)
 
@@ -34,7 +41,8 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
     const [errors, setErrors] = useState([]);
 
     // confirm modal
-    const [showModal, setShowModal] = useState(false);
+    const [showConfirmRes, setShowConfirmRes] = useState(false);
+    const [showConfirmWaitlist, setShowConfirmWaitlist] = useState(false);
 
     // console.log('DATE INDEX : ', selectDateIndex)
     // console.log('TIME INDEX : ', selectTimeIndex)
@@ -124,10 +132,13 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
     }
 
     const validateDate = () => {
-        const errors = [];
-        if (new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() < new Date().getTime()) errors.push("reservation time has already passed, please adjust your date and/or time")
-        console.log('date errors', errors)
-        return errors;
+        if (!setShowAddWaitlist) {
+            const errors = [];
+            if (new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() < new Date().getTime()) errors.push("reservation time has already passed, please adjust your date and/or time")
+            console.log('date errors', errors)
+            return errors;
+        }
+        return [];
     }
     const validateNameAndPhone = () => {
         const errors = [];
@@ -167,6 +178,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         setErrors(data.errors)
         return data
     }
+
     // handle update
     const handleUpdate = async () => {
         // if editReservation
@@ -277,12 +289,13 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         }
 
     }
+    //TODO:
                 // update selected reservation with date/time/tags/party that changed
             // if guest is not selected
                 // create new guest with info entered
                 // update reservation with the new guest and date/time/tags/party if changed
 
-    const handleSubmit = async () => {
+    const handleResSubmit = async () => {
         // if guest is selected but none of the edits are present
         if (selectedGuest && !editEmailField && !editNameField && !editNumberField && !editNotesField) {
             const newReservation = {
@@ -394,7 +407,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
             setErrors(data.errors);
             return data;
         }
-        const uknownError = {"errors": ["not hitting any handleSubmit conditions"]}
+        const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
         setErrors(uknownError.errors)
 
         return uknownError
@@ -472,9 +485,9 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                             </>}
                             {selectedGuest && editNotesField &&
                             <>
-                                <input onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input}></input>
+                                <textarea onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input} name="notes" cols="20" rows="2"></textarea>
                             </>}
-                            {!selectedGuest  && <input onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input}></input>}
+                            {!selectedGuest  && <textarea onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input} name="notes" cols="20" rows="2"></textarea>}
                         </div>
                         <div className={style.contact_label}>Contact Info</div>
                         <div className={style.phone_block}>
@@ -518,22 +531,22 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                         </div>
                     </div>
                 </form>}
-                {(selectedGuest || validateNameAndPhone()) && editReservation &&
+                {(selectedGuest || validateNameAndPhone()) && (editReservation || editWaitlist) &&
                 <div  onClick={() => {
                     const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
                     setErrors(errors);
-                    setShowModal(true);
-                    }} className={style.place_reservation_button}>{'Update Reservation'}</div>
+                    setShowAddWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
+                    }} className={style.place_reservation_button}>{editReservation ? 'Update Reservation' : 'Update Waitlist'}</div>
                 }
-                {((selectedGuest || validateNameAndPhone()) && !editReservation) && <div  onClick={() => {
+                {((selectedGuest || validateNameAndPhone()) && (!!editReservation || !!editWaitlist)) && <div  onClick={() => {
                     const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
                     setErrors(errors);
-                    setShowModal(true);
-                    }} className={style.place_reservation_button}>{'Reserve Table'}</div>}
+                    setShowAddWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
+                    }} className={style.place_reservation_button}>{setShowAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>}
                 {(!selectedGuest && !validateNameAndPhone()) && <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>}
-                {showModal && <div className={style.modal_background}>
+                {showConfirmRes && <div className={style.modal_background}>
                         <div className={style.error_submission_modal}>
-                            <div className={style.title_bar}>{errors.length < 1 ? "Confirm Reservation" : "It seems there is an issue..."}</div>
+                            <div className={style.title_bar}>{errors.length < 1 ? "Confirm Submission" : "It seems there is an issue..."}</div>
                             {!errors.length && <ul className={style.reservation_details}>
                                 <li>Your reservation:</li>
                                 <li>{`${partySize} ${partySize === 1 ? 'Guest' : 'Guests'}`}</li>
@@ -557,7 +570,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                                         if (result.errors) {
                                         }
                                         else {
-                                            setShowModal(false)
+                                            setShowConfirmRes(false)
                                             setEditReservation('')
                                             const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
                                             reservedDate.setHours(0,0,0,0)
@@ -565,11 +578,11 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                                         }
                                         }} className={style.confirm_button}>Confirm Reservation</div>}
                                 {!editReservation && <div onClick={async ()=>{
-                                        const result = await handleSubmit();
+                                        const result = await handleResSubmit();
                                         if (result.errors) {
                                         }
                                         else {
-                                            setShowModal(false)
+                                            setShowConfirmRes(false)
                                             setShowMakeRes(false)
                                             const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
                                             reservedDate.setHours(0,0,0,0)
@@ -577,16 +590,36 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                                         }
                                         }} className={style.confirm_button}>Confirm Reservation</div>}
                                 <div onClick={()=>{
-                                        setShowModal(false)
+                                        setShowConfirmRes(false)
                                         setErrors([])}} className={style.return_button}>Return</div>
                                     </div>}
                             {errors.length && <div className={style.button_area}>
                                     <div onClick={()=>{
-                                        setShowModal(false)
+                                        setShowConfirmRes(false)
                                         setErrors([])}} className={style.return_button}>Return</div>
                                 </div>}
                         </div>
                     </div>}
+                    {showConfirmWaitlist &&
+                        <ConfirmWaitlistModal
+                            errors={errors}
+                            partySize={partySize}
+                            estimatedWait={estimatedWait}
+                            selectedGuest={selectedGuest}
+                            name={name}
+                            notes={notes}
+                            phoneNumber={phoneNumber}
+                            email={email}
+                            tags={tags}
+                            editWaitlist={editWaitlist}
+                            setEditWaitlist={setEditWaitlist}
+                            setShowAddWaitlist={setShowAddWaitlist}
+                            setShowConfirmWaitlist={setShowConfirmWaitlist}
+                            editNameField={editNameField}
+                            editEmailField={editEmailField}
+                            editNumberField={editNumberField}
+                            editNotesField={editNotesField}
+                            />}
             </div>
         </div>
     )

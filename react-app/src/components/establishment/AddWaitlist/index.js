@@ -7,18 +7,16 @@ import AddGuest from '../AddGuest';
 // add title bar for edit displaying current waitlist info
 // must handle passing these props to AddGuest: selectDateIndex={selectDateIndex} selectTimeIndex={selectTimeIndex}
 const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist}) => {
-    const [partySize, setPartySize] = useState(1)
-    const [estimatedWait, setEstimatedWait] = useState(5)
-    const partySizeModel = Array(21).fill(0).map((space, guestNum) => guestNum + 1)
-    console.log('party model: ', partySizeModel);
+    const [partySize, setPartySize] = useState(editWaitlist ? editWaitlist.party_size : 1)
+    const [estimatedWait, setEstimatedWait] = useState(editWaitlist ? editWaitlist.estimated_wait : 5)
+    const partySizeModel = Array(21).fill(0).map((space, guestNum) => guestNum + 1);
     const estimatedWaitModel = Array(20).fill(5).map((minutes, multiplier) => minutes * multiplier);
-    console.log('estimatedWait: ', estimatedWait)
 
     return (
         <div className={style.modal_background}>
             <div className={style.modal}>
                 {!editWaitlist && <div className={style.title}>Add to Waitlist</div>}
-                {editWaitlist && <div className={style.title}>{`Edit Waitlist:`}</div>}
+                {editWaitlist && <div className={style.title}>{`Edit Party Details`}</div>}
                 {editWaitlist && <X onClick={() => {setEditWaitlist('')}} className={style.icon}/>}
                 {!editWaitlist && <X onClick={() => {setShowAddWaitlist(false)}} className={style.icon}/>}
                 <div className={style.date}>
@@ -57,7 +55,7 @@ const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist}) => {
                     )}
                     <div className={style.bottom_scroll_space}></div>
                 </div>
-                <AddGuest editReservation={editWaitlist} setEditReservation={setEditWaitlist} setShowMakeRes={setShowAddWaitlist} partySize={partySize} estimatedWait={estimatedWait}/>
+                <AddGuest editWaitlist={editWaitlist} setEditWaitlist={setEditWaitlist} setShowAddWaitlist={setShowAddWaitlist} partySize={partySize} estimatedWait={estimatedWait}/>
             </div>
         </div>
     )

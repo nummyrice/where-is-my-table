@@ -11,16 +11,15 @@ import LeftPanel from './LeftPanel';
 export const EstablishmentContext = createContext();
 
 const Establishment = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     // const user = useSelector(state => state.session.user)
-    const today = new Date()
-    today.setHours(0,0,0,0)
-    const [selectedDate, setSelectedDate] = useState(today)
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const [selectedDate, setSelectedDate] = useState(today);
     useEffect(() => {
         dispatch(getSelectedDateAvailability(selectedDate.toISOString())).then((data)=>{
             console.log("Availability DATA: ", data)
-        }
-        )
+        })
         dispatch(getSelectedDateWaitlist(selectedDate.toISOString())).then((data) => {
             console.log("Waitlist DATA", data)
         })
@@ -37,4 +36,4 @@ const Establishment = () => {
     )
 }
 
-export default Establishment
+export default Establishment;

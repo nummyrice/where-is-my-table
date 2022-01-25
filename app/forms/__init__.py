@@ -4,3 +4,4 @@ from .reservation_form import ReservationForm, UpdateReservationForm
 from .guest_form import NewGuestForm, UpdateGuestForm
 from .edit_user_form import EditUserForm
 from .tags_form import NewTagsForm
+from .waitlist_form import WaitlistForm, UpdateWaitlistForm

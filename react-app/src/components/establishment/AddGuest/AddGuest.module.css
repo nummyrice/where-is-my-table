@@ -185,19 +185,21 @@
 }
 
 .name_block {
-    width: 350px;
+    width: 346px;
     height: 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 5px;
 
 }
 
 .name_block label {
-    margin-left: 30px;
+    /* margin-left: 30px; */
 }
 
 .name_input {
-    margin-left: 10px;
+    /* margin-left: 10px; */
 }
 
 .guest_name,
@@ -205,7 +207,7 @@
 .guest_email,
 .guest_phone {
     color: #979797;
-    margin-left: 20px;
+    /* margin-left: 10px; */
 }
 
 
@@ -214,24 +216,27 @@
     height: 100px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: #f7f7f7;
+    padding: 5px;
 }
 
 .notes_block label {
-    margin-left: 20px;
+    /* margin-left: 20px; */
 }
 
 .notes_input {
-    margin-left: 10px;
-    width: 250px;
-    height: 60px;
+    /* margin-left: 10px; */
+    /* margin-right: 10px; */
+    /* height: 60px; */
 }
 
 .guest_notes {
-    margin-left: 10px;
-    width: 260px;
+    /* margin-left: 10px; */
+    width: 220px;
     height: 80px;
     overflow-y: scroll;
+    /* margin-left: 10px; */
 }
 
 .contact_label {
@@ -250,34 +255,36 @@
     height: 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: #f7f7f7;
-
-
-
+    padding: 5px;
 }
 
 .phone_block label {
-    margin-left: 10px;
+    /* margin-left: 10px; */
 }
 
 .phone_input {
-    margin-left: 10px;
+    /* margin-left: 10px; */
 }
 
 .email_block {
-    width: 350px;
+    width: 346px;
     height: 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+
 
 }
 
 .email_block label {
-    margin-left: 10px;
+    /* margin-left: 10px; */
 }
 
 .email_input {
-    margin-left: 10px;
+    /* margin-left: 10px; */
 }
 
 .tag_section {
@@ -306,11 +313,13 @@
     align-items: center;
     background-color: #f7f7f7;
     border: 2px solid rgb(169, 169, 169);
+    justify-content: space-evenly;
+
 
 }
 
 .tags_block label {
-    margin-left: 10px;
+    /* margin-left: 10px; */
     color: black;
 
 }
@@ -320,8 +329,8 @@
 
 }
 .tag_input {
-    margin-left: 10px;
-    width: 240px;
+    /* margin-left: 10px; */
+    /* width: 240px; */
 }
 
 /* PLACE RESERVATION BUTTON */
@@ -355,8 +364,10 @@
 .edit_icon {
     width: 20px;
     color: black;
-    margin-left: auto;
-    margin-right: 8px;
+    /* margin-left: auto; */
+    /* margin-right: 8px; */
+    /* justify-self: flex-end; */
+    /* margin-left: auto; */
 }
 
 
