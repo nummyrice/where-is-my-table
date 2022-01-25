@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { EstablishmentContext } from '..';
 import { useDispatch } from 'react-redux';
 import style from "./LeftPanel.module.css";
 import AddReservation from '../AddReservation';
 import ResList from './ResList';
+import Waitlist from './Waitlist';
 import AddWaitlist from '../AddWaitlist';
 import { ReactComponent as WaitlistIcon } from './assets/user-clock-solid.svg';
 import { ReactComponent as BookIcon } from './assets/book-open-solid.svg';
 import { ReactComponent as LeftCaret } from './assets/caret-left-solid.svg';
 import { ReactComponent as DownCaret } from './assets/caret-down-solid.svg'
 import { getSevenDayAvailability } from '../../../store/sevenDayAvailability.js';
-import { getSelectedDateAvailability } from '../../../store/selectedDateAvailability';
-
+// import { getSelectedDateAvailability } from '../../../store/selectedDateAvailability';
 
 
 const LeftPanel = () => {
@@ -20,12 +20,12 @@ const LeftPanel = () => {
     const [viewWaitlist, setViewWaitlist] = useState(false);
     const [showMakeRes, setShowMakeRes] = useState(false);
     const [showAddWaitlist, setShowAddWaitlist] = useState(false);
-    const [editWaitlist, setEditWaitlist] = useState(null);
-    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
+    const { selectedDate } = useContext(EstablishmentContext);
 
     return (
         <div className={style.left_panel}>
             {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}
+        {showAddWaitlist && <AddWaitlist setShowAddWaitlist={setShowAddWaitlist}/>}
             <input className={style.search}></input>
             <div className={style.filter_bar}>
                 <div className={style.sort_by}>Sort By</div>
@@ -51,14 +51,10 @@ const LeftPanel = () => {
                     <WaitlistIcon className={style.icon}/>
                     <div className={style.label}> Add </div>
                 </div>
-                {showAddWaitlist && <AddWaitlist
-                editWaitlist={editWaitlist}
-                setEditWaitlist={setEditWaitlist}
-                setShowAddWaitlist={setShowAddWaitlist}
-                />}
                 {viewWaitlist && <DownCaret onClick={() => {setViewWaitlist(false)}} className={style.icon}/>}
                 {!viewWaitlist && <LeftCaret onClick={() => {setViewWaitlist(true)}} className={style.icon}/>}
             </div>
+            {viewWaitlist && <Waitlist/>}
         </div>
     )
 }

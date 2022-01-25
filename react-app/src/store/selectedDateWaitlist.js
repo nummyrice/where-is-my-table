@@ -15,13 +15,14 @@ export const getSelectedDateWaitlist = (selectedDateISOstring) => async (dispatc
     });
     const data = await response.json()
 
+    console.log('DATA FROM WAITLIST DISPATCH: ', data)
     if (response.ok) {
         dispatch(setWaitlist(data.waitlist))
     }
     return data;
 }
 
-const initialState = {};
+const initialState = [];
 export default function reducer(state = initialState, action) {
     switch(action.type) {
         case SET_WAITLIST:

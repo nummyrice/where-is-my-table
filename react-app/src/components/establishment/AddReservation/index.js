@@ -12,12 +12,12 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) =
     })
     const [selectDateIndex, setselectDateIndex] = useState(0)
     const [selectTimeIndex, setselectTimeIndex] = useState(initialTimeIndex)
-    const [partySize, setPartySize] = useState(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.max_seat)
+    const [partySize, setPartySize] = useState(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.max_seat)
 
     // RETURNS ARRAY OF GUEST NUM FOR TABLE
     const tableCapacity = (function getCapacity() {
-        const tableMin = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.min_seat
-        const tableMax = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.max_seat
+        const tableMin = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.min_seat
+        const tableMax = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.max_seat
         const guestNum = [];
         for (let index = tableMin; index <= tableMax; index++) {
             guestNum.push(index);

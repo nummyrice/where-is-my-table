@@ -54,7 +54,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
     return(
         <div className={style.background}>
             <form onSubmit={handleSubmit} id={style.guest_res_modal}>
-                <span>
+                <span id={style.guest_res_header}>
                     <UtensilsIcon/>
                     <span>{`Reserve ${availableTableTime.table.table_name}`}</span>
                 </span>
@@ -67,11 +67,11 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
                     <span>{`${new Date(availableTableTime.datetime).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} ${new Date(availableTableTime.datetime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}`}</span>
                 </div>
                 <div>
-                    <label>Party Name:</label>
+                    <label id={style.name_label}>Party Name:</label>
                     <span>{user.name}</span>
                 </div>
                 <div>
-                    <label>Party Size:</label>
+                    <label id={style.party_label}>Party Size:</label>
                     <select onChange={(e)=> setPartySize(e.target.value)}>
                         {partySizeOptions.map((num) => {
                             return(
