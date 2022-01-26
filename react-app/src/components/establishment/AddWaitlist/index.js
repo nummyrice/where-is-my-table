@@ -6,7 +6,7 @@ import AddGuest from '../AddGuest';
 // add state in left panel
 // add title bar for edit displaying current waitlist info
 // must handle passing these props to AddGuest: selectDateIndex={selectDateIndex} selectTimeIndex={selectTimeIndex}
-const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist}) => {
+const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist}) => {
     const [partySize, setPartySize] = useState(editWaitlist ? editWaitlist.party_size : 1)
     const [estimatedWait, setEstimatedWait] = useState(editWaitlist ? editWaitlist.estimated_wait : 5)
     const partySizeModel = Array(21).fill(0).map((space, guestNum) => guestNum + 1);
@@ -55,7 +55,7 @@ const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist}) => {
                     )}
                     <div className={style.bottom_scroll_space}></div>
                 </div>
-                <AddGuest editWaitlist={editWaitlist} setEditWaitlist={setEditWaitlist} setShowAddWaitlist={setShowAddWaitlist} partySize={partySize} estimatedWait={estimatedWait}/>
+                <AddGuest editWaitlist={editWaitlist} setEditWaitlist={setEditWaitlist} setShowAddWaitlist={setShowAddWaitlist} showAddWaitlist={showAddWaitlist} partySize={partySize} estimatedWait={estimatedWait}/>
             </div>
         </div>
     )

@@ -31,6 +31,13 @@
     top: 64px;
     z-index: 1;
 }
+
+.waitlist_bar {
+    position: sticky;
+    z-index: 1;
+    top: 104px;
+}
+
 .booked_bar,
 .waitlist_bar {
     display: flex;
@@ -88,7 +95,11 @@
     padding: 18px 0px 18px 0px;
     grid-area: edit;
     background-color: #555555;
+}
 
+#edit_button:hover,
+.add_button:hover {
+    color: grey;
 }
 
 /* RES INFO*/
@@ -113,7 +124,7 @@
 
 #status_sizer {
     width: 400px;
-    z-index: 101;
+    z-index: 200;
     /* position: relative; */
     /* left: 50px; */
     left: 50px;

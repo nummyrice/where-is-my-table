@@ -22,6 +22,7 @@ def selected_date_waitlist():
         return {"waitlist": [entry.to_dict() for entry in waitlist]}
     return {"waitlist": []}
 
+# NEW PARTY
 @waitlist_routes.route('/new', methods=['POST'])
 def new_party():
     form = WaitlistForm()
@@ -38,3 +39,29 @@ def new_party():
         return {'result': 'successfully added party', "party": newParty.to_dict()}
     print('MADE IT', validation_errors_to_error_messages(form.errors))
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
+
+# EDIT PARTY
+@waitlist_routes.route('/update', methods=['PUT'])
+def update_party():
+    form = UpdateWaitlistForm()
+    form['csrf_token'].data = request.cookies['csrf_token']
+    if form.validate_on_submit():
+        updated_party = db.session.query(Waitlist).get(form.data['waitlist_id'])
+        updated_party.guest_id = form.data['guest_id']
+        updated_party.party_size = form.data['party_size']
+        updated_party.estimated_wait = form.data['estimated_wait']
+        db.session.commit()
+        return { "result": "successfully updated waitlist", "party": updated_party.to_dict()}
+    return {'errors': validation_errors_to_error_messages(form.errors)}, 400
+
+# UPDATE PARTY STATUS
+@waitlist_routes.route('/status/update', methods=['PUT'])
+def edit_status():
+    data = request.json
+    try:
+        party = db.session.query(Waitlist).get(data['party_id'])
+        party.status_id = data['status_id']
+        db.session.commit()
+        return {"result": "successfully updated party status", "party": party.to_dict()}
+    except:
+        return {"errors": "there was a server error updating the reservation status"}

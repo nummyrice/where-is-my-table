@@ -18,10 +18,10 @@ const Establishment = () => {
     const [selectedDate, setSelectedDate] = useState(today);
     useEffect(() => {
         dispatch(getSelectedDateAvailability(selectedDate.toISOString())).then((data)=>{
-            console.log("Availability DATA: ", data)
+            // console.log("Availability DATA: ", data)
         })
         dispatch(getSelectedDateWaitlist(selectedDate.toISOString())).then((data) => {
-            console.log("Waitlist DATA", data)
+            // console.log("Waitlist DATA", data)
         })
     }, [selectedDate, dispatch])
 

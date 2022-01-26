@@ -22,11 +22,10 @@ const Waitlist = () => {
         <div id={style.scroll_res_list}>
             {waitlist.length > 0 &&
                 waitlist.map((waitlistEntry, index) => {
-                    // console.log('RESERVATION: ', reservation)
                     return(
                         <div key={waitlistEntry.id} className={style.res_entry}>
                             <div id={style.status_icon}>
-                                {waitlistEntry.status_id === 3 &&
+                                {waitlistEntry.status_id === 5 &&
                                     <ReservedIcon title="Reserved" className={style.icon_blue} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
                                 }
                                 {waitlistEntry.status_id === 4 &&
@@ -53,7 +52,7 @@ const Waitlist = () => {
                                 {showStatusBar === waitlistEntry.id &&
                                     <div id={style.status_sizer}>
                                         <StatusBar setShowStatusBar={setShowStatusBar} waitlistEntryId={waitlistEntry.id} statusId={waitlistEntry.status_id}/>
-                                    </div> }
+                                    </div>}
                             </div>
                             <div id={style.res_info_sec}>
                                 <div>{waitlistEntry.guest_info.name}</div>

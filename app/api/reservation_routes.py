@@ -164,7 +164,7 @@ def edit_reservation():
             res_to_edit.reservation_time = reservation_time
             res_to_edit.table_id = form.data['table_id']
             db.session.commit()
-            return {"result": "successfully updated"}
+            return {"result": "successfully updated", "reservation": res_to_edit.to_dict()}
         return {'errors': ["reservation already exists for this time"]}, 400
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
