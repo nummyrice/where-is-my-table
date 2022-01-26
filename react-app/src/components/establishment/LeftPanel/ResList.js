@@ -18,12 +18,12 @@ import { ReactComponent as LeftMessageIcon } from '../StatusBar//assets/spinner-
 const ResList = () => {
     const dispatch = useDispatch();
     const selectedDateRes = useSelector(state => state.selectedDateAvailability.reservations)
-    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
+    const {selectedDate} = useContext(EstablishmentContext);
     const [showStatusBar, setShowStatusBar] = useState(null);
     const [editReservation, setEditReservation] = useState('')
     return(
         <div id={style.scroll_res_list}>
-            {selectedDateRes.length > 0 &&
+            {selectedDateRes &&
                 selectedDateRes.map((reservation) => {
                     // console.log('RESERVATION: ', reservation)
                     return(
@@ -74,7 +74,7 @@ const ResList = () => {
                     )
                 })
             }
-            {!selectedDateRes.length &&
+            {!selectedDateRes &&
                 <div id={style.no_res_message}>No Reservations for Today</div>
             }
 

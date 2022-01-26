@@ -1,39 +1,112 @@
 import React, { useState, useContext } from 'react';
+import { useDispatch } from 'react-redux';
 import style from './AddGuest.module.css';
 import { EstablishmentContext } from '..';
-import { newWaitlistFetch, newGuestFetch, updateGuestFetch } from '../utils';
+import { newGuestFetch, updateGuestFetch } from '../utils';
+import { newWaitlistParty, updateWaitlistParty } from '../../../store/selectedDateWaitlist';
 
 
 
 const ConfirmWaitlistModal = ({errors, partySize, estimatedWait, selectedGuest, name, notes, phoneNumber, email, tags, editWaitlist, setEditWaitlist, setShowAddWaitlist, setShowConfirmWaitlist, editNameField, editEmailField, editNumberField, editNotesField}) => {
-    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
+    const dispatch = useDispatch();
+    const {selectedDate} = useContext(EstablishmentContext);
     const [serverErrors, setServerErrors] = useState(errors);
 
+    // UPDATE PARTY
     const handleWaitlistUpdate = async () => {
-
+                // if guest is selected but none of the edits are present
+                if (selectedGuest && !editEmailField && !editNameField && !editNumberField && !editNotesField) {
+                    dispatch(updateWaitlistParty(editWaitlist.id, selectedGuest.id, partySize, estimatedWait, tags))
+                        .then((data) => {
+                            if (data.errors) {
+                                setServerErrors(data.errors)
+                                return data;
+                            } else {
+                                setShowConfirmWaitlist(false)
+                                setEditWaitlist(null)
+                                return data;
+                            }
+                        })
+                }
+                // if guest is selected and any edit is present
+                if (selectedGuest && (editEmailField || editNameField || editNumberField || editNotesField)) {
+                    const updatedGuestResult = await updateGuestFetch(editWaitlist.id, selectedGuest.id, name, notes, phoneNumber, email)
+                    // if update is success
+                    if (updatedGuestResult.result) {
+                            dispatch(updateWaitlistParty(selectedGuest.id, partySize, estimatedWait, tags))
+                            .then((data) => {
+                                if (data.errors) {
+                                    setServerErrors([data.errors]);
+                                } else {
+                                    setShowConfirmWaitlist(false)
+                                    setEditWaitlist(null)
+                                    return data;
+                                }
+                            })
+                    }
+                    // setServerErrors([...serverErrors, ...updatedGuestResult.errors]);
+                    return updatedGuestResult;
+                }
+                // if guest is NOT selected
+                if (!selectedGuest) {
+                    const newGuestResult = await newGuestFetch(name, notes, phoneNumber, email)
+                    // if post is success
+                    if (newGuestResult.result) {
+                        dispatch(updateWaitlistParty(editWaitlist.id, newGuestResult.guest.id, partySize, estimatedWait, tags))
+                        .then((data) => {
+                            if (data.errors) {
+                                setServerErrors(data.errors)
+                                return data;
+                            } else {
+                                setShowConfirmWaitlist(false)
+                                setEditWaitlist(null)
+                                return data;
+                            }
+                        })
+                    }
+                    // setServerErrors([...serverErrors, ...newGuestResult.errors]);
+                    return newGuestResult;
+                }
+                // const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
+                // setServerErrors([...uknownError.errors, ...serverErrors])
+                // return uknownError
     }
 
+
+    // NEW PARTY
     const handleWaitlistSubmit = async () => {
          // if guest is selected but none of the edits are present
         if (selectedGuest && !editEmailField && !editNameField && !editNumberField && !editNotesField) {
-            const fetchResult = await newWaitlistFetch(selectedGuest.id, partySize, estimatedWait, tags)
-            console.log('FETCH RESULT: ', fetchResult)
-            if (fetchResult.errors) setServerErrors([...errors, ...fetchResult.errors]);
-            return fetchResult;
+            dispatch(newWaitlistParty(selectedGuest.id, partySize, estimatedWait, tags))
+                .then((data) => {
+                    if (data.errors) {
+                        setServerErrors(data.errors)
+                        return data;
+                    } else {
+                        setShowConfirmWaitlist(false)
+                        setShowAddWaitlist(false)
+                        return data;
+                    }
+                })
         }
         // if guest is selected and any edit is present
         if (selectedGuest && (editEmailField || editNameField || editNumberField || editNotesField)) {
             const updatedGuestResult = await updateGuestFetch(selectedGuest.id, name, notes, phoneNumber, email)
             // if update is success
             if (updatedGuestResult.result) {
-                if (selectedGuest && !editEmailField && !editNameField && !editNumberField && !editNotesField) {
-                    const fetchResult = newWaitlistFetch(selectedGuest.id, partySize, estimatedWait, tags)
-                    if (fetchResult.errors) setServerErrors([...errors, ...fetchResult.errors]);
-                    return fetchResult
-                }
-                setServerErrors([...serverErrors, ...updatedGuestResult.errors]);
-                return updatedGuestResult;
+                    dispatch(newWaitlistParty(selectedGuest.id, partySize, estimatedWait, tags))
+                    .then((data) => {
+                        if (data.errors) {
+                            setServerErrors([data.errors]);
+                            return data;
+                        } else {
+                            setShowConfirmWaitlist(false)
+                            setShowAddWaitlist(false)
+                            return data;
+                        }
+                    })
             }
+            // setServerErrors([...serverErrors, ...updatedGuestResult.errors]);
             return updatedGuestResult;
         }
         // if guest is NOT selected
@@ -41,18 +114,27 @@ const ConfirmWaitlistModal = ({errors, partySize, estimatedWait, selectedGuest, 
             const newGuestResult = await newGuestFetch(name, notes, phoneNumber, email)
             // if post is success
             if (newGuestResult.result) {
-                const fetchResult = newWaitlistFetch(selectedGuest.id, partySize, estimatedWait, tags)
-                if (fetchResult.errors) setServerErrors([...errors, ...fetchResult.errors]);
-                return fetchResult
+                dispatch(newWaitlistParty(newGuestResult.guest.id, partySize, estimatedWait, tags))
+                .then((data) => {
+                    if (data.errors) {
+                        setServerErrors(data.errors)
+                        return data;
+                    } else {
+                        setShowConfirmWaitlist(false)
+                        setShowAddWaitlist(false)
+                        return data;
+                    }
+                })
             }
-            console.log('not getting a success result', newGuestResult)
-            setServerErrors([...serverErrors, ...newGuestResult.errors]);
+            // setServerErrors([...serverErrors, ...newGuestResult.errors]);
             return newGuestResult;
         }
-        const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
-        setServerErrors([...uknownError.errors, ...serverErrors])
-        return uknownError
+        // const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
+        // setServerErrors([...uknownError.errors, ...serverErrors])
+        // return uknownError
     }
+
+
     return(
         <div className={style.modal_background}>
         <div className={style.error_submission_modal}>
@@ -73,32 +155,9 @@ const ConfirmWaitlistModal = ({errors, partySize, estimatedWait, selectedGuest, 
                 })}
                 </div>}
                 {!serverErrors.length && <div className={style.button_area}>
-                {editWaitlist && <div onClick={async ()=>{
-                        const result = handleWaitlistUpdate();
-                        if (result.errors) {
-                        }
-                        else {
-                            setShowConfirmWaitlist(false)
-                            setEditWaitlist('')
-                            // const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
-                            // reservedDate.setHours(0,0,0,0)
-                            // setSelectedDate(reservedDate)
-                        }
-                        }} className={style.confirm_button}>Confirm Party</div>}
-                {!editWaitlist && <div onClick={async ()=>{
-                        const result = await handleWaitlistSubmit();
-                        if (result.errors) {
-                        }
-                        else {
-                            setShowConfirmWaitlist(false)
-                            setShowAddWaitlist(false)
-                            // const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
-                            // reservedDate.setHours(0,0,0,0)
-                            // setSelectedDate(reservedDate)
-                        }
-                        }} className={style.confirm_button}>Confirm Reservation</div>}
-                <div onClick={()=>{
-                        setShowConfirmWaitlist(false)}} className={style.return_button}>Return</div>
+                {editWaitlist && <div onClick={handleWaitlistUpdate} className={style.confirm_button}>Confirm Update</div>}
+                {!editWaitlist && <div onClick={handleWaitlistSubmit} className={style.confirm_button}>Confirm Party Info</div>}
+                <div onClick={()=>{setShowConfirmWaitlist(false)}} className={style.return_button}>Return</div>
                     </div>}
             {serverErrors.length > 0 && <div className={style.button_area}>
                     <div onClick={()=>{setShowConfirmWaitlist(false)}} className={style.return_button}>Return</div>

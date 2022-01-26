@@ -5,24 +5,23 @@ import style from "./AddGuest.module.css";
 import {ReactComponent as CheckCircle} from './assets/check-circle-solid.svg';
 import {ReactComponent as Circle} from  './assets/circle-regular.svg';
 import {ReactComponent as EditIcon} from './assets/edit-regular.svg';
+import ConfirmResModal from './ConfirmResModal';
 import ConfirmWaitlistModal from './ConfirmWaitlistModal';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
-const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, estimatedWait}) => {
+const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait}) => {
     const selectedGuestCheck = (function() {
         if (editReservation) return editReservation.guest_info;
         if (editWaitlist) return editWaitlist.guest_info;
         return null;
     })()
-    console.log('edit waitlist: ', editWaitlist)
+
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
     const [selectedGuest, setSelectedGuest] = useState(selectedGuestCheck);
     const [searchResults, setSearchResults] = useState([]);
-    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext)
-
 
     // edit buttons
     const [editNameField, setEditNameField] = useState(false);
@@ -132,10 +131,9 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
     }
 
     const validateDate = () => {
-        if (!setShowAddWaitlist) {
+        if (setShowMakeRes) {
             const errors = [];
             if (new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() < new Date().getTime()) errors.push("reservation time has already passed, please adjust your date and/or time")
-            console.log('date errors', errors)
             return errors;
         }
         return [];
@@ -161,257 +159,6 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         return errors;
     }
 
-    const postTags = async (reservationId) => {
-        const newTags = {
-            reservation_id: reservationId,
-            tags: tags
-        }
-        const response = await fetch('/api/tags/add', {
-            method: 'POST',
-            headers: {'Content-Type': "application/json"},
-            body: JSON.stringify(newTags)
-        })
-        const data = await response.json()
-        if (data.result) {
-            return data
-        }
-        setErrors(data.errors)
-        return data
-    }
-
-    // handle update
-    const handleUpdate = async () => {
-        // if editReservation
-        // if guest is selected
-        if (selectedGuest) {
-            // if guest fields were edited
-            if (editEmailField || editNameField || editNumberField || editNotesField) {
-                const guestToUpdate = {
-                    id: selectedGuest.id,
-                    name: name,
-                    email: email,
-                    notes: notes,
-                    phone_number: phoneNumber
-                }
-                // then post update guest
-                const response = await fetch('/api/guests/update', {
-                    method: 'PUT',
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(guestToUpdate)
-                })
-                const data = await response.json()
-                   // if update is success
-                if (data.result) {
-                    const resToUpdate = {
-                        reservation_id: editReservation.id,
-                        guest_id: selectedGuest.id,
-                        reservation_time: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime,
-                        party_size: partySize,
-                        table_id: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.id
-                    }
-                    const updateResponse = await fetch('/api/reservations/update', {
-                        method: 'PUT',
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify(resToUpdate)
-                    })
-                    const resUpdateData = await updateResponse.json()
-
-                    if (resUpdateData.result) {
-                        return resUpdateData;
-                    }
-                    setErrors(resUpdateData.errors)
-                    return resUpdateData;
-                }
-                setErrors(data.errors)
-                return data;
-            } else {
-                const resToUpdate = {
-                    reservation_id: editReservation.id,
-                    guest_id: selectedGuest.id,
-                    reservation_time: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime,
-                    party_size: partySize,
-                    table_id: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.id
-                }
-                const updateResponse = await fetch('/api/reservations/update', {
-                    method: 'PUT',
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(resToUpdate)
-                })
-                const resUpdateData = await updateResponse.json()
-
-                if (resUpdateData.result) {
-                    return resUpdateData;
-                }
-                setErrors(resUpdateData.errors)
-                return resUpdateData;
-            }
-        } else {
-            const newGuest = {
-                name: name,
-                notes: notes,
-                phone_number: phoneNumber,
-                email: email
-            }
-            // post new guest
-            const response = await fetch('/api/guests/add', {
-                method: 'POST',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(newGuest)
-            })
-            const data = await response.json();
-            if (data.result) {
-                const updateRes = {
-                    reservation_id: editReservation.id,
-                    guest_id: data.guest.id,
-                    reservation_time: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime,
-                    party_size: partySize,
-                    table_id: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.id
-                }
-                //then post reservation
-                const resResponse = await fetch('/api/reservations/update', {
-                    method: 'PUT',
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(updateRes)
-                })
-                const resUpdateData = await resResponse.json()
-                if (resUpdateData.result) {
-                    // if (tags) {
-                    //     return postTags(resUpdateData.newReservation.id);
-                    // }
-                    return resUpdateData.newReservation
-                }
-                setErrors(resUpdateData.errors);
-                return resUpdateData;
-            }
-            console.log('not getting a success result', data)
-            setErrors(data.errors);
-            return data;
-        }
-
-    }
-    //TODO:
-                // update selected reservation with date/time/tags/party that changed
-            // if guest is not selected
-                // create new guest with info entered
-                // update reservation with the new guest and date/time/tags/party if changed
-
-    const handleResSubmit = async () => {
-        // if guest is selected but none of the edits are present
-        if (selectedGuest && !editEmailField && !editNameField && !editNumberField && !editNotesField) {
-            const newReservation = {
-                guest_id: selectedGuest.id,
-                reservation_time: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime,
-                party_size: partySize,
-                table_id: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.id
-            }
-            //then post reservation
-            const response = await fetch('/api/reservations/new', {
-                method: 'POST',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(newReservation)
-            })
-            const data = await response.json()
-            if (data.result) {
-                if (tags) {
-                    return postTags(data.newReservation.id)
-                }
-                return data.newReservation
-            }
-            setErrors(data.errors);
-            return data
-        }
-        // if guest is selected and any edit is present
-        if (selectedGuest && (editEmailField || editNameField || editNumberField || editNotesField)) {
-            const guestToUpdate = {
-                id: selectedGuest.id,
-                name: name,
-                email: email,
-                notes: notes,
-                phone_number: phoneNumber
-            }
-            // then post update guest
-            const response = await fetch('/api/guests/update', {
-                method: 'PUT',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(guestToUpdate)
-            })
-
-            const data = await response.json()
-            // if update is success
-            if (data.result) {
-                const newReservation = {
-                    guest_id: selectedGuest.id,
-                    reservation_time: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime,
-                    party_size: partySize,
-                    table_id: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.id
-                }
-                //then post reservation
-                const response = await fetch('/api/reservations/new', {
-                    method: 'POST',
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(newReservation)
-                })
-                const data = await response.json()
-                if (data.result) {
-                    if (tags) {
-                        return postTags(data.newReservation.id)
-                    }
-                    return data.newReservation
-                }
-                setErrors(data.errors);
-                return data
-
-            }
-            setErrors(data.errors);
-            return data
-        }
-        // if not guest is selected
-        if (!selectedGuest) {
-            const newGuest = {
-                name: name,
-                notes: notes,
-                phone_number: phoneNumber,
-                email: email
-            }
-            // post new guest
-            const response = await fetch('/api/guests/add', {
-                method: 'POST',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(newGuest)
-            })
-            const data = await response.json();
-            if (data.result) {
-                const newReservation = {
-                    guest_id: data.guest.id,
-                    reservation_time: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime,
-                    party_size: partySize,
-                    table_id: sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].table.id
-                }
-                //then post reservation
-                const resResponse = await fetch('/api/reservations/new', {
-                    method: 'POST',
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(newReservation)
-                })
-                const reservationData = await resResponse.json()
-                if (reservationData.result) {
-                    if (tags) {
-                        return postTags(reservationData.newReservation.id);
-                    }
-                    return reservationData.newReservation
-                }
-                setErrors(reservationData.errors);
-                return reservationData;
-            }
-            console.log('not getting a success result', data)
-            setErrors(data.errors);
-            return data;
-        }
-        const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
-        setErrors(uknownError.errors)
-
-        return uknownError
-    }
 
     return(
         <div className={style.add_guest}>
@@ -535,94 +282,61 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                 <div  onClick={() => {
                     const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
                     setErrors(errors);
-                    setShowAddWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
+                    editWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
                     }} className={style.place_reservation_button}>{editReservation ? 'Update Reservation' : 'Update Waitlist'}</div>
                 }
-                {((selectedGuest || validateNameAndPhone()) && (!!editReservation || !!editWaitlist)) && <div  onClick={() => {
+                {((selectedGuest || validateNameAndPhone()) && (!editReservation && !editWaitlist)) && <div  onClick={() => {
                     const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
                     setErrors(errors);
-                    setShowAddWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
+                    showAddWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
                     }} className={style.place_reservation_button}>{setShowAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>}
                 {(!selectedGuest && !validateNameAndPhone()) && <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>}
-                {showConfirmRes && <div className={style.modal_background}>
-                        <div className={style.error_submission_modal}>
-                            <div className={style.title_bar}>{errors.length < 1 ? "Confirm Submission" : "It seems there is an issue..."}</div>
-                            {!errors.length && <ul className={style.reservation_details}>
-                                <li>Your reservation:</li>
-                                <li>{`${partySize} ${partySize === 1 ? 'Guest' : 'Guests'}`}</li>
-                                <li>{`at ${new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}`}</li>
-                                <li>{`on ${new Date(sevenDayAvailability[selectDateIndex].date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}`}</li>
-                                <li> {`for ${selectedGuest ? selectedGuest.name : name}`}</li>
-                                </ul>}
-                            {errors.length && <div className={style.errors}>
-                                <div className={style.error_message}></div>
-                                {errors.map((error)=>{
-                                    return(
-                                        <>
-                                        <div className={style.error_description}>{error}</div>
-                                        </>
-                                    )
-                                })}
-                                </div>}
-                                {!errors.length && <div className={style.button_area}>
-                                {editReservation && <div onClick={async ()=>{
-                                        const result = await handleUpdate();
-                                        if (result.errors) {
-                                        }
-                                        else {
-                                            setShowConfirmRes(false)
-                                            setEditReservation('')
-                                            const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
-                                            reservedDate.setHours(0,0,0,0)
-                                            setSelectedDate(reservedDate)
-                                        }
-                                        }} className={style.confirm_button}>Confirm Reservation</div>}
-                                {!editReservation && <div onClick={async ()=>{
-                                        const result = await handleResSubmit();
-                                        if (result.errors) {
-                                        }
-                                        else {
-                                            setShowConfirmRes(false)
-                                            setShowMakeRes(false)
-                                            const reservedDate = new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime)
-                                            reservedDate.setHours(0,0,0,0)
-                                            setSelectedDate(reservedDate)
-                                        }
-                                        }} className={style.confirm_button}>Confirm Reservation</div>}
-                                <div onClick={()=>{
-                                        setShowConfirmRes(false)
-                                        setErrors([])}} className={style.return_button}>Return</div>
-                                    </div>}
-                            {errors.length && <div className={style.button_area}>
-                                    <div onClick={()=>{
-                                        setShowConfirmRes(false)
-                                        setErrors([])}} className={style.return_button}>Return</div>
-                                </div>}
-                        </div>
-                    </div>}
-                    {showConfirmWaitlist &&
-                        <ConfirmWaitlistModal
-                            errors={errors}
-                            partySize={partySize}
-                            estimatedWait={estimatedWait}
-                            selectedGuest={selectedGuest}
-                            name={name}
-                            notes={notes}
-                            phoneNumber={phoneNumber}
-                            email={email}
-                            tags={tags}
-                            editWaitlist={editWaitlist}
-                            setEditWaitlist={setEditWaitlist}
-                            setShowAddWaitlist={setShowAddWaitlist}
-                            setShowConfirmWaitlist={setShowConfirmWaitlist}
-                            editNameField={editNameField}
-                            editEmailField={editEmailField}
-                            editNumberField={editNumberField}
-                            editNotesField={editNotesField}
-                            />}
+                {showConfirmRes &&
+                    <ConfirmResModal
+                        errors={errors}
+                        selectedGuest={selectedGuest}
+                        editReservation={editReservation}
+                        setEditReservation={setEditReservation}
+                        setShowMakeRes={setShowMakeRes}
+                        setShowConfirmRes={setShowConfirmRes}
+                        date={sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].datetime}
+                        table={sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].table.id}
+                        partySize={partySize}
+                        name={name}
+                        notes={notes}
+                        phoneNumber={phoneNumber}
+                        email={email}
+                        tags={tags}
+                        editNameField={editNameField}
+                        editEmailField={editEmailField}
+                        editNumberField={editNumberField}
+                        editNotesField={editNotesField}
+                    />}
+                {showConfirmWaitlist &&
+                    <ConfirmWaitlistModal
+                        errors={errors}
+                        partySize={partySize}
+                        estimatedWait={estimatedWait}
+                        selectedGuest={selectedGuest}
+                        name={name}
+                        notes={notes}
+                        phoneNumber={phoneNumber}
+                        email={email}
+                        tags={tags}
+                        editWaitlist={editWaitlist}
+                        setEditWaitlist={setEditWaitlist}
+                        setShowAddWaitlist={setShowAddWaitlist}
+                        setShowConfirmWaitlist={setShowConfirmWaitlist}
+                        editNameField={editNameField}
+                        editEmailField={editEmailField}
+                        editNumberField={editNumberField}
+                        editNotesField={editNotesField}
+                    />}
             </div>
         </div>
     )
 }
 
 export default AddGuest;
+
+// editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize,

@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch } from 'react-redux';
-import { updateAndSetStatus } from '../../../store/selectedDateAvailability';
+import { updateAndSetResStatus } from '../../../store/selectedDateAvailability';
+import { updateAndSetPartyStatus } from '../../../store/selectedDateWaitlist';
 import style from './StatusBar.module.css'
 import { ReactComponent as CancelIcon } from './assets/times-circle-regular.svg';
 import { ReactComponent as LateIcon } from './assets/exclamation-circle-solid.svg';
@@ -11,16 +12,27 @@ import { ReactComponent as SeatedIcon } from './assets/check-circle-solid.svg';
 import { ReactComponent as ReservedIcon } from './assets/circle-solid.svg';
 import { ReactComponent as LeftMessageIcon } from './assets/spinner-solid.svg';
 
-const StatusBar = ({reservationId, statusId, setShowStatusBar}) => {
+const StatusBar = ({reservationId, statusId, setShowStatusBar, waitlistEntryId}) => {
     const dispatch = useDispatch();
     const [selectedStatus, setSelectedStatus] = useState(statusId)
     const handleStatusChange = (newStatusId) => {
-       dispatch(updateAndSetStatus(reservationId, newStatusId)).then((data)=>{
-        setSelectedStatus(data.reservation.status_id);
-        if (setShowStatusBar) {
-            setShowStatusBar(null);
+        if (reservationId) {
+            dispatch(updateAndSetResStatus(reservationId, newStatusId)).then((data) => {
+                setSelectedStatus(data.reservation.status_id);
+                if (setShowStatusBar) {
+                    setShowStatusBar(null)
+                }
+            });
         }
-       });
+        if (waitlistEntryId) {
+            dispatch(updateAndSetPartyStatus(waitlistEntryId, newStatusId)).then((data)=>{
+             setSelectedStatus(data.party.status_id);
+             if (setShowStatusBar) {
+                 setShowStatusBar(null);
+             }
+            });
+
+        }
     }
 
     const popoverElementRef = useRef(null);
@@ -43,12 +55,12 @@ const StatusBar = ({reservationId, statusId, setShowStatusBar}) => {
     // TODO: add confirmation modal when cancelled status is selected. Cancel should lock all status changes and rerender ResSchedule
     return(
         <div  className={style.status_bar}>
-            <div className={selectedStatus === 3 ? style.selected : style.status_reserved}
+            <div className={(selectedStatus === 3 || selectedStatus === 5) ? style.selected : style.status_reserved}
             onClick={() => {
                 handleStatusChange(3);
             }}>
                 <ReservedIcon className={style.icon}></ReservedIcon>
-                <div className={style.txt}>Reserved</div>
+                <div className={style.txt}>{waitlistEntryId ? "Confirmed" : "Reserved"}</div>
             </div>
             <div className={selectedStatus === 4 ? style.selected : style.status_lm}
             onClick={() => {

@@ -31,5 +31,5 @@ def add_tags():
                 db.session.commit()
             except:
                 return {"errors": ["there was an error adding your tag to the database. please try again"]}, 400
-        return {"result": 'succsesfully applied tags'}
+        return {"result": 'succsesfully applied tags', "reservation": target_res.to_dict}
     return {"errors": ["the length of one or more of your declared tags is greater than 40 characters. please be sure each tag is seperated by a space"]}, 400

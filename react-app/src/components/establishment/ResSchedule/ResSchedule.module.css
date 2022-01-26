@@ -70,6 +70,7 @@
 
 .footer_options {
     grid-area: bottom;
+    text-align: center;
 
 }
 
@@ -114,7 +115,11 @@
     padding: 4px;
     color: white;
     font-family: sans-serif;
+}
 
+.available_time_card:hover {
+    cursor: pointer;
+    border: 2px solid #55b68a;
 }
 
 .spacer {

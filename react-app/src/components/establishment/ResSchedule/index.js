@@ -8,9 +8,10 @@ import StatusBar from '../StatusBar';
 import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 
 const ResSchedule =() => {
-    const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
+    const {selectedDate} = useContext(EstablishmentContext);
     const dispatch = useDispatch();
     const [availableTables, setavailableTables] = useState();
+    const [showMakeRes, setShowMakeRes] = useState(null);
     const [reservations, setReservations] = useState();
     const [editReservation, setEditReservation] = useState('')
 
@@ -55,7 +56,7 @@ const ResSchedule =() => {
         )
     })
 
-    console.log('MODEL ARRAY: ', resScheduleModel);
+    // console.log('MODEL ARRAY: ', resScheduleModel);
 
     return(
         <div className={style.res_schedule}>
@@ -108,15 +109,16 @@ const ResSchedule =() => {
                                         )
                                         }} className={style.edit_reservation_button}>Edit</div>
                                 </div>
-                                {editReservation && <AddReservation setEditReservation={setEditReservation} editReservation={editReservation}/>}
+                                {editReservation && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
                             </>
                            )
                         })}
-                        {column.availableTables?.length > 0 && column.availableTables.map((availableTable, index) => {
+                        {column.availableTables?.length > 0 && column.availableTables.map((availableTable, timeIndex) => {
                             const tableTime  = new Date(availableTable.datetime);
                             if (tableTime > new Date()) {
                                 return(
-                                    <div key={index} className={style.available_time_card}>
+                                    <>
+                                    <div key={timeIndex} onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes(timeIndex))} className={style.available_time_card}>
                                         <div className={style.available_party}>
                                             <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
                                             <div className={style.party_size}>
@@ -128,6 +130,8 @@ const ResSchedule =() => {
                                             {availableTable.table.table_name}
                                         </div>
                                     </div>
+                                    {showMakeRes === timeIndex && <AddReservation key={`avail${timeIndex}`} setShowMakeRes={setShowMakeRes} availableTable={availableTable}/>}
+                                    </>
                                 )
                             } else {
                                 return(null)
@@ -139,7 +143,7 @@ const ResSchedule =() => {
             })}
             </div>
 
-            <div className={style.footer_options}>Options Not Yet Added</div>
+            <div className={style.footer_options}>More schdule options coming...</div>
         </div>
     )
 }

@@ -16,8 +16,8 @@ import { getSevenDayAvailability } from '../../../store/sevenDayAvailability.js'
 
 const LeftPanel = () => {
     const dispatch = useDispatch();
-    const [viewBooked, setViewBooked] = useState(false);
-    const [viewWaitlist, setViewWaitlist] = useState(false);
+    const [viewBooked, setViewBooked] = useState(true);
+    const [viewWaitlist, setViewWaitlist] = useState(true);
     const [showMakeRes, setShowMakeRes] = useState(false);
     const [showAddWaitlist, setShowAddWaitlist] = useState(false);
     const { selectedDate } = useContext(EstablishmentContext);
@@ -25,7 +25,7 @@ const LeftPanel = () => {
     return (
         <div className={style.left_panel}>
             {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}
-        {showAddWaitlist && <AddWaitlist setShowAddWaitlist={setShowAddWaitlist}/>}
+        {showAddWaitlist && <AddWaitlist setShowAddWaitlist={setShowAddWaitlist} showAddWaitlist={showAddWaitlist}/>}
             <input className={style.search}></input>
             <div className={style.filter_bar}>
                 <div className={style.sort_by}>Sort By</div>
