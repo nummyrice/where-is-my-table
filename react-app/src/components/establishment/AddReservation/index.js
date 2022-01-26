@@ -4,7 +4,7 @@ import style from './AddReservation.module.css';
 import {ReactComponent as X} from './assets/times-solid.svg';
 import AddGuest from '../AddGuest';
 
-const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) => {
+const AddReservation = ({setShowMakeRes, setEditReservation, editReservation, availableTable}) => {
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const initialTimeIndex = sevenDayAvailability[0].availability.findIndex((table) => {
         const tableTime = new Date(table.datetime);
@@ -16,13 +16,20 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) =
 
     // RETURNS ARRAY OF GUEST NUM FOR TABLE
     const tableCapacity = (function getCapacity() {
-        const tableMin = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.min_seat
-        const tableMax = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.max_seat
         const guestNum = [];
-        for (let index = tableMin; index <= tableMax; index++) {
-            guestNum.push(index);
+        if (availableTable) {
+            for (let index = availableTable.table.min_seat; index <= availableTable.table.max_seat; index++) {
+                guestNum.push(index);
+            }
+            return guestNum;
+        } else {
+            const tableMin = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.min_seat
+            const tableMax = sevenDayAvailability[selectDateIndex].availability[selectTimeIndex]?.table.max_seat
+            for (let index = tableMin; index <= tableMax; index++) {
+                guestNum.push(index);
+            }
+            return guestNum;
         }
-        return guestNum;
     })()
 
     return (
@@ -34,7 +41,11 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) =
                 {!editReservation && <X onClick={() => {setShowMakeRes(false)}} className={style.icon}/>}
                 <div className={style.date}>
                     <div className={style.top_scroll_space}></div>
-                {sevenDayAvailability && sevenDayAvailability.map((day, index) => {
+                {availableTable && <div className={style.date_cell_select}>
+                            <div className={style.weekday}>{new Date(availableTable.datetime).toLocaleDateString('en-US', {weekday: 'short'}).slice(0,1)}</div>
+                            <div className={style.date_text}>{new Date(availableTable.datetime).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>
+                        </div>}
+                {(sevenDayAvailability && !availableTable) && sevenDayAvailability.map((day, index) => {
                     const cellDate = new Date(day.date);
                     const dateText = cellDate.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
                     const weekday = cellDate.toLocaleDateString('en-US', {weekday: 'short'});
@@ -68,7 +79,11 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) =
                 </div>
                 <div className={style.time}>
                     <div className={style.top_scroll_space}></div>
-                    {sevenDayAvailability[selectDateIndex]?.availability.length > 0 && sevenDayAvailability[selectDateIndex].availability.map((availableTime, index) => {
+                    {availableTable && <div className={style.time_cell_select}>
+                                    <div className={style.time_text}>{new Date(availableTable.datetime).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
+                                    <div className={style.table}>{availableTable.table.table_name}</div>
+                                </div>}
+                    {(sevenDayAvailability[selectDateIndex]?.availability.length > 0 && !availableTable) && sevenDayAvailability[selectDateIndex].availability.map((availableTime, index) => {
                         const datetime = new Date(availableTime.datetime);
                         const localTimeString = datetime.toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' });
                         if (datetime > new Date()) {
@@ -87,7 +102,7 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation}) =
                     })}
                     <div className={style.bottom_scroll_space}></div>
                 </div>
-                <AddGuest editReservation={editReservation} setEditReservation={setEditReservation} setShowMakeRes={setShowMakeRes} selectDateIndex={selectDateIndex} selectTimeIndex={selectTimeIndex} partySize={partySize}/>
+                <AddGuest editReservation={editReservation} setEditReservation={setEditReservation} setShowMakeRes={setShowMakeRes} selectDateIndex={selectDateIndex} selectTimeIndex={selectTimeIndex} partySize={partySize} availableTable={availableTable}/>
             </div>
         </div>
     )

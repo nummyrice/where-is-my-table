@@ -10,7 +10,7 @@ import ConfirmWaitlistModal from './ConfirmWaitlistModal';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
-const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait}) => {
+const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait, availableTable}) => {
     const selectedGuestCheck = (function() {
         if (editReservation) return editReservation.guest_info;
         if (editWaitlist) return editWaitlist.guest_info;
@@ -299,8 +299,8 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                         setEditReservation={setEditReservation}
                         setShowMakeRes={setShowMakeRes}
                         setShowConfirmRes={setShowConfirmRes}
-                        date={sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].datetime}
-                        table={sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].table.id}
+                        date={availableTable ? availableTable.datetime : sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].datetime}
+                        table={availableTable ? availableTable.table.id : sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].table.id}
                         partySize={partySize}
                         name={name}
                         notes={notes}
