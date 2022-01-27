@@ -95,7 +95,7 @@
     padding: 18px 0px 18px 0px;
     grid-area: edit;
     background-color: #555555;
-}
+}e
 
 #edit_button:hover,
 .add_button:hover {
@@ -112,6 +112,58 @@
     /* top: 100px; */
 }
 
+/* WAITLIST */
+
+.waitlist_entry {
+    display: grid;
+    grid-template-columns: 50px 100px 100px 50px;
+    grid-template-rows: 70px;
+    grid-template-areas:
+    "icon party-info time edit-delete";
+    /* overflow-y: scroll; */
+    border-bottom: 1px solid grey;
+}
+
+#party_info_sec {
+    grid-area: party-info;
+    font-family: sans-serif;
+}
+
+#time_track {
+    grid-area: time;
+    font-family: sans-serif;
+}
+
+#edit_delete_buttons {
+    grid-area: edit-delete;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#edit_party_icon,
+#delete_party_icon {
+    background-color: #555555;
+    text-align: center;
+    height: 30px;
+    width: 30px;
+    border-radius: 3px;
+}
+#edit_party_icon:hover,
+#delete_party_icon:hover,
+.waitlist_icon:hover {
+    cursor: pointer;
+    color: grey;
+}
+
+.waitlist_icon {
+    color: white;
+    height: 18px;
+    position: relative;
+    top: 18%;
+    /* bottom: 50%; */
+}
 
 /* STATUS */
 #status_icon {

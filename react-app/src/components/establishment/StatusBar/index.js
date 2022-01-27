@@ -57,7 +57,7 @@ const StatusBar = ({reservationId, statusId, setShowStatusBar, waitlistEntryId})
         <div  className={style.status_bar}>
             <div className={(selectedStatus === 3 || selectedStatus === 5) ? style.selected : style.status_reserved}
             onClick={() => {
-                handleStatusChange(3);
+                handleStatusChange(waitlistEntryId ? 5 : 3);
             }}>
                 <ReservedIcon className={style.icon}></ReservedIcon>
                 <div className={style.txt}>{waitlistEntryId ? "Confirmed" : "Reserved"}</div>

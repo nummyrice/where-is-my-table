@@ -64,4 +64,14 @@ def edit_status():
         db.session.commit()
         return {"result": "successfully updated party status", "party": party.to_dict()}
     except:
-        return {"errors": "there was a server error updating the reservation status"}
+        return {"errors": "there was a server error updating the party status"}, 400
+
+# DELETE PARTY STATUS
+@waitlist_routes.route('/<int:partyId>remove', methods=['DELETE'])
+def delete_party(partyId):
+    try:
+        party = db.session.query(Waitlist).get(partyId)
+        db.session.delete(party)
+        return {'result': 'successfully deleted party'}
+    except:
+        return {'errors': "there was a server error deleting the party"}, 400

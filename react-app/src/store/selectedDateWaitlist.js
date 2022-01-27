@@ -1,6 +1,7 @@
 const SET_WAITLIST = 'selectedDateWaitlist/SET_WAITLIST';
 const SET_PARTY = 'selectedDateWaitlist/SET_PARTY';
 const UPDATE_PARTY = 'selectedDateWaitlist/UPDATE_PARTY';
+const DELETE_PARTY = 'selectedDateWaitlist/DELETE_PARTY'
 
 const setWaitlist = (waitlist) => ({
     type: SET_WAITLIST,
@@ -15,6 +16,11 @@ const setParty = (party) => ({
 const updateParty = (party) => ({
     type: UPDATE_PARTY,
     payload: party
+})
+
+const deleteParty = (partyId) => ({
+    type: DELETE_PARTY,
+    payload: partyId
 })
 
 // GET WAITLIST
@@ -83,6 +89,16 @@ export const updateAndSetPartyStatus = (partyId, newStatusId) => async (dispatch
     return data;
 }
 
+// DELETE PARTY
+export const deleteAndUnsetParty = (partyId) => async (dispatch) => {
+    const response = await fetch(`api/waitlist/${partyId}remove`, {method: 'DELETE'});
+    const data = await response.json();
+    if (response.ok) {
+        dispatch(deleteParty(partyId))
+    }
+    return data;
+}
+
 const initialState = [];
 export default function reducer(state = initialState, action) {
     const newState = [...state];
@@ -96,6 +112,10 @@ export default function reducer(state = initialState, action) {
         case UPDATE_PARTY:
             const updatedPartyIndex = newState.findIndex((party) => party.id === action.payload.id)
             newState.splice(updatedPartyIndex, 1, action.payload)
+            return newState;
+        case DELETE_PARTY:
+            const targetPartyIndex = newState.findIndex((party) => party.id === action.payload)
+            newState.splice(targetPartyIndex, 1)
             return newState;
         default:
             return state;
