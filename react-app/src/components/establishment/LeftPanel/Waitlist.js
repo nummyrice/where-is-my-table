@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import style from './LeftPanel.module.css';
 import StatusBar from '../StatusBar';
 import AddWaitlist from '../AddWaitlist';
+import { deleteAndUnsetParty } from '../../../store/selectedDateWaitlist';
 
 import { ReactComponent as EditIcon } from './assets/chevron-right-solid.svg';
 import { ReactComponent as CancelIcon } from '../StatusBar//assets/times-circle-regular.svg';
@@ -13,8 +14,11 @@ import { ReactComponent as ArrivedIcon } from '../StatusBar//assets/check-circle
 import { ReactComponent as SeatedIcon } from '../StatusBar//assets/check-circle-solid.svg';
 import { ReactComponent as ReservedIcon } from '../StatusBar//assets/circle-solid.svg';
 import { ReactComponent as LeftMessageIcon } from '../StatusBar//assets/spinner-solid.svg';
+import { ReactComponent as EditPartyIcon } from '../AddGuest/assets/edit-regular.svg';
+import { ReactComponent as TrashIcon } from './assets/trash-alt-solid.svg';
 
 const Waitlist = () => {
+    const dispatch = useDispatch();
     const waitlist = useSelector(state => state.selectedDateWaitlist)
     const [showStatusBar, setShowStatusBar] = useState(null);
     const [editWaitlist, setEditWaitlist] = useState('')
@@ -23,7 +27,7 @@ const Waitlist = () => {
             {waitlist.length > 0 &&
                 waitlist.map((waitlistEntry, index) => {
                     return(
-                        <div key={waitlistEntry.id} className={style.res_entry}>
+                        <div key={waitlistEntry.id} className={style.waitlist_entry}>
                             <div id={style.status_icon}>
                                 {waitlistEntry.status_id === 5 &&
                                     <ReservedIcon title="Reserved" className={style.icon_blue} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
@@ -54,13 +58,20 @@ const Waitlist = () => {
                                         <StatusBar setShowStatusBar={setShowStatusBar} waitlistEntryId={waitlistEntry.id} statusId={waitlistEntry.status_id}/>
                                     </div>}
                             </div>
-                            <div id={style.res_info_sec}>
+                            <div id={style.party_info_sec}>
                                 <div>{waitlistEntry.guest_info.name}</div>
-                                <div>{new Date(waitlistEntry.created_at).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
                                 <div id={style.party_size}>{`Guests: ${waitlistEntry.party_size}`}</div>
+                                <div>{new Date(waitlistEntry.created_at).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
                             </div>
-                            <div onClick={()=>setEditWaitlist(waitlistEntry)} id={style.edit_button}>
-                                <EditIcon id={style.edit_icon}/></div>
+                            <div id={style.time_track}></div>
+                            <div id={style.edit_delete_buttons}>
+                                <div id={style.edit_party_icon}>
+                                    <EditPartyIcon onClick={()=>setEditWaitlist(waitlistEntry)} className={style.waitlist_icon}/>
+                                </div>
+                                <div onClick={() => dispatch(deleteAndUnsetParty(waitlistEntry.id))} id={style.delete_party_icon}>
+                                    <TrashIcon className={style.waitlist_icon}/>
+                                </div>
+                            </div>
                             {editWaitlist && <AddWaitlist editWaitlist={editWaitlist} setEditWaitlist={setEditWaitlist}/>}
                         </div>
                     )

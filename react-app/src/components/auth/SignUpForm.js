@@ -30,7 +30,7 @@ const SignUpForm = () => {
       } else if (data) {
         setErrors(data)
       }
-    }
+    } else setErrors(['passwords do not match'])
   };
 
   const onClaimUser = async (e) => {

@@ -15,6 +15,16 @@
     justify-self: center;
 }
 
+#welcome {
+    grid-area: empty;
+    color: black;
+    align-self: center;
+    font-family: sans-serif;
+    font-size: 15px;
+
+}
+
+
 img {
     height: 70px;
 }
@@ -134,4 +144,8 @@ li {
 .ul_flex:hover {
     cursor: pointer;
     display: block;
+}
+
+#delete_user {
+    color: red;
 }
