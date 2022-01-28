@@ -8,7 +8,7 @@ import logo from './assets/Artboard1.png';
 import { ReactComponent as Dragon} from './assets/dragon-solid.svg';
 import { ReactComponent as Bird} from './assets/crow-solid.svg';
 import { ReactComponent as DropDownIcon } from './assets/bars-solid.svg';
-import { login } from '../../store/session';
+import { login, deleteUser } from '../../store/session';
 
 const NavBar = () => {
   const dispatch = useDispatch()
@@ -29,6 +29,7 @@ const NavBar = () => {
           <img alt='Logo' src={logo}></img>
         </NavLink>
       </div>
+      {user && <div id={style.welcome}>{`Welcome ${user.name.toUpperCase()}`}</div>}
       {(!user || user?.id !== 4) && <div onClick={demoGuestLogin} id={style.demo_guest}>
         <Bird/>
         <div id={style.demo_guest_txt}>Demo Guest</div>
@@ -58,7 +59,10 @@ const NavBar = () => {
           </NavLink>
         </li>}
         {user && <li>
-          <LogoutButton />
+          <LogoutButton/>
+        </li>}
+        {user && (user.id !== 1 && user.id !== 4) && <li id={style.delete_user} onClick={()=> {dispatch(deleteUser(user.id))}}>
+          Delete My Account
         </li>}
       </ul>
     </nav>

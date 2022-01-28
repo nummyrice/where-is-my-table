@@ -129,6 +129,13 @@ export const claimUser = (id, email, password) => async (dispatch) => {
 
 }
 
+export const deleteUser = (userId) => async (dispatch) => {
+  const response = await fetch(`/api/users/${userId}/delete`, {method: 'DELETE'})
+  const data = await response.json()
+  if (response.ok) return dispatch(removeUser());
+  return data;
+}
+
 // REDUCER
 export default function reducer(state = initialState, action) {
   switch (action.type) {

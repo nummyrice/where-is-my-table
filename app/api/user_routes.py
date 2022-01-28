@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.models import db, User
 from app.forms import UpdateGuestForm, EditUserForm, ClaimUserForm
 from .auth_routes import validation_errors_to_error_messages
@@ -77,10 +77,14 @@ def edit_user():
 
 
 #DELETE USER
-@user_routes.route('/delete', methods=['DELETE'])
-def delete_user():
-    data = request.json
-    target_user = db.session.query(User).get(data['id'])
-    db.session.delete(target_user)
-    db.session.commit()
-    return {"result": "successfully deleted user"}
+@user_routes.route('/<int:userId>/delete', methods=['DELETE'])
+def delete_user(userId):
+    if current_user.id == userId:
+        try:
+            target_user = db.session.query(User).get(userId)
+            db.session.delete(target_user)
+            db.session.commit()
+            return {"result": "successfully deleted user"}
+        except:
+            return {"errors": ["failed to delete user"]}, 400
+    return {"errors": ["permission not granted"]}, 400
