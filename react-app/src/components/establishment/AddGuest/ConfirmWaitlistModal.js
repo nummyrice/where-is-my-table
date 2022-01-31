@@ -30,10 +30,10 @@ const ConfirmWaitlistModal = ({errors, partySize, estimatedWait, selectedGuest, 
                 }
                 // if guest is selected and any edit is present
                 if (selectedGuest && (editEmailField || editNameField || editNumberField || editNotesField)) {
-                    const updatedGuestResult = await updateGuestFetch(editWaitlist.id, selectedGuest.id, name, notes, phoneNumber, email)
+                    const updatedGuestResult = await updateGuestFetch(selectedGuest.id, name, notes, phoneNumber, email)
                     // if update is success
                     if (updatedGuestResult.result) {
-                            dispatch(updateWaitlistParty(selectedGuest.id, partySize, estimatedWait, tags))
+                            dispatch(updateWaitlistParty(editWaitlist.id, selectedGuest.id, partySize, estimatedWait, tags))
                             .then((data) => {
                                 if (data.errors) {
                                     setServerErrors([data.errors]);

@@ -313,7 +313,8 @@
     align-items: center;
     background-color: #f7f7f7;
     border: 2px solid rgb(169, 169, 169);
-    justify-content: space-evenly;
+    /* justify-content: space-evenly; */
+    overflow-x: scroll;
 
 
 }
@@ -331,6 +332,28 @@
 .tag_input {
     /* margin-left: 10px; */
     /* width: 240px; */
+}
+
+.tag {
+    height: 30px;
+    /* display: inline-block; */
+    color: black;
+    border: 1px solid black;
+    width: auto;
+    margin: 3px;
+    border-radius: 3px;
+    padding: 3px;
+    white-space: nowrap;
+}
+.delete_tag {
+    height: 10px;
+    margin: 3px;
+    /* text-align: center; */
+
+}
+
+.delete_tag:hover {
+    cursor: pointer;
 }
 
 /* PLACE RESERVATION BUTTON */

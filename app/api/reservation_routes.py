@@ -115,7 +115,7 @@ def reservation_submit():
     if form.validate_on_submit():
         reservation_time = parser.parse(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
-        print('RESERVATION_____________: ', reservation_exists)
+        # print('RESERVATION_____________: ', reservation_exists)
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
@@ -127,7 +127,7 @@ def reservation_submit():
                 reservation_exists['party_size'] = form.data['party_size']
                 reservation_exists['table_id'] = form.data['table_id']
                 db.session.commit()
-                return {'result': "succesfully reserved"}, 200
+                return {'result': "succesfully reserved", "reservation": reservation_exists.to_dict()}, 200
             else:
                 return {"errors": ["time unavailable, please choose a different time"]}, 400
         else:
@@ -140,34 +140,54 @@ def reservation_submit():
                 )
             db.session.add(reservation)
             db.session.commit()
-            return {'result': "successfully reserved", 'newReservation': reservation.to_dict()}, 201
+            return {'result': "successfully reserved", 'reservation': reservation.to_dict()}, 201
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
-
 # UPDATE RESERVATION
-@reservation_routes.route('/update', methods=['PUT'])
+@reservation_routes.route('update', methods=['PUT'])
 def edit_reservation():
     form = UpdateReservationForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
         reservation_time = parser.isoparse(form.data['reservation_time'])
-        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
-        pending_status = None
-        if reservation_exists:
-            res_updated_at = reservation_exists.updated_at
-            pending_status: datetime = datetime.now() - res_updated_at
-        if not reservation_exists or reservation_exists and reservation_exists.status_id == 2 and (pending_status / 60) > 10:
-            res_to_edit = db.session.query(Reservation).get(form.data['reservation_id'])
-            res_to_edit.guest_id = form.data['guest_id']
-            res_to_edit.party_size = form.data['party_size']
-            res_to_edit.reservation_time = reservation_time
-            res_to_edit.table_id = form.data['table_id']
+        target_reservation = db.session.query(Reservation).get(form.data['reservation_id'])
+        res_updated_at = target_reservation.updated_at
+        pending_status = datetime.now() - res_updated_at
+        if not target_reservation.status_id == 2 or (target_reservation.status_id == 2 and (pending_status / 60) > 10):
+            target_reservation.guest_id = form.data['guest_id']
+            target_reservation.party_size = form.data['party_size']
+            target_reservation.reservation_time = reservation_time
+            target_reservation.table_id = form.data['table_id']
             db.session.commit()
-            return {"result": "successfully updated", "reservation": res_to_edit.to_dict()}
+            return {"result": "successfully updated", "reservation": target_reservation.to_dict()}
         return {'errors': ["reservation already exists for this time"]}, 400
-
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
+
+
+# UPDATE RESERVATION FIRST METHOD
+# @reservation_routes.route('/update', methods=['PUT'])
+# def edit_reservation():
+#     form = UpdateReservationForm()
+#     form['csrf_token'].data = request.cookies['csrf_token']
+#     if form.validate_on_submit():
+#         reservation_time = parser.isoparse(form.data['reservation_time'])
+#         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
+#         pending_status = None
+#         if reservation_exists:
+#             res_updated_at = reservation_exists.updated_at
+#             pending_status: datetime = datetime.now() - res_updated_at
+#         if not reservation_exists or reservation_exists and reservation_exists.status_id == 2 and (pending_status / 60) > 10:
+#             res_to_edit = db.session.query(Reservation).get(form.data['reservation_id'])
+#             res_to_edit.guest_id = form.data['guest_id']
+#             res_to_edit.party_size = form.data['party_size']
+#             res_to_edit.reservation_time = reservation_time
+#             res_to_edit.table_id = form.data['table_id']
+#             db.session.commit()
+#             return {"result": "successfully updated", "reservation": res_to_edit.to_dict()}
+#         return {'errors': ["reservation already exists for this time"]}, 400
+
+#     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 # UPDATE RESERVATION STATUS
 @reservation_routes.route('/status/update', methods=['PUT'])

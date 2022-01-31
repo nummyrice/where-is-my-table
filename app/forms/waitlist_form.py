@@ -9,7 +9,7 @@ class WaitlistForm(FlaskForm):
 
 
 class UpdateWaitlistForm(FlaskForm):
-    waitlist_id = IntegerField('id', validators=[DataRequired()])
+    id = IntegerField('id', validators=[DataRequired()])
     guest_id = IntegerField('guest_id', validators=[DataRequired()])
     party_size = IntegerField('party_size', validators=[DataRequired()])
     estimated_wait = IntegerField('estimated_wait', validators=[DataRequired()])

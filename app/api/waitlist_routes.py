@@ -46,7 +46,7 @@ def update_party():
     form = UpdateWaitlistForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
-        updated_party = db.session.query(Waitlist).get(form.data['waitlist_id'])
+        updated_party = db.session.query(Waitlist).get(form.data['id'])
         updated_party.guest_id = form.data['guest_id']
         updated_party.party_size = form.data['party_size']
         updated_party.estimated_wait = form.data['estimated_wait']

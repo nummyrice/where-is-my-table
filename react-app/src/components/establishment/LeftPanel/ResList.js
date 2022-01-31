@@ -25,7 +25,6 @@ const ResList = () => {
         <div id={style.scroll_res_list}>
             {selectedDateRes &&
                 selectedDateRes.map((reservation) => {
-                    // console.log('RESERVATION: ', reservation)
                     return(
                         <div key={reservation.id} className={style.res_entry}>
                             <div id={style.status_icon}>
