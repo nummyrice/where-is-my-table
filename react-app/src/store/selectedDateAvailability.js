@@ -3,6 +3,7 @@ import { postTags } from "../components/establishment/utils";
 
 const SET_SELECTED_DATE = 'selectedDateAvailability/SET_DATE';
 const SET_RES = 'selectedDateAvailability/SET_RES';
+const REMOVE_TAG = 'selectedDateAvailability/REMOVE_TAG';
 const UPDATE_RES = 'selectedDateAvailability/UPDATE_RES';
 
 const setSelectedDateAvailability = (selectedDateAvailability) => ({
@@ -13,6 +14,11 @@ const setSelectedDateAvailability = (selectedDateAvailability) => ({
 const setRes = (reservation) => ({
     type: SET_RES,
     payload: reservation
+})
+
+const setRemoveTag = (resId, tagId) => ({
+    type: REMOVE_TAG,
+    payload: {resId, tagId}
 })
 
 const setUpdatedRes = (reservation) => ({
@@ -49,14 +55,19 @@ export const newReservation = (guestId, reservationTime, partySize, tableId, tag
     });
     const data = await response.json();
     if (response.ok) {
+        dispatch(setRes(data.reservation))
         if (tags) {
-            const tagAppliedData = postTags(data.reservation.id, tags);
-            dispatch(setUpdatedRes(tagAppliedData.reservation));
-            return tagAppliedData;
+            const tagAppliedData = await postTags(data.reservation.id, tags);
+            if (tagAppliedData.result) {
+                dispatch(setUpdatedRes(tagAppliedData.reservation));
+                return tagAppliedData;
+            }
+            const returnErrors= { errors: [...tagAppliedData.errors, 'reservation successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
+            return returnErrors
         }
-        dispatch(setRes(data.newReservation));
         return data;
     }
+
     return data;
 }
 
@@ -77,12 +88,29 @@ export const updateReservation = (reservationId, guestId, reservationTime, party
     const data = await response.json()
 
     if (response.ok) {
-        if (tags) {
-            const tagAppliedData = postTags(data.reservation.id, tags);
-            dispatch(setRes(tagAppliedData.reservation));
-            return tagAppliedData;
-        }
         dispatch(setUpdatedRes(data.reservation))
+        if (tags) {
+            const tagAppliedData = await postTags(data.reservation.id, tags);
+            if (tagAppliedData.result) {
+                dispatch(setUpdatedRes(tagAppliedData.reservation));
+                return tagAppliedData;
+            }
+            const returnErrors= { errors: [...tagAppliedData.errors, 'reservation successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
+            return returnErrors;
+
+        }
+        return data;
+    }
+    return data;
+}
+
+//REMOVE TAG
+export const removeTag = (reservationId, tagId) => async (dispatch) => {
+    console.log('MADE IT INTO TAG STORE: ', reservationId, tagId)
+    const response = await fetch(`/api/tags/${reservationId}/${tagId}/remove`, {method:"DELETE"})
+    const data = await response.json()
+    if (response.ok) {
+        dispatch(setRemoveTag(reservationId, tagId))
         return data;
     }
     return data;
@@ -113,14 +141,19 @@ export default function reducer(state = initialState, action) {
         case UPDATE_RES:
             if (newState.reservations.length) {
                 const newStatusReservation = [...state.reservations];
-                console.log('REDUCER LOG', newStatusReservation)
                 const resIndex = newStatusReservation.findIndex((reservation)=> {
-                    console.log(action.payload)
                     return reservation.id === action.payload.id});
                 newStatusReservation.splice(resIndex, 1, action.payload);
                 return {...newState, reservations: newStatusReservation};
             }
             return newState;
+        case REMOVE_TAG:
+            const resIndex = newState.reservations.findIndex((res) => res.id === action.payload.resId);
+            const tagToRemoveIndex = newState.reservations[resIndex].tags.findIndex((tag) => tag.id === action.payload.tagId)
+            newState.reservations[resIndex].tags.splice(tagToRemoveIndex, 1)
+            const updatedRes = {...newState.reservations[resIndex], tags: [...newState.reservations[resIndex].tags]}
+            newState.reservations.splice(resIndex, 1, updatedRes)
+            return {...newState, reservations: [...newState.reservations]}
         default:
             return state;
     }

@@ -40,7 +40,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
         if (data.result) {
             setShowGuestReserveModal(false);
             setSelectedDate(new Date(selectedDate));
-            return data.newReservation
+            return data.reservation
 
         }
         setErrors(data.errors);

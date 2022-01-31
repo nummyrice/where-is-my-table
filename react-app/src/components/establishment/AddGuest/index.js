@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from "./AddGuest.module.css";
 import {ReactComponent as CheckCircle} from './assets/check-circle-solid.svg';
 import {ReactComponent as Circle} from  './assets/circle-regular.svg';
 import {ReactComponent as EditIcon} from './assets/edit-regular.svg';
+import {ReactComponent as DeleteTag} from '../AddReservation/assets/times-solid.svg';
 import ConfirmResModal from './ConfirmResModal';
 import ConfirmWaitlistModal from './ConfirmWaitlistModal';
+import { removeTag } from '../../../store/selectedDateAvailability';
+import { removePartyTag } from '../../../store/selectedDateWaitlist';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
@@ -16,7 +19,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         if (editWaitlist) return editWaitlist.guest_info;
         return null;
     })()
-
+    const dispatch = useDispatch()
     const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
@@ -73,6 +76,17 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         setSearchInput(guest.name)
     }
 
+    const handleRemoveTag = async (reservationId, tagId) => {
+        dispatch(removeTag(reservationId, tagId)).then((data)=>{
+            console.log('DELETE TAG DISPATCH: ', data)
+        });
+    }
+
+    const handleRemovePartyTag = async (waitlistId, tagId) => {
+        dispatch(removePartyTag(waitlistId, tagId)).then((data)=>{
+            console.log('DELETE TAG DISPATCH: ', data)
+        });
+    }
     // new guest validate
     const validateNewGuest = () => {
         const errors = [];
@@ -149,7 +163,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
 
     const validateTags = () => {
         const errors = [];
-        const tagArray = tags.split('');
+        const tagArray = tags.split(',');
         if (tagArray.some((tag) => {
             let trimmedTag = tag.trim()
             return trimmedTag.length > 40
@@ -273,8 +287,30 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                     <div className={style.tag_section}>
                         <div className={style.tag_section_title}> Reservation Tags</div>
                         <div className={style.tags_block}>
-                            <label>TAGS</label>
-                            <input  value={tags} placeholder={"enter tags seperated by a space"} onChange={(e)=>{setTags(e.target.value)}} className={style.tag_input}></input>
+                            <label>Add</label>
+                            <input  value={tags} placeholder={"enter tags seperated by a comma"} onChange={(e)=>{setTags(e.target.value)}} className={style.tag_input}></input>
+                            {editReservation && editReservation.tags &&
+                            <>
+                                {editReservation.tags.map((tag)=>{
+                                    return(
+                                        <div key={tag.id} className={style.tag}>
+                                            <span className={style.tag_name}>{tag.name}</span>
+                                            <DeleteTag onClick={()=>handleRemoveTag(editReservation.id, tag.id)}className={style.delete_tag}/>
+                                        </div>
+                                    )
+                                })}
+                            </>}
+                            {editWaitlist && editWaitlist.tags &&
+                            <>
+                                {editWaitlist.tags.map((tag)=>{
+                                    return(
+                                        <div key={tag.id} className={style.tag}>
+                                            <span className={style.tag_name}>{tag.name}</span>
+                                            <DeleteTag onClick={()=>handleRemovePartyTag(editWaitlist.id, tag.id)}className={style.delete_tag}/>
+                                        </div>
+                                    )
+                                })}
+                            </>}
                         </div>
                     </div>
                 </form>}

@@ -18,7 +18,7 @@
     width: 50%;
     padding: 25px;
     border-radius: 18px;
-    margin: 200px auto 200px auto;
+    margin: 200px auto 100px auto;
 }
 
 .txt {
@@ -197,4 +197,23 @@
 .avail_table_cell:hover {
     background-color: #679436;
     cursor: pointer;
+}
+
+#links_section {
+    display: flex;
+    background-color: #427aa1;
+    width: 25%;
+    padding: 25px;
+    border-radius: 18px;
+    margin: 0px auto 40px auto;
+    justify-content: space-evenly;
+
+}
+
+#linkedIn {
+
+}
+
+#github {
+
 }

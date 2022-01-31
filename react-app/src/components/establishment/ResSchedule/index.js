@@ -109,16 +109,17 @@ const ResSchedule =() => {
                                         )
                                         }} className={style.edit_reservation_button}>Edit</div>
                                 </div>
-                                {editReservation && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
+                                {editReservation.id === reservation.id && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
                             </>
                            )
                         })}
                         {column.availableTables?.length > 0 && column.availableTables.map((availableTable, timeIndex) => {
                             const tableTime  = new Date(availableTable.datetime);
+                            console.log('available table:', availableTable)
                             if (tableTime > new Date()) {
                                 return(
                                     <>
-                                    <div key={timeIndex} onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes(timeIndex))} className={style.available_time_card}>
+                                    <div key={timeIndex} onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes({tableId: availableTable.table.id, datetime: availableTable.datetime}))} className={style.available_time_card}>
                                         <div className={style.available_party}>
                                             <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
                                             <div className={style.party_size}>
@@ -130,7 +131,7 @@ const ResSchedule =() => {
                                             {availableTable.table.table_name}
                                         </div>
                                     </div>
-                                    {showMakeRes === timeIndex && <AddReservation key={`avail${timeIndex}`} setShowMakeRes={setShowMakeRes} availableTable={availableTable}/>}
+                                    {showMakeRes?.tableId === availableTable.table.id && new Date(showMakeRes.datetime).getTime() === new Date(availableTable.datetime).getTime() && <AddReservation key={`avail${timeIndex}`} setShowMakeRes={setShowMakeRes} availableTable={availableTable}/>}
                                     </>
                                 )
                             } else {
