@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getSelectedDateAvailability } from '../../store/selectedDateAvailability';
 import { getSelectedDateWaitlist } from '../../store/selectedDateWaitlist';
 import style from "./Establishment.module.css";
@@ -14,11 +14,11 @@ const Establishment = () => {
     const dispatch = useDispatch();
     // const user = useSelector(state => state.session.user)
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setUTCHours(0,0,0,0);
     const [selectedDate, setSelectedDate] = useState(today);
     useEffect(() => {
         dispatch(getSelectedDateAvailability(selectedDate.toISOString())).then((data)=>{
-            // console.log("Availability DATA: ", data)
+            // console.log("SELECTED DATA ISO: ", selectedDate.toISOString() )
         })
         dispatch(getSelectedDateWaitlist(selectedDate.toISOString())).then((data) => {
             // console.log("Waitlist DATA", data)

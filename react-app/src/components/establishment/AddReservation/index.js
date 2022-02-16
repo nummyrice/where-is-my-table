@@ -42,13 +42,13 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation, av
                 <div className={style.date}>
                     <div className={style.top_scroll_space}></div>
                 {availableTable && <div className={style.date_cell_select}>
-                            <div className={style.weekday}>{new Date(availableTable.datetime).toLocaleDateString('en-US', {weekday: 'short'}).slice(0,1)}</div>
-                            <div className={style.date_text}>{new Date(availableTable.datetime).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>
+                            <div className={style.weekday}>{new Date(availableTable.datetime).toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short'}).slice(0,1)}</div>
+                            <div className={style.date_text}>{new Date(availableTable.datetime).toLocaleDateString('en-US', {timeZone: 'America/New_York', month: 'short', day: 'numeric'})}</div>
                         </div>}
                 {(sevenDayAvailability && !availableTable) && sevenDayAvailability.map((day, index) => {
                     const cellDate = new Date(day.date);
-                    const dateText = cellDate.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
-                    const weekday = cellDate.toLocaleDateString('en-US', {weekday: 'short'});
+                    const dateText = cellDate.toLocaleDateString('en-US', {timeZone: 'America/New_York', month: 'short', day: 'numeric'});
+                    const weekday = cellDate.toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short'});
                     const weekdayChar = weekday.slice(0,1);
 
                     return(
@@ -80,12 +80,12 @@ const AddReservation = ({setShowMakeRes, setEditReservation, editReservation, av
                 <div className={style.time}>
                     <div className={style.top_scroll_space}></div>
                     {availableTable && <div className={style.time_cell_select}>
-                                    <div className={style.time_text}>{new Date(availableTable.datetime).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
+                                    <div className={style.time_text}>{new Date(availableTable.datetime).toLocaleTimeString('en-Us', {timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' })}</div>
                                     <div className={style.table}>{availableTable.table.table_name}</div>
                                 </div>}
                     {(sevenDayAvailability[selectDateIndex]?.availability.length > 0 && !availableTable) && sevenDayAvailability[selectDateIndex].availability.map((availableTime, index) => {
                         const datetime = new Date(availableTime.datetime);
-                        const localTimeString = datetime.toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' });
+                        const localTimeString = datetime.toLocaleTimeString('en-Us', {timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
                         if (datetime > new Date()) {
                             return (
                                 <div onClick={() => {

@@ -37,7 +37,6 @@ def get_availability(client_datetime):
                             "table": table.to_dict()
                         }
                         availability.append(available_table)
-
             else:
                 available_table = {
                             "datetime": available_time.isoformat(),
@@ -51,6 +50,7 @@ def get_availability(client_datetime):
 def todays_available_tables():
     data = request.json
     client_date = parser.isoparse(data['client_date'])
+    print(f"client date = {data['client_date']} and when parsed = {client_date}")
     data = get_availability(client_date)
     return data
 
@@ -113,6 +113,7 @@ def reservation_submit():
     form['csrf_token'].data = request.cookies['csrf_token']
     # if validate on submit
     if form.validate_on_submit():
+        print('CLIENT TIME__________: ', form.data['reservation_time'], 'PARSED_____________: ', parser.parse(form.data['reservation_time']))
         reservation_time = parser.parse(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
         # print('RESERVATION_____________: ', reservation_exists)
