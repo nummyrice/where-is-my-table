@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     # associations
     reservations = db.relationship("Reservation", back_populates="guest", cascade="all, delete")
     waitlist = db.relationship("Waitlist", back_populates='guest', cascade="all, delete")
+    establishment = db.relationship("Establishment", back_populates='user', cascade='all, delete', uselist=False)
     # tags = db.relationship()
 
     @property
@@ -42,6 +43,7 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'hashed_password': self.hashed_password,
+            'establishment': self.establishment.to_dict(),
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
@@ -53,6 +55,7 @@ class User(db.Model, UserMixin):
             'email': self.email,
             'phone_number': self.phone_number,
             'notes': self.notes,
+            'establishment': self.establishment.to_dict(),
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

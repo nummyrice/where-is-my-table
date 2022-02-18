@@ -58,6 +58,7 @@ def todays_available_tables():
 @reservation_routes.route('selected-date', methods=['POST'])
 def selected_dates_available_tables():
     data = request.json
+    print('ISO Selected Date__________________________: ', data['selected_date'])
     selected_date = parser.isoparse(data['selected_date'])
     data = get_availability(selected_date)
     return {'selectedDateAvailability': data}

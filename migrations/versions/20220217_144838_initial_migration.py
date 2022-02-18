@@ -1,16 +1,16 @@
-"""Inital migration.
+"""initial migration
 
-Revision ID: 1f101859334c
+Revision ID: 11657ada4d87
 Revises: 
-Create Date: 2022-01-25 14:16:06.580719
+Create Date: 2022-02-17 14:48:38.400906
 
 """
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '1f101859334c'
+revision = '11657ada4d87'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -55,6 +55,16 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name'),
     sa.UniqueConstraint('phone_number')
+    )
+    op.create_table('establishments',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('timezone_offset', sa.Integer(), nullable=False),
+    sa.Column('schedule', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+    sa.Column('daylight_savings', sa.Boolean(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('reservations',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -107,6 +117,7 @@ def downgrade():
     op.drop_table('reservation_tags')
     op.drop_table('waitlist')
     op.drop_table('reservations')
+    op.drop_table('establishments')
     op.drop_table('users')
     op.drop_table('tags')
     op.drop_table('tables')
