@@ -7,3 +7,4 @@ from .waitlist import Waitlist
 from .table import Table
 from .tags_join import reservation_tags, waitlist_tags
 from .establishment import Establishment
+from .section import Section

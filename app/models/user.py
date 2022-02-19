@@ -42,13 +42,25 @@ class User(db.Model, UserMixin):
             'email': self.email,
             'phone_number': self.phone_number,
             'notes': self.notes,
+            'establishment': self.establishment.to_dict() if self.establishment else None,
             'hashed_password': self.hashed_password,
-            'establishment': self.establishment.to_dict(),
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
 
     def to_safe_dict(self):
+        return {
+            "id": self.id,
+            'name': self.name,
+            'email': self.email,
+            'phone_number': self.phone_number,
+            'notes': self.notes,
+            'establishment': self.establishment.to_dict() if self.establishment else None,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
+
+    def to_establishment_dict(self):
         return {
             "id": self.id,
             'name': self.name,
