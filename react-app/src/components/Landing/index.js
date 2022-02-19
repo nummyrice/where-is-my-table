@@ -16,7 +16,7 @@ import linkedinLogo from './assets/linkedin.png';
 
 const Landing = () => {
     const today = new Date()
-    today.setHours(0,0,0,0)
+    today.setUTCHours(0,0,0,0)
     const [selectedDate, setSelectedDate] = useState(today);
     const [availableTables, setavailableTables] = useState([]);
     const [showDatePicker, setShowDatePicker] = useState(false)

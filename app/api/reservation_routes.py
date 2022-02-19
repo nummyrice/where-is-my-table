@@ -1,25 +1,45 @@
 from flask import Blueprint, request
 from flask_login import current_user, login_required
-from app.models import db, Reservation, Table
+from app.models import db, Reservation, Table, Establishment
 from sqlalchemy.sql import func
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
 from app.forms import ReservationForm, UpdateReservationForm
 from .auth_routes import validation_errors_to_error_messages
+import json
 
 reservation_routes = Blueprint('reservations', __name__)
 
+def get_availability2(client_datetime, schedule, timezone_offset, daylight_savings):
+    esta_offset = client_datetime + relativedelta(hours=timezone_offset)
+    end_offset = esta_offset + relativedelta(days=1)
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
+    tables = db.session.query(Table).all()
+    weekday = client_datetime.strftime('%A').lower()
+    select_day_schedule = schedule[weekday]
+    availability = []
+# iterate every 15 minutes from first scheduled start time
+    # iterate over sections
+        # if section is not open at this time skip
+        # iterate over section tables
+            # if select table is not reserved within two hours before and after this time,
+                # add to availabilty array
+
+
 # generate table availability (accepts isodate string)
-def get_availability(client_datetime):
-    end_datetime = client_datetime + relativedelta(days=1)
-    print('RANGE DATETIME: ', client_datetime, end_datetime)
+def get_availability(client_datetime, schedule, timezone_offset, daylight_savings):
+    esta_offset = client_datetime + relativedelta(hours=timezone_offset)
+    end_offset = esta_offset + relativedelta(days=1)
     # query the database for all reservations for 24 hour period indicated by isodate string
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_datetime)).all()
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
     # query database for all tables
     tables = db.session.query(Table).all()
     availability = []
-    available_time = client_datetime + relativedelta(hours=7)
+    weekday = client_datetime.strftime('%A').lower()
+    select_day_schedule = schedule[weekday]
+    print('SELECT DAY SCHEDULE: ++++++++++++++++++++: ', select_day_schedule)
+    available_time = esta_offset + relativedelta(hours=7)
     for hour in range(13):
     # iterate over tables
         # for each table create a datetime object for each hour
@@ -37,7 +57,6 @@ def get_availability(client_datetime):
                             "table": table.to_dict()
                         }
                         availability.append(available_table)
-
             else:
                 available_table = {
                             "datetime": available_time.isoformat(),
@@ -49,14 +68,19 @@ def get_availability(client_datetime):
 # GET TODAYS AVAILABILITY
 @reservation_routes.route('/today', methods=['POST'])
 def todays_available_tables():
+    est_query = Establishment.query.filter_by(user_id=1).first()
+    # est = establishment
+    est = est_query.to_dict()
     data = request.json
     client_date = parser.isoparse(data['client_date'])
-    data = get_availability(client_date)
+    print('INCREDIBLE DATA___________________: ', json.dumps(est, indent = 4) )
+    data = get_availability(client_date, est["schedule"], est["timezone_offset"], est["daylight_savings"])
     return data
 
 # GET SELECTED DATE AVAILABILITY
 @reservation_routes.route('selected-date', methods=['POST'])
 def selected_dates_available_tables():
+    print('CURRENT USER: ', current_user.to_dict())
     data = request.json
     selected_date = parser.isoparse(data['selected_date'])
     data = get_availability(selected_date)
@@ -113,6 +137,7 @@ def reservation_submit():
     form['csrf_token'].data = request.cookies['csrf_token']
     # if validate on submit
     if form.validate_on_submit():
+        print('CLIENT TIME__________: ', form.data['reservation_time'], 'PARSED_____________: ', parser.parse(form.data['reservation_time']))
         reservation_time = parser.parse(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
         # print('RESERVATION_____________: ', reservation_exists)

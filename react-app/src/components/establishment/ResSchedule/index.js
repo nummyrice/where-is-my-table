@@ -34,16 +34,18 @@ const ResSchedule =() => {
     // SET 24 TEMPLATE COLUMNS
     const hourColumns = Array(24).fill(0).map((_, hour) => {
         const date = new Date(selectedDate)
-        date.setHours(hour, 0, 0, 0)
+        date.setUTCHours(hour + 5, 0, 0, 0)
         return date
     })
-
+    console.log('WEST COAST LOG', hourColumns[1].toLocaleTimeString())
+    console.log('EAST COAST TIME?', hourColumns[1].toLocaleTimeString('en-US',{ timeZone: 'America/New_York' }))
     // SET 24 SCHEDULE MODEL
     const resScheduleModel = hourColumns.map((datetime, hourIndex) => {
         const scheduleColumn = {
             timeMarker: datetime,
             reservations: reservations?.filter((reservation) => {
                 const reservationDate = new Date(reservation.reservation_time)
+                // console.log(` DEBUGGER: ReservationISO  "${reservation.reservation_time} becomes ${reservationDate}`)
                 return reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]
             }),
             availableTables: availableTables?.filter((tableTimeSlot) => {
@@ -65,7 +67,7 @@ const ResSchedule =() => {
                 return(
                     <div key={index} className={style.column}>
                         <div className={style.column_time}>
-                            {column.timeMarker.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                            {column.timeMarker.toLocaleTimeString([], { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}
                         </div>
                         {column.reservations?.length > 0 && column.reservations.map((reservation) => {
                            return(
@@ -87,8 +89,8 @@ const ResSchedule =() => {
                                 <div key={`hover${reservation.id}`} className={style.booked_hover_info_card}>
                                     <div className={style.hover_table_title}>{reservation.table.table_name}</div>
                                     <div className={style.table_details}>
-                                        <div className={style.hover_time}>{new Date(reservation.reservation_time).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
-                                        <div className={style.hover_date}>{new Date(reservation.reservation_time).toLocaleDateString()}</div>
+                                        <div className={style.hover_time}>{new Date(reservation.reservation_time).toLocaleTimeString([], {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}</div>
+                                        <div className={style.hover_date}>{new Date(reservation.reservation_time).toLocaleDateString([], {timeZone: 'America/New_York'})}</div>
                                         <div className={style.hover_min_max}>{`Min: ${reservation.table.min_seat}, Max: ${reservation.table.max_seat}`}</div>
                                         <div className={style.hover_tags}>{reservation.tags.reduce((prev, curr) => {
                                             return prev + ', ' + curr.name
@@ -115,7 +117,6 @@ const ResSchedule =() => {
                         })}
                         {column.availableTables?.length > 0 && column.availableTables.map((availableTable, timeIndex) => {
                             const tableTime  = new Date(availableTable.datetime);
-                            console.log('available table:', availableTable)
                             if (tableTime > new Date()) {
                                 return(
                                     <>

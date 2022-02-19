@@ -4,91 +4,106 @@ def seed_tables():
     parlor_1 = Table(
         table_name = "parlor 1",
         min_seat = 1,
-        max_seat = 2
+        max_seat = 2,
+        section_id = 1,
     )
 
     parlor_2 = Table(
         table_name = "parlor 2",
         min_seat = 2,
-        max_seat = 3
+        max_seat = 3,
+        section_id = 1,
     )
 
     parlor_3 = Table(
         table_name = "parlor 3",
         min_seat = 1,
-        max_seat = 2
+        max_seat = 2,
+        section_id = 1,
     )
 
     pdr = Table(
         table_name = "PDR",
         min_seat = 3,
-        max_seat = 6
+        max_seat = 6,
+        section_id = 1,
     )
 
     clock_1 = Table(
         table_name = "clock 1",
         min_seat = 3,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 2,
     )
 
     clock_2 = Table(
         table_name = "clock 2",
         min_seat = 3,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 2,
     )
 
     clock_3 = Table(
         table_name = "clock 3",
         min_seat = 3,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 2,
     )
 
     club_1 = Table(
         table_name = "club 1",
         min_seat = 1,
-        max_seat = 2
+        max_seat = 2,
+        section_id = 3,
     )
 
     club_2 = Table(
         table_name = "club 2",
         min_seat = 1,
-        max_seat = 2
+        max_seat = 2,
+        section_id = 3,
     )
 
     club_3 = Table(
         table_name = "club 3",
         min_seat = 2,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 3,
     )
 
     club_4 = Table(
         table_name = "club 4",
         min_seat = 2,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 3,
     )
 
     cafe_1= Table(
         table_name = "cafe 1",
         min_seat = 2,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 5,
     )
 
     cafe_2= Table(
         table_name = "cafe 2",
         min_seat = 2,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 5,
     )
 
     cafe_3= Table(
         table_name = "cafe 3",
         min_seat = 2,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 5,
     )
 
     cafe_4= Table(
         table_name = "cafe 4",
         min_seat = 2,
-        max_seat = 4
+        max_seat = 4,
+        section_id = 5,
     )
 
     db.session.add(parlor_1)

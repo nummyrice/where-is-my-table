@@ -30,7 +30,7 @@ const TopBar = () => {
                     date={moment(selectedDate)}
                     onDateChange={date => {
                         const newDate = date.toDate();
-                        newDate.setHours(0,0,0,0)
+                        newDate.setUTCHours(0,0,0,0)
                         setSelectedDate(newDate)}}
                     focused={showDatePicker}
                     onFocusChange={({focused}) => setShowDatePicker(focused)}
