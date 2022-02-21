@@ -37,15 +37,18 @@ const ResSchedule =() => {
         date.setUTCHours(hour + 5, 0, 0, 0)
         return date
     })
-    console.log('WEST COAST LOG', hourColumns[1].toLocaleTimeString())
-    console.log('EAST COAST TIME?', hourColumns[1].toLocaleTimeString('en-US',{ timeZone: 'America/New_York' }))
     // SET 24 SCHEDULE MODEL
     const resScheduleModel = hourColumns.map((datetime, hourIndex) => {
         const scheduleColumn = {
             timeMarker: datetime,
             reservations: reservations?.filter((reservation) => {
                 const reservationDate = new Date(reservation.reservation_time)
-                // console.log(` DEBUGGER: ReservationISO  "${reservation.reservation_time} becomes ${reservationDate}`)
+                // console.log('|----------------------------------------------------------|')
+                // console.log(` DEBUGGER: ReservationISO  "${reservation.reservation_time} becomes ${reservationDate} AND ISOSTRING ${reservationDate.toISOString()}`)
+                // console.log('GUEST: ', reservation.guest_info.name)
+                // console.log('LEFT COLUMN: ', datetime.toISOString())
+                // console.log('RIGHT COLUMN (NOT ISO): ', hourColumns[hourIndex + 1] ? hourColumns[hourIndex + 1].toISOString() : 'undefined')
+                // console.log('|----------------------------------------------------------|')
                 return reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]
             }),
             availableTables: availableTables?.filter((tableTimeSlot) => {
@@ -65,7 +68,7 @@ const ResSchedule =() => {
             <div className={style.schedule_scroll}>
             {resScheduleModel && resScheduleModel.map((column, index) => {
                 return(
-                    <div key={index} className={style.column}>
+                    <div key={`column ${index}`} className={style.column}>
                         <div className={style.column_time}>
                             {column.timeMarker.toLocaleTimeString([], { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}
                         </div>
@@ -120,7 +123,7 @@ const ResSchedule =() => {
                             if (tableTime > new Date()) {
                                 return(
                                     <>
-                                    <div key={timeIndex} onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes({tableId: availableTable.table.id, datetime: availableTable.datetime}))} className={style.available_time_card}>
+                                    <div key={`party${timeIndex}`} onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes({tableId: availableTable.table.id, datetime: availableTable.datetime}))} className={style.available_time_card}>
                                         <div className={style.available_party}>
                                             <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
                                             <div className={style.party_size}>
