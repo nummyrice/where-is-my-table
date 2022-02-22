@@ -13,7 +13,7 @@ const ResSchedule =() => {
     const [availableTables, setavailableTables] = useState();
     const [showMakeRes, setShowMakeRes] = useState(null);
     const [reservations, setReservations] = useState();
-    const [editReservation, setEditReservation] = useState('')
+    const [editReservation, setEditReservation] = useState(null)
 
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
@@ -72,10 +72,10 @@ const ResSchedule =() => {
                         <div className={style.column_time}>
                             {column.timeMarker.toLocaleTimeString([], { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}
                         </div>
-                        {column.reservations?.length > 0 && column.reservations.map((reservation) => {
+                        {column.reservations && column.reservations.length > 0 && column.reservations.map((reservation) => {
                            return(
-                               <>
-                                <div key={reservation.id} className={style.booked_reservation_card}>
+                               <React.Fragment key={reservation.id}>
+                                <div  className={style.booked_reservation_card}>
                                     <div className={style.booked_party}>
                                         <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
                                         <div className={style.party_size}>
@@ -89,7 +89,7 @@ const ResSchedule =() => {
                                         {reservation.table.table_name}
                                     </div>
                                 </div>
-                                <div key={`hover${reservation.id}`} className={style.booked_hover_info_card}>
+                                <div  className={style.booked_hover_info_card}>
                                     <div className={style.hover_table_title}>{reservation.table.table_name}</div>
                                     <div className={style.table_details}>
                                         <div className={style.hover_time}>{new Date(reservation.reservation_time).toLocaleTimeString([], {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}</div>
@@ -114,16 +114,16 @@ const ResSchedule =() => {
                                         )
                                         }} className={style.edit_reservation_button}>Edit</div>
                                 </div>
-                                {editReservation.id === reservation.id && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
-                            </>
+                                {editReservation?.id === reservation.id && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
+                            </React.Fragment>
                            )
                         })}
                         {column.availableTables?.length > 0 && column.availableTables.map((availableTable, timeIndex) => {
                             const tableTime  = new Date(availableTable.datetime);
                             if (tableTime > new Date()) {
                                 return(
-                                    <>
-                                    <div key={`party${timeIndex}`} onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes({tableId: availableTable.table.id, datetime: availableTable.datetime}))} className={style.available_time_card}>
+                                    <React.Fragment key={"" + availableTable.table.id + availableTable.datetime}>
+                                    <div onClick={()=>dispatch(getSevenDayAvailability(selectedDate)).then(() => setShowMakeRes({tableId: availableTable.table.id, datetime: availableTable.datetime}))} className={style.available_time_card}>
                                         <div className={style.available_party}>
                                             <UserIcon className={style.party_size_icon} alt="party icon"></UserIcon>
                                             <div className={style.party_size}>
@@ -136,7 +136,7 @@ const ResSchedule =() => {
                                         </div>
                                     </div>
                                     {showMakeRes?.tableId === availableTable.table.id && new Date(showMakeRes.datetime).getTime() === new Date(availableTable.datetime).getTime() && <AddReservation key={`avail${timeIndex}`} setShowMakeRes={setShowMakeRes} availableTable={availableTable}/>}
-                                    </>
+                                    </React.Fragment>
                                 )
                             } else {
                                 return(null)
@@ -148,7 +148,7 @@ const ResSchedule =() => {
             })}
             </div>
 
-            <div className={style.footer_options}>More schdule options coming...</div>
+            <div className={style.footer_options}>More schedule options coming...</div>
         </div>
     )
 }

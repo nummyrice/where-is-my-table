@@ -1,3 +1,4 @@
+from app.models.utils import UTCDateTime
 from .db import db
 from sqlalchemy.sql import func
 from .tags_join import reservation_tags
@@ -8,7 +9,7 @@ class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     guest_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     party_size = db.Column(db.Integer)
-    reservation_time = db.Column(db.DateTime)
+    reservation_time = db.Column(UTCDateTime)
     table_id = db.Column(db.Integer, db.ForeignKey('tables.id'))
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'))
     created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
