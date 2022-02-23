@@ -43,12 +43,15 @@ const ResSchedule =() => {
             timeMarker: datetime,
             reservations: reservations?.filter((reservation) => {
                 const reservationDate = new Date(reservation.reservation_time)
-                // console.log('|----------------------------------------------------------|')
-                // console.log(` DEBUGGER: ReservationISO  "${reservation.reservation_time} becomes ${reservationDate} AND ISOSTRING ${reservationDate.toISOString()}`)
-                // console.log('GUEST: ', reservation.guest_info.name)
-                // console.log('LEFT COLUMN: ', datetime.toISOString())
-                // console.log('RIGHT COLUMN (NOT ISO): ', hourColumns[hourIndex + 1] ? hourColumns[hourIndex + 1].toISOString() : 'undefined')
-                // console.log('|----------------------------------------------------------|')
+                if (reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]) {
+                    // console.log('|----------------------------------------------------------|')
+                    // console.log(` DEBUGGER: ReservationISO  "${reservation.reservation_time} becomes ${typeof reservationDate} AND ISOSTRING ${reservationDate.toISOString()}`)
+                    // console.log('GUEST: ', reservation.guest_info.name)
+                    // console.log('LEFT COLUMN: ', datetime.toISOString())
+                    // console.log('RIGHT COLUMN (NOT ISO): ', hourColumns[hourIndex + 1] ? hourColumns[hourIndex + 1].toISOString() : 'undefined')
+                    // console.log('RESERVATION IS BETWEEN LEFT AND RIGHT COLUMNS: ', reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1])
+                    // console.log('|----------------------------------------------------------|')
+                }
                 return reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]
             }),
             availableTables: availableTables?.filter((tableTimeSlot) => {

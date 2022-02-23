@@ -42,7 +42,7 @@ export const getSelectedDateAvailability = (currentTimestamp) => async (dispatch
 
 // NEW RESERVATION
 export const newReservation = (guestId, reservationTime, partySize, tableId, tags) => async (dispatch) => {
-    console.log('RESERVATION TIME FROM NEW RESERVATION THUNK: ', reservationTime)
+    console.log('RESERVATION TIME: ', reservationTime)
     const newReservation = {
         guest_id: guestId,
         reservation_time: reservationTime,
@@ -55,6 +55,7 @@ export const newReservation = (guestId, reservationTime, partySize, tableId, tag
         body: JSON.stringify(newReservation)
     });
     const data = await response.json();
+    console.log('RETURNED FROM API: ', data)
     if (response.ok) {
         dispatch(setRes(data.reservation))
         if (tags) {

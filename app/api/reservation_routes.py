@@ -169,10 +169,11 @@ def reservation_submit():
     form['csrf_token'].data = request.cookies['csrf_token']
     # if validate on submit
     if form.validate_on_submit():
-        print('CLIENT TIME__________: ', form.data['reservation_time'], 'PARSED_____________: ', parser.parse(form.data['reservation_time']))
-        reservation_time = parser.parse(form.data['reservation_time'])
+        # reservation_time = parser.parse(form.data['reservation_time'])
+        reservation_time = datetime.fromisoformat(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
-        # print('RESERVATION_____________: ', reservation_exists)
+        print('FORM DATA FROM CLIENT_____________: ', form.data['reservation_time'])
+        print('RESERVATION back to iso_____________: ', reservation_time.tzinfo)
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
@@ -197,6 +198,7 @@ def reservation_submit():
                 )
             db.session.add(reservation)
             db.session.commit()
+            print('returned from database: ______',         reservation.to_dict()['reservation_time'])
             return {'result': "successfully reserved", 'reservation': reservation.to_dict()}, 201
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
