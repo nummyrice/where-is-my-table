@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useContext} from 'react';
-import {useDispatch} from 'react-redux';
+import React, { useState, useContext } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from "./ResSchedule.module.css";
 import { ReactComponent as UserIcon }from './assets/user-solid.svg';
@@ -10,32 +10,35 @@ import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 const ResSchedule =() => {
     const {selectedDate} = useContext(EstablishmentContext);
     const dispatch = useDispatch();
-    const [availableTables, setavailableTables] = useState();
+    // const [availableTables, setavailableTables] = useState();
     const [showMakeRes, setShowMakeRes] = useState(null);
-    const [reservations, setReservations] = useState();
+    // const [reservations, setReservations] = useState();
     const [editReservation, setEditReservation] = useState(null)
-
+    const availableTables = useSelector(state => state.selectedDateAvailability.availability)
+    const reservations = useSelector(state => state.selectedDateAvailability.reservations)
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
-    useEffect(() => {
-        fetch('/api/reservations/today', {
-            method: 'POST',
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({"client_date": selectedDate.toISOString()})
-        }).then(async (response) => {
-            const data = await response.json()
-            setavailableTables(data.availability)
-            setReservations(data.reservations)
-        }).catch((e) => {
-            console.error(e)
-        })
-    },[selectedDate])
+    // useEffect(() => {
+    //     fetch('/api/reservations/today', {
+    //         method: 'POST',
+    //         headers: {"Content-Type": "application/json"},
+    //         body: JSON.stringify({"client_date": selectedDate.toISOString()})
+    //     }).then(async (response) => {
+    //         const data = await response.json()
+    //         setavailableTables(data.availability)
+    //         setReservations(data.reservations)
+    //     }).catch((e) => {
+    //         console.error(e)
+    //     })
+    // },[selectedDate])
 
     // SET 24 TEMPLATE COLUMNS
-    const hourColumns = Array(24).fill(0).map((_, hour) => {
-        const date = new Date(selectedDate)
-        date.setUTCHours(hour + 5, 0, 0, 0)
-        return date
+    let date = new Date(selectedDate)
+    date.setUTCHours(5, 0, 0, 0)
+    const hourColumns = Array(96).fill(0).map((_, minutesMultiplier) => {
+        const timeIncrement = new Date(date)
+        timeIncrement.setMinutes(15 * minutesMultiplier)
+        return timeIncrement;
     })
     // SET 24 SCHEDULE MODEL
     const resScheduleModel = hourColumns.map((datetime, hourIndex) => {
@@ -65,7 +68,6 @@ const ResSchedule =() => {
     })
 
     // console.log('MODEL ARRAY: ', resScheduleModel);
-
     return(
         <div className={style.res_schedule}>
             <div className={style.schedule_scroll}>

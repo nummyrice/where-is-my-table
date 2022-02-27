@@ -73,11 +73,11 @@ def get_availability(client_datetime, sections, timezone_offset, daylight_saving
                             # if reservation exists for this table:
                             if res.table.id == target_table:
                                 difference = res.reservation_time - target_time
-                                # print('database reservation_________________: ', res.reservation_time)
-                                # print('target time:', target_time)
-                                # print(difference.total_seconds())
+                                print('database reservation_________________: ', res.reservation_time)
+                                print('target time:', target_time)
+                                print(abs(difference.total_seconds()) / 60)
                                 # if none of these reservations exist within two hours + or - target_time
-                                if (difference.total_seconds() / 60) < 120:
+                                if (abs(difference.total_seconds()) / 60) < 120:
                                     conflicting_res = True
                                     break
                         if conflicting_res == False:
@@ -169,11 +169,9 @@ def reservation_submit():
     form['csrf_token'].data = request.cookies['csrf_token']
     # if validate on submit
     if form.validate_on_submit():
-        # reservation_time = parser.parse(form.data['reservation_time'])
-        reservation_time = datetime.fromisoformat(form.data['reservation_time'])
+        reservation_time = parser.parse(form.data['reservation_time'])
+        # reservation_time = datetime.fromisoformat(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
-        print('FORM DATA FROM CLIENT_____________: ', form.data['reservation_time'])
-        print('RESERVATION back to iso_____________: ', reservation_time.tzinfo)
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
@@ -193,7 +191,7 @@ def reservation_submit():
                     guest_id = form.data['guest_id'],
                     party_size = form.data['party_size'],
                     status_id = 3,
-                    reservation_time = reservation_time,
+                    reservation_time = reservation_time.replace(tzinfo = None),
                     table_id = form.data['table_id']
                 )
             db.session.add(reservation)

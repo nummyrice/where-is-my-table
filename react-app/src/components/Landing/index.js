@@ -43,7 +43,7 @@ const Landing = () => {
         }).then(async (response) => {
             const data = await response.json()
             setavailableTables(data.availability)
-            console.log('AVAILABLE TABLES', data)
+            // console.log('AVAILABLE TABLES', data)
         }).catch((e) => {
             console.error(e)
         })
@@ -57,7 +57,7 @@ const Landing = () => {
                 <img alt='pie' src={pie}id={style.pie_icon} className={style.icon}></img>
                 <Food1 id={style.food1_icon} className={style.icon}/>
                 <Food2 id={style.food2_icon} className={style.icon}/>
-                <p id={style.intro} class={style.txt}>Let tableGater manage your table reservations. Keep the phone lines open and save time by allowing customers to join the waitlist or book a table right from your website.</p>
+                <p id={style.intro} className={style.txt}>Let tableGater manage your table reservations. Keep the phone lines open and save time by allowing customers to join the waitlist or book a table right from your website.</p>
                 <div id={style.links_section}>
                     <a href={"https://github.com/nummyrice"} id={style.github}>
                         <img alt='github logo' src={githubLogo}></img>
@@ -92,6 +92,7 @@ const Landing = () => {
                             // console.log("DATE LOG: ", date)
                             return(
                             <div
+                            key={date}
                             id={index}
                             className={selectedDate.getTime() === new Date(date).getTime() ? style.date_selection_active : style.date_selection}
                             onClick={()=>setSelectedDate(new Date(date))}
@@ -101,7 +102,7 @@ const Landing = () => {
                     {availableTables.length && <div id={style.availability_grid}>
                         {availableTables.map((table, reservationId)=>{
                             return(
-                            <>
+                            <React.Fragment key={reservationId}>
                             <div onClick={() => setShowGuestReserveModal(reservationId)} id={reservationId} className={style.avail_table_cell}>
                                 <div>{new Date(table.datetime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
                                 <div>{table.table.table_name}</div>
@@ -113,7 +114,7 @@ const Landing = () => {
                                 selectedDate={selectedDate}
                                 setSelectedDate={setSelectedDate}
                                 />}
-                            </>)
+                            </React.Fragment>)
                         })}</div>}
                 </div>
             </div>
