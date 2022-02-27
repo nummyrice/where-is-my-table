@@ -8,61 +8,90 @@ from dateutil import parser
 from app.forms import ReservationForm, UpdateReservationForm
 from .auth_routes import validation_errors_to_error_messages
 import json
+import pytz
 
 reservation_routes = Blueprint('reservations', __name__)
 
-def get_availability2(client_datetime, schedule, timezone_offset, daylight_savings):
+def get_availability(client_datetime, sections, timezone_offset, daylight_savings):
     esta_offset = client_datetime + relativedelta(hours=timezone_offset)
     end_offset = esta_offset + relativedelta(days=1)
     todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
-    tables = db.session.query(Table).all()
+    for res in todays_res:
+        res.reservation_time = res.reservation_time.replace(tzinfo=pytz.utc)
     weekday = client_datetime.strftime('%A').lower()
-    select_day_schedule = schedule[weekday]
+    # get the earliest start time for given day
+    est_open = None
+    est_close = None
+    for section_id in sections:
+        if weekday in sections[section_id]['schedule']:
+            weekday_blocks = list(sections[section_id]['schedule'][weekday].keys())
+            last_block_key = max(weekday_blocks)
+            start_hour = sections[section_id]['schedule'][weekday]['1']['start']['hour']
+            start_minute = sections[section_id]['schedule'][weekday]['1']['start']['minute']
+            end_hour = sections[section_id]['schedule'][weekday][last_block_key]['end']['hour']
+            end_minute = sections[section_id]['schedule'][weekday][last_block_key]['end']['minute']
+            start_offset_datetime = esta_offset + relativedelta(hours=start_hour, minutes=start_minute)
+            end_offset_datetime = esta_offset + relativedelta(hours=end_hour, minutes=end_minute)
+            if est_close == None:
+                est_close = end_offset_datetime
+            elif end_offset_datetime > est_close:
+                est_close = end_offset_datetime
+            if est_open == None:
+                est_open = start_offset_datetime
+            elif start_offset_datetime < est_open:
+                est_open = start_offset_datetime
+    # print('OPEN________________: ', est_open)
+    # print('CLOSE________________: ', est_close)
     availability = []
-# iterate every 15 minutes from first scheduled start time
-    # iterate over sections
-        # if section is not open at this time skip
-        # iterate over section tables
-            # if select table is not reserved within two hours before and after this time,
-                # add to availabilty array
-
-
-# generate table availability (accepts isodate string)
-def get_availability(client_datetime, schedule, timezone_offset, daylight_savings):
-    esta_offset = client_datetime + relativedelta(hours=timezone_offset)
-    end_offset = esta_offset + relativedelta(days=1)
-    # query the database for all reservations for 24 hour period indicated by isodate string
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
-    # query database for all tables
-    tables = db.session.query(Table).all()
-    availability = []
-    weekday = client_datetime.strftime('%A').lower()
-    select_day_schedule = schedule[weekday]
-    print('SELECT DAY SCHEDULE: ++++++++++++++++++++: ', select_day_schedule)
-    available_time = esta_offset + relativedelta(hours=7)
-    for hour in range(13):
-    # iterate over tables
-        # for each table create a datetime object for each hour
-        available_time = available_time + relativedelta(hours=1)
-        for table in tables:
-        # if this time does not match any reservation for a table that was already placed
-            table_available = True
-            if len(todays_res):
-                for reservation in todays_res:
-                    if reservation.reservation_time == available_time and reservation.table_id == table.id:
-                        table_available = False
-                if table_available:
-                        available_table = {
-                            "datetime": available_time.isoformat(),
-                            "table": table.to_dict()
-                        }
-                        availability.append(available_table)
-            else:
-                available_table = {
-                            "datetime": available_time.isoformat(),
-                            "table": table.to_dict()
-                        }
-                availability.append(available_table)
+    # iterate every 15 minutes from first scheduled start time
+    target_time = est_open
+    table_queues = {}
+    while target_time < est_close:
+        # iterate over sections
+        for section_id in sections:
+            if weekday in sections[section_id]['schedule']:
+                # if sevction table list does not already exist in table_queues
+                if not section_id in table_queues:
+                    # define table queue consisting of this sections table ids
+                    table_queues[section_id] = list(sections[section_id]['tables'].keys())
+                # iterate over blocks for weekday
+                if len(table_queues[section_id]):
+                    section_open = False
+                    for block in sections[section_id]['schedule'][weekday]:
+                        # make a check to see if target_time is in between start and end time of any block in time blocks
+                        current_block_start = esta_offset + relativedelta(hours=sections[section_id]['schedule'][weekday][block]['start']['hour'], minutes=sections[section_id]['schedule'][weekday][block]['start']['minute'])
+                        current_block_end = esta_offset + relativedelta(hours=sections[section_id]['schedule'][weekday][block]['end']['hour'], minutes=sections[section_id]['schedule'][weekday][block]['end']['minute'])
+                        if target_time > current_block_start and target_time < current_block_end:
+                            section_open = True
+                            break
+                    if section_open:
+                        # check the first table in the queue
+                        target_table = table_queues[section_id][0]
+                        # iterate over reservations
+                        conflicting_res = False
+                        for res in todays_res:
+                            # if reservation exists for this table:
+                            if res.table.id == target_table:
+                                difference = res.reservation_time - target_time
+                                print('database reservation_________________: ', res.reservation_time)
+                                print('target time:', target_time)
+                                print(abs(difference.total_seconds()) / 60)
+                                # if none of these reservations exist within two hours + or - target_time
+                                if (abs(difference.total_seconds()) / 60) < 120:
+                                    conflicting_res = True
+                                    break
+                        if conflicting_res == False:
+                            available_table = {
+                            "datetime": target_time.isoformat(),
+                            "table": sections[section_id]['tables'][target_table]
+                            }
+                            # add to table availability array
+                            availability.append(available_table)
+                            popped_target_table = table_queues[section_id].pop(0)
+                            # move table to back of queue
+                            table_queues[section_id].append(popped_target_table)
+        # increase target_time by 15. minutes
+        target_time = target_time + relativedelta(minutes=15)
     return { "availability": availability, "reservations": [reservation.to_dict() for reservation in todays_res] }
 
 # GET TODAYS AVAILABILITY
@@ -73,17 +102,18 @@ def todays_available_tables():
     est = est_query.to_dict()
     data = request.json
     client_date = parser.isoparse(data['client_date'])
-    print('INCREDIBLE DATA___________________: ', json.dumps(est, indent = 4) )
-    data = get_availability(client_date, est["schedule"], est["timezone_offset"], est["daylight_savings"])
+    data = get_availability(client_date, est["sections"], est["timezone_offset"], est["daylight_savings"])
     return data
 
 # GET SELECTED DATE AVAILABILITY
 @reservation_routes.route('selected-date', methods=['POST'])
 def selected_dates_available_tables():
-    print('CURRENT USER: ', current_user.to_dict())
+    est_query = Establishment.query.filter_by(user_id=1).first()
+    # est = establishment
+    est = est_query.to_dict()
     data = request.json
     selected_date = parser.isoparse(data['selected_date'])
-    data = get_availability(selected_date)
+    data = get_availability(selected_date, est["sections"], est["timezone_offset"], est["daylight_savings"])
     return {'selectedDateAvailability': data}
 
 # GET WEEKS AVAILABILITY
@@ -91,10 +121,12 @@ def selected_dates_available_tables():
 def weeks_available_tables():
     data = request.json
     client_date = parser.isoparse(data['client_date'])
+    est_query = Establishment.query.filter_by(user_id=1).first()
+    est = est_query.to_dict()
     seven_day_availability = []
     for date_increase in range(6):
         next_day = client_date + relativedelta(days=date_increase)
-        todays_tables = get_availability(next_day)
+        todays_tables = get_availability(next_day, est["sections"], est["timezone_offset"], est["daylight_savings"])
         seven_day_availability.append({"date": next_day, 'availability': todays_tables['availability']})
     return {'sevenDayAvailability': seven_day_availability}
 
@@ -137,10 +169,9 @@ def reservation_submit():
     form['csrf_token'].data = request.cookies['csrf_token']
     # if validate on submit
     if form.validate_on_submit():
-        print('CLIENT TIME__________: ', form.data['reservation_time'], 'PARSED_____________: ', parser.parse(form.data['reservation_time']))
         reservation_time = parser.parse(form.data['reservation_time'])
+        # reservation_time = datetime.fromisoformat(form.data['reservation_time'])
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
-        # print('RESERVATION_____________: ', reservation_exists)
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
             pending_status: datetime = datetime.now() - res_updated_at
@@ -160,11 +191,12 @@ def reservation_submit():
                     guest_id = form.data['guest_id'],
                     party_size = form.data['party_size'],
                     status_id = 3,
-                    reservation_time = reservation_time,
+                    reservation_time = reservation_time.replace(tzinfo = None),
                     table_id = form.data['table_id']
                 )
             db.session.add(reservation)
             db.session.commit()
+            print('returned from database: ______',         reservation.to_dict()['reservation_time'])
             return {'result': "successfully reserved", 'reservation': reservation.to_dict()}, 201
 
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400

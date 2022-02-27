@@ -1,10 +1,15 @@
+from app.models.utils import UTCDateTime
 from .db import db
 from sqlalchemy.sql import func
 from .tags_join import reservation_tags
 
 class Reservation(db.Model):
     __tablename__ = 'reservations'
-
+    """
+    TypeDecorator UTCDateTime was defined to try to combat issue of naive datetime objects being submitted.
+    However it seems the issue can instead be fixed by "inserting" a naïve datetime.
+    Not sure why/how this works. Please see: https://stackoverflow.com/questions/26105730/sqlalchemy-converting-utc-datetime-to-local-time-before-saving
+    """
     id = db.Column(db.Integer, primary_key=True)
     guest_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     party_size = db.Column(db.Integer)
