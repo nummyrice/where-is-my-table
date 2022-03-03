@@ -6,6 +6,7 @@ import AddReservation from '../AddReservation';
 import ResList from './ResList';
 import Waitlist from './Waitlist';
 import AddWaitlist from '../AddWaitlist';
+import BookReservation from '../BookReservation';
 import { ReactComponent as WaitlistIcon } from './assets/user-clock-solid.svg';
 import { ReactComponent as BookIcon } from './assets/book-open-solid.svg';
 import { ReactComponent as LeftCaret } from './assets/caret-left-solid.svg';
@@ -13,22 +14,25 @@ import { ReactComponent as DownCaret } from './assets/caret-down-solid.svg'
 import { getSevenDayAvailability } from '../../../store/sevenDayAvailability.js';
 // import { getSelectedDateAvailability } from '../../../store/selectedDateAvailability';
 
-
 const LeftPanel = () => {
     const dispatch = useDispatch();
     const [viewBooked, setViewBooked] = useState(true);
     const [viewWaitlist, setViewWaitlist] = useState(true);
     const [showMakeRes, setShowMakeRes] = useState(false);
     const [showAddWaitlist, setShowAddWaitlist] = useState(false);
+    const [bookings, setBookings] = useState(null);
     const { selectedDate } = useContext(EstablishmentContext);
 
+    function startNewBooking() {
+
+    }
     return (
         <div className={style.left_panel}>
             {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}
         {showAddWaitlist && <AddWaitlist setShowAddWaitlist={setShowAddWaitlist} showAddWaitlist={showAddWaitlist}/>}
             <input className={style.search}></input>
             <div className={style.filter_bar}>
-                <div className={style.sort_by}>Sort By</div>
+                <div onClick={()=>setBookings({})} className={style.sort_by}>Sort By</div>
                 <div className={style.order}>Order</div>
             </div>
             <div className={style.booked_bar}>
@@ -55,6 +59,7 @@ const LeftPanel = () => {
                 {!viewWaitlist && <LeftCaret onClick={() => {setViewWaitlist(true)}} className={style.icon}/>}
             </div>
             {viewWaitlist && <Waitlist/>}
+            {bookings && <BookReservation setBookings={setBookings}/>}
         </div>
     )
 }

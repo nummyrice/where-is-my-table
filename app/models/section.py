@@ -98,6 +98,7 @@ class Section(db.Model):
     #associations
     tables = db.relationship("Table", back_populates='section')
     establishment = db.relationship("Establishment", back_populates='sections')
+    reservations = db.relationship("Reservation", back_populates='section')
 
     def id_and_name(self):
         return {

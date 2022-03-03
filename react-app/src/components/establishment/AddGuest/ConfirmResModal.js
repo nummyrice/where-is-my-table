@@ -24,7 +24,7 @@ const ConfirmResModal = ({errors, name, editReservation, setEditReservation, set
                             setShowConfirmRes(false)
                             setEditReservation(null)
                             const resDate = new Date(date);
-                            resDate.setHours(0,0,0,0);
+                            resDate.setUTCHours(0,0,0,0);
                             setSelectedDate(resDate)
                             return data;
                         }
@@ -44,7 +44,7 @@ const ConfirmResModal = ({errors, name, editReservation, setEditReservation, set
                             setShowConfirmRes(false)
                             setEditReservation(null)
                             const resDate = new Date(date);
-                            resDate.setHours(0,0,0,0);
+                            resDate.setUTCHours(0,0,0,0);
                             setSelectedDate(resDate)
                             return data;
                         }
@@ -66,7 +66,7 @@ const ConfirmResModal = ({errors, name, editReservation, setEditReservation, set
                             setShowConfirmRes(false)
                             setEditReservation(null)
                             const resDate = new Date(date);
-                            resDate.setHours(0,0,0,0);
+                            resDate.setUTCHours(0,0,0,0);
                             setSelectedDate(resDate)
                             return data;
                         }
@@ -98,7 +98,7 @@ const ConfirmResModal = ({errors, name, editReservation, setEditReservation, set
                         setShowConfirmRes(false)
                         setShowMakeRes(false)
                         const resDate = new Date(date);
-                        resDate.setHours(0,0,0,0);
+                        resDate.setUTCHours(0,0,0,0);
                         setSelectedDate(resDate)
                         return data;
                     }
@@ -118,7 +118,7 @@ const ConfirmResModal = ({errors, name, editReservation, setEditReservation, set
                         setShowConfirmRes(false)
                         setShowMakeRes(false)
                         const resDate = new Date(date);
-                        resDate.setHours(0,0,0,0);
+                        resDate.setUTCHours(0,0,0,0);
                         setSelectedDate(resDate)
                         return data;
                     }
@@ -140,7 +140,7 @@ const ConfirmResModal = ({errors, name, editReservation, setEditReservation, set
                         setShowConfirmRes(false)
                         setShowMakeRes(false)
                         const resDate = new Date(date);
-                        resDate.setHours(0,0,0,0);
+                        resDate.setUTCHours(0,0,0,0);
                         setSelectedDate(resDate)
                         return data;
                     }

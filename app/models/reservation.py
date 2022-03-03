@@ -14,6 +14,7 @@ class Reservation(db.Model):
     guest_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     party_size = db.Column(db.Integer)
     reservation_time = db.Column(db.DateTime)
+    section_id = db.Column(db.Integer, db.ForeignKey('sections.id'))
     table_id = db.Column(db.Integer, db.ForeignKey('tables.id'))
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'))
     created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
@@ -24,6 +25,7 @@ class Reservation(db.Model):
     guest = db.relationship("User", back_populates="reservations")
     tags = db.relationship("Tag", secondary=reservation_tags, back_populates="reservations")
     table = db.relationship("Table", back_populates="reservations")
+    section = db.relationship("Section", back_populates="reservations")
 
 
 
@@ -37,6 +39,8 @@ class Reservation(db.Model):
             "reservation_time": self.reservation_time.isoformat(),
             "table_id": self.table_id,
             "table": self.table.to_dict(),
+            "section": self.section_id,
+            "section_info": self.section.to_dict(),
             "status_id": self.status_id,
             "status": self.status.to_dict(),
             "tags": [tag.to_dict() for tag in self.tags],
