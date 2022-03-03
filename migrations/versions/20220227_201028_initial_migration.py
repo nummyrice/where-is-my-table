@@ -1,8 +1,8 @@
-"""initial migration
+"""Initial migration.
 
-Revision ID: 90ac27f10705
+Revision ID: aeedd2593b35
 Revises: 
-Create Date: 2022-02-18 16:36:08.169449
+Create Date: 2022-02-27 20:10:28.724227
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '90ac27f10705'
+revision = 'aeedd2593b35'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -102,11 +102,13 @@ def upgrade():
     sa.Column('guest_id', sa.Integer(), nullable=True),
     sa.Column('party_size', sa.Integer(), nullable=True),
     sa.Column('reservation_time', sa.DateTime(), nullable=True),
+    sa.Column('section_id', sa.Integer(), nullable=True),
     sa.Column('table_id', sa.Integer(), nullable=True),
     sa.Column('status_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['statuses.id'], ),
     sa.ForeignKeyConstraint(['table_id'], ['tables.id'], ),
     sa.PrimaryKeyConstraint('id')
