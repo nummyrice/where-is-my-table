@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from './BookReservation.module.css';
 import AddGuest from '../AddGuest';
 import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg'
+import { getReservations } from '../../../store/reservations';
 // create data model for calendar (next 30 days including selected date)
     // [date1, date2, date3, date4]
     // create data model for guest number
@@ -28,11 +29,16 @@ import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg'
         ]
     }*/
 function BookReservation({setBookings}) {
+    const dispatch = useDispatch()
     const { selectedDate } = useContext(EstablishmentContext);
+    // console.log("selectedDate: ", selectedDate.toISOString())
+    const [isLoading, setIsLoading] = useState(false)
     const [partySize, setPartySize] = useState(1)
     const [selectedBookDate, setSelectedBookDate] = useState(selectedDate)
     const [selectedTimeIndex, setSelectedTimeIndex] = useState(0)
+    const [selectedSection, setSelectedSection] = useState(null)
     const establishment = useSelector(state => state.session.user.establishment)
+    const reservations = useSelector(state => state.reservations)
     const timezoneOffset = establishment.timezone_offset
     const todaysScheduleBySection = {}
     const weekday = selectedBookDate.toLocaleDateString('en-US',{weekday: 'long'}).toLowerCase();
@@ -77,11 +83,6 @@ function BookReservation({setBookings}) {
         }
         return false;
     })
-    // TODO: get reservations when a given date is selected
-    const reservations = [ {
-        id: 1,
-        reservation_time: new Date().toISOString()
-    }]
     // get sections available at selected time
     // get number of tables that are not taken
         // declare table counter
@@ -99,10 +100,12 @@ function BookReservation({setBookings}) {
                 const end = selectedBookDateEnd.setHours(selectedBookDateEnd.getHours() + todaysScheduleBySection[id][block].end.hour, selectedBookDateEnd.getMinutes() + todaysScheduleBySection[id][block].end.minute)
                 if (availableTimes[selectedTimeIndex] > start && availableTimes[selectedTimeIndex] < end) {
                     let tableTotal = Object.keys(establishment.sections[id].tables).length
-                    reservations.forEach((res) => {
+                    const resIds = Object.keys(reservations)
+                    resIds.forEach((id) => {
+                        const res = reservations[id]
                         const reservationTime = new Date(res.reservation_time)
                         const timeDiff =  Math.abs(reservationTime.getTime() - availableTimes[selectedTimeIndex].getTime()) / 60000
-                        if (timeDiff < 120) {
+                        if (res.section_id === id &&  timeDiff < 120) {
                             tableTotal--;
                         }
                     })
@@ -120,6 +123,12 @@ function BookReservation({setBookings}) {
             }
         }
     }
+
+    function handleDateChange() {
+        // set selectedBookTime to new date
+        // query for any reservations for that day
+        return
+    }
 return(
     <div id={style.book_background}>
         <div id={style.modal}>
@@ -132,7 +141,7 @@ return(
                     const weekday = date.toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short'});
                     const weekdayChar = weekday.slice(0,1);
                     return (
-                        <div onClick={() => {}} key={date.toISOString()} className={style.date_cell}>
+                        <div onClick={() => dispatch(getReservations(date.toISOString()))} key={date.toISOString()} className={`${style.date_cell} ${selectedBookDate.toISOString() === date.toISOString() ? style.selected : style.null}`}>
                             <div className={style.weekday}>{weekdayChar}</div>
                             <div className={style.date_text}>{dateText}</div>
                         </div>
@@ -154,11 +163,12 @@ return(
                 <div className={style.bottom_scroll_space}></div>
             </div>
             <div className={style.time}>
-                <div className={style.top_scroll_space}></div>
-                {availableTimes.map(time => {
+                <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>                {availableTimes.map((time, i) => {
                     const localTimeString = time.toLocaleTimeString('en-Us', {timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
                     let capacity = 0;
-                    reservations.forEach((res) => {
+                    const resIds = Object.keys(reservations)
+                    resIds.forEach((id) => {
+                        const res = reservations[id]
                         const reservationTime = new Date(res.reservation_time)
                         const timeDiff =  Math.abs(reservationTime.getTime() - time.getTime()) / 60000
                         if (timeDiff < 120) {
@@ -166,27 +176,35 @@ return(
                         }
                     })
                     return(
-                        <div onClick={() =>{
-                        }} key={time.toISOString()}className={style.time_cell}>
+                        <div onClick={() => setSelectedTimeIndex(i)} key={time.toISOString()}className={`${style.time_cell} ${selectedTimeIndex === i ? style.selected : style.null} ${isLoading ? style.is_loading : style.loaded}`}>
                             <div className={style.time_text}>{localTimeString}</div>
                             <div className={style.capacity}>{`${capacity}/20`}</div>
                         </div>
                     )
                 })}
-                <div className={style.bottom_scroll_space}></div>
-            </div>
+                {isLoading && <div id={style.panel}>
+                	<span id={style.loading5}>
+                    <span id={style.outerCircle}></span>
+               		</span>
+                </div>}
+                <div className={`${style.bottom_scroll_space} ${isLoading ? style.is_loading : style.loaded}`}></div>            </div>
             <div className={style.section}>
-                <div className={style.top_scroll_space}></div>
+                <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
                 {availableSections.map((section => {
                     return (
-                        <div key={section.id} className={style.section_cell}>
+                        <div key={section.id} className={`${style.section_cell} ${selectedSection === section.id ? style.selected : style.null} ${isLoading ? style.is_loading : style.loaded}`} onClick={() => setSelectedSection(section.id)}>
                             <div className={style.section_name}>{section.name}</div>
                             <div className={style.section_tables}>{`${section.availableTables} available`}</div>
                         </div>
                     )
                 }))}
-                <div className={style.section_cell}>Unassigned Table</div>
-                <div className={style.bottom_scroll_space}></div>
+                {isLoading && <div id={style.panel}>
+                	<span id={style.loading5}>
+                    <span id={style.outerCircle}></span>
+               		</span>
+                </div>}
+                <div className={`${style.section_cell} ${selectedSection ? style.null : style.selected} ${isLoading ? style.is_loading : style.loaded}`} onClick={() => setSelectedSection(null)}>Unassigned Table</div>
+                <div className={`${style.bottom_scroll_space} ${isLoading ? style.is_loading : style.loaded}`}></div>
             </div>
             <AddGuest></AddGuest>
         </div>

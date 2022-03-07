@@ -4,12 +4,14 @@ import session from './session';
 import sevenDayAvailability from './sevenDayAvailability';
 import selectedDateAvailability from './selectedDateAvailability';
 import selectedDateWaitlist from './selectedDateWaitlist';
+import reservations from './reservations';
 
 const rootReducer = combineReducers({
   session,
   sevenDayAvailability,
   selectedDateAvailability,
-  selectedDateWaitlist
+  selectedDateWaitlist,
+  reservations
 });
 
 

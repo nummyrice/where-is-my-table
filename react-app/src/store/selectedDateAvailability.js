@@ -28,7 +28,7 @@ const setUpdatedRes = (reservation) => ({
 
 // GET AVAILABLE TABLES AND CURR. RESERVATIONS
 export const getSelectedDateAvailability = (currentTimestamp) => async (dispatch) => {
-    const response = await fetch('/api/reservations/selected-date', {
+    const response = await fetch('/api/reservations/availability/selected-date', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export const getSelectedDateAvailability = (currentTimestamp) => async (dispatch
 
 // NEW RESERVATION
 export const newReservation = (guestId, reservationTime, partySize, tableId, tags) => async (dispatch) => {
-    console.log('RESERVATION TIME: ', reservationTime)
+    // console.log('RESERVATION TIME: ', reservationTime)
     const newReservation = {
         guest_id: guestId,
         reservation_time: reservationTime,
@@ -55,7 +55,7 @@ export const newReservation = (guestId, reservationTime, partySize, tableId, tag
         body: JSON.stringify(newReservation)
     });
     const data = await response.json();
-    console.log('RETURNED FROM API: ', data)
+    // console.log('RETURNED FROM API: ', data)
     if (response.ok) {
         dispatch(setRes(data.reservation))
         if (tags) {
@@ -108,7 +108,7 @@ export const updateReservation = (reservationId, guestId, reservationTime, party
 
 //REMOVE TAG
 export const removeTag = (reservationId, tagId) => async (dispatch) => {
-    console.log('MADE IT INTO TAG STORE: ', reservationId, tagId)
+    // console.log('MADE IT INTO TAG STORE: ', reservationId, tagId)
     const response = await fetch(`/api/tags/${reservationId}/${tagId}/remove`, {method:"DELETE"})
     const data = await response.json()
     if (response.ok) {

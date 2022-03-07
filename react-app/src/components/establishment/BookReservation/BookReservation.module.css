@@ -125,23 +125,6 @@
     border-bottom: 1px solid black;
 }
 
-.time_cell_select {
-       /* text-align: center;
-    vertical-align: middle;
-    line-height: 60px; */
-    text-align: center;
-    vertical-align: middle;
-    line-height: 30px;
-    display: flex;
-    flex-direction: column;
-    font-family: sans-serif;
-    height: 60px;
-    width: 180px;
-    /* border-top: 1px solid black; */
-    border-bottom: 1px solid black;
-    background-color: #55b68a;
-}
-
 /* SECTION COLUMN */
 .section {
     grid-area: section;
@@ -165,6 +148,163 @@
     border-bottom: 1px solid black;
 }
 
+.selected {
+    /* text-align: center;
+ vertical-align: middle;
+ line-height: 60px; */
+ text-align: center;
+ vertical-align: middle;
+ line-height: 30px;
+ display: flex;
+ flex-direction: column;
+ font-family: sans-serif;
+ height: 60px;
+ width: 180px;
+ /* border-top: 1px solid black; */
+ border-bottom: 1px solid black;
+ background-color: #55b68a;
+}
+
+/* LOADING */
+
+#loading5 #outerCircle
+{
+	box-shadow:none;
+	-moz-box-shadow:none;
+	-ms-box-shadow:none;
+	-o-box-shadow:none;
+	-webkit-box-shadow:none;
+
+	border-top:7px solid transparent;
+	border-bottom:7px solid #06F;
+	border-left:7px solid #06F;
+	border-right:7px solid transparent;
+
+	-webkit-animation: cwSpin 1s linear .2s infinite;
+	-moz-animation: cwSpin .666s linear .2s infinite;
+	-o-animation: cwSpin .666s linear .2s infinite;
+	-ms-animation: cwSpin .666s linear .2s infinite;
+	animation: cwSpin .666s linear .2s infinite;
+}
+
+#panel
+{
+    align-self: center;
+    justify-self: center;
+    margin-top: 250px;
+	/* display:block; */
+	/* height:180px;
+	width:180px;
+	box-shadow:0 0 20px #333;
+	-mozbox-shadow:0 0 20px #333;
+	-ms-box-shadow:0 0 20px #333;
+	-o-box-shadow:0 0 20px #333;
+	-webkit-box-shadow:0 0 20px #333;
+
+	border:1px solid #333;
+
+	border-radius:8px;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+	-ms-border-radius:8px;
+	-o-border-radius:8px; */
+}
+
+#loading1,#loading2,#loading4,#loading5,#loading8-1,#loading8-2,#loading8-3
+{
+	/* display:inline-block; */
+	/* position:absolute; */
+    align-self: center;
+    justify-self: center;
+	margin: 10px 50px 10px 50px;
+	width:80px;
+	height:80px;
+}
+#loading1 #outerCircle,#loading5 #outerCircle
+{
+	display:inline-block;
+	/* position:absolute; */
+	margin:auto;
+
+	width:80px;
+	height:80px;
+	border-top:7px solid #06F;
+	border-bottom:7px solid #06F;
+	border-left:7px solid transparent;
+	border-right:7px solid transparent;
+
+	border-radius:80px;
+	-moz-border-radius:80px;
+	-webkit-border-radius:80px;
+	-ms-border-radius:80px;
+	-o-border-radius:80px;
+
+	box-shadow:0 0 20px #06F;
+	-mozbox-shadow:0 0 20px #06F;
+	-ms-box-shadow:0 0 20px #06F;
+	-o-box-shadow:0 0 20px #06F;
+	-webkit-box-shadow:0 0 20px #06F;
+
+	-webkit-animation: cwSpin 1s linear .2s infinite;
+	-moz-animation: cwSpin .666s linear .2s infinite;
+	-o-animation: cwSpin .666s linear .2s infinite;
+	-ms-animation: cwSpin .666s linear .2s infinite;
+	animation: cwSpin .666s linear .2s infinite;
+}
+
+@-webkit-keyframes cwSpin
+{
+	0%{-webkit-transform:rotate(0deg);	}
+	100%{-webkit-transform:rotate(360deg); }
+}
+@-moz-keyframes cwSpin
+{
+	0%{-moz-transform:rotate(0deg);	}
+	100%{-moz-transform:rotate(360deg); }
+}
+@-ms-keyframes cwSpin
+{
+	0%{-ms-transform:rotate(0deg);	}
+	100%{-ms-transform:rotate(360deg); }
+}
+@-o-keyframes cwSpin
+{
+	0%{-o-transform:rotate(0deg);	}
+	100%{-o-transform:rotate(360deg); }
+}
+@keyframes cwSpin
+{
+	0%{transform:rotate(0deg);	}
+	100%{transform:rotate(360deg); }
+}
+
+@-webkit-keyframes ccwSpin
+{
+	0%{-webkit-transform:rotate(0deg);	}
+	100%{-webkit-transform:rotate(-360deg); }
+}
+@-moz-keyframes ccwSpin
+{
+	0%{-moz-transform:rotate(0deg);	}
+	100%{-moz-transform:rotate(-360deg); }
+}
+@-ms-keyframes ccwSpin
+{
+	0%{-ms-transform:rotate(0deg);	}
+	100%{-ms-transform:rotate(-360deg); }
+}
+@-o-keyframes ccwSpin
+{
+	0%{-o-transform:rotate(0deg);	}
+	100%{-o-transform:rotate(-360deg); }
+}
+@keyframes ccwSpin
+{
+	0%{transform:rotate(0deg);	}
+	100%{transform:rotate(-360deg); }
+}
+
+/* SCROLL BLOCKS */
 .top_scroll_space {
     border-bottom: 1px solid black;
     width: 180px;
@@ -174,4 +314,8 @@
 .bottom_scroll_space {
     width: 180px;
     height: 270px;
+}
+
+.is_loading {
+    display: none;
 }

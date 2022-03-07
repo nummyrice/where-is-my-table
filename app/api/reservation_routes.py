@@ -73,8 +73,8 @@ def get_availability(client_datetime, sections, timezone_offset, daylight_saving
                             # if reservation exists for this table:
                             if res.table.id == target_table:
                                 difference = res.reservation_time - target_time
-                                print('database reservation_________________: ', res.reservation_time)
-                                print('target time:', target_time)
+                                # print('database reservation_________________: ', res.reservation_time)
+                                # print('target time:', target_time)
                                 print(abs(difference.total_seconds()) / 60)
                                 # if none of these reservations exist within two hours + or - target_time
                                 if (abs(difference.total_seconds()) / 60) < 120:
@@ -106,7 +106,7 @@ def todays_available_tables():
     return data
 
 # GET SELECTED DATE AVAILABILITY
-@reservation_routes.route('selected-date', methods=['POST'])
+@reservation_routes.route('/availability/selected-date', methods=['POST'])
 def selected_dates_available_tables():
     est_query = Establishment.query.filter_by(user_id=1).first()
     # est = establishment
@@ -130,6 +130,16 @@ def weeks_available_tables():
         seven_day_availability.append({"date": next_day, 'availability': todays_tables['availability']})
     return {'sevenDayAvailability': seven_day_availability}
 
+# GET RESERVATIONS FOR SET DATE
+@reservation_routes.route('/selected-date', methods=['POST'])
+def get_reservations():
+    est = current_user.to_dict()['establishment']
+    data = request.json
+    client_datetime = parser.isoparse(data['selected_date'])
+    esta_offset = client_datetime + relativedelta(hours=est['timezone_offset'])
+    end_offset = esta_offset + relativedelta(days=1)
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
+    return {reservation.id: reservation.to_dict() for reservation in todays_res}
 
 # CREATE RESERVATION TIME AND SET PENDING
 @reservation_routes.route('/lock', methods=['POST'])
