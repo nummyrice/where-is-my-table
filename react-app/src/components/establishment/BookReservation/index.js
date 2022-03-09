@@ -1,10 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from './BookReservation.module.css';
 import AddGuest from '../AddGuest';
 import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg'
 import { getReservations } from '../../../store/reservations';
+import { Modal } from '../../context/Modal.js';
+import ConfirmResModal from '../AddGuest/ConfirmResModal';
+import { newReservation, updateReservation } from '../../../store/reservations';
 // create data model for calendar (next 30 days including selected date)
     // [date1, date2, date3, date4]
     // create data model for guest number
@@ -28,15 +31,37 @@ import { getReservations } from '../../../store/reservations';
             }
         ]
     }*/
-function BookReservation({setBookings}) {
+
+    //
+function BookReservation({bookRes, setBookRes}) {
     const dispatch = useDispatch()
-    const { selectedDate } = useContext(EstablishmentContext);
+    const { selectedDate, setSelectedDate } = useContext(EstablishmentContext);
     // console.log("selectedDate: ", selectedDate.toISOString())
+    let editDate
+    if (bookRes !== "new") {
+        const editDate = new Date(bookRes.reservation_time)
+        editDate.setUTCHours(0,0,0,0);
+    }
     const [isLoading, setIsLoading] = useState(false)
     const [partySize, setPartySize] = useState(1)
-    const [selectedBookDate, setSelectedBookDate] = useState(selectedDate)
+    const [selectedBookDate, setSelectedBookDate] = useState(bookRes === 'new' ? selectedDate : editDate)
     const [selectedTimeIndex, setSelectedTimeIndex] = useState(0)
-    const [selectedSection, setSelectedSection] = useState(null)
+    const [selectedSection, setSelectedSection] = useState(bookRes === 'new' ? null : bookRes.section_id)
+    const [selectedGuest, setSelectedGuest] = useState(bookRes === 'new' ? null : bookRes.guest_info)
+    const [showConfirmRes, setShowConfirmRes] = useState(false)
+    const [showErrorsModal, setShowErrorsModal] = useState(false)
+    const [errors, setErrors] = useState([]);
+    useEffect(() => {
+        setIsLoading(true)
+        dispatch(getReservations(selectedBookDate.toISOString()))
+        .then(async result => {
+            console.log("successfully acquired reservations")
+        }).catch(err => {
+            console.log("failed to acquire reservations")
+        }).finally(() => {
+            setIsLoading(false);
+        })
+    }, [dispatch, selectedBookDate])
     const establishment = useSelector(state => state.session.user.establishment)
     const reservations = useSelector(state => state.reservations)
     const timezoneOffset = establishment.timezone_offset
@@ -124,16 +149,127 @@ function BookReservation({setBookings}) {
         }
     }
 
-    function handleDateChange() {
-        // set selectedBookTime to new date
-        // query for any reservations for that day
-        return
+    function handleDateChange(dateString) {
+        setIsLoading(true)
+        dispatch(getReservations(selectedBookDate.toISOString()))
+        .then(async result => {
+            console.log("successfully acquired reservations")
+            setSelectedBookDate(new Date(dateString))
+        }).catch(err => {
+            console.log("failed to acquire reservations")
+        }).finally(() => {
+            setIsLoading(false);
+        })
     }
+
+    // const validateDate = () => {
+    //     if (reservationDetails.setShowMakeRes) {
+    //         const errors = [];
+    //         if (reservationDetails.reservation_time.getTime() < new Date().getTime()) errors.push("reservation time has already passed, please adjust your date and/or time")
+    //         return errors;
+    //     }
+    //     return [];
+    // }
+
+    // handle res submit
+    // if selected user with id then skip the user register/update handler
+    // new reservation
+
+        // NEW RESERVATION
+        const handleNewResSubmit = async () => {
+            // if guest is selected but none of the edits are present
+            dispatch(newReservation(selectedGuest.id, date, partySize, selectedSection))
+                .then((data) => {
+                    if (data.errors) {
+                        setErrors(data.errors)
+                        return data;
+                    } else {
+                        setShowConfirmRes(false)
+                        setBookRes(null)
+                        const resDate = new Date(date);
+                        resDate.setUTCHours(0,0,0,0);
+                        setSelectedDate(resDate)
+                        return data;
+                    }
+                })
+
+            // if guest is selected and any edit is present
+            // if (selectedGuest && (editEmailField || editNameField || editNumberField || editNotesField)) {
+            //     const updatedGuestResult = await updateGuestFetch(selectedGuest.id, name, notes, phoneNumber, email)
+            //     // if update is success
+            //     if (updatedGuestResult.result) {
+            //         dispatch(newReservation(selectedGuest.id, date, partySize, table, tags))
+            //         .then((data) => {
+            //             if (data.errors) {
+            //                 setServerErrors(data.errors)
+            //                 return data;
+            //             } else {
+            //                 setShowConfirmRes(false)
+            //                 setShowMakeRes(false)
+            //                 const resDate = new Date(date);
+            //                 resDate.setUTCHours(0,0,0,0);
+            //                 setSelectedDate(resDate)
+            //                 return data;
+            //             }
+            //         })
+            //     }
+            //     if (updatedGuestResult.errors) setServerErrors(updatedGuestResult.errors);
+            //     return updatedGuestResult;
+            // }
+            // if not guest is selected
+            // if (!selectedGuest) {
+            //     const newGuestResult = await newGuestFetch(name, notes, phoneNumber, email);
+            //     if (newGuestResult.result) {
+            //         dispatch(newReservation(newGuestResult.guest.id, date, partySize, table, tags))
+            //         .then((data) => {
+            //             if (data.errors) {
+            //                 setServerErrors(data.errors)
+            //                 return data;
+            //             } else {
+            //                 setShowConfirmRes(false)
+            //                 setShowMakeRes(false)
+            //                 const resDate = new Date(date);
+            //                 resDate.setUTCHours(0,0,0,0);
+            //                 setSelectedDate(resDate)
+            //                 return data;
+            //             }
+            //         })
+            //     }
+            //     if (newGuestResult.errors) setServerErrors(newGuestResult.errors);
+            //     return newGuestResult;
+            // }
+            // const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
+            // setErrors(uknownError.errors)
+            // return uknownError
+        }
+
+            // UPDATE RESERVATION
+    const handleResUpdate = async () => {
+        // if guest is selected but none of the edits are present
+        dispatch(updateReservation(bookRes.id, selectedGuest.id, date, partySize, selectedSection))
+            .then((data) => {
+                if (data.errors) {
+                    setErrors(data.errors)
+                    return data;
+                } else {
+                    setShowConfirmRes(false)
+                    setBookRes(null)
+                    const resDate = new Date(date);
+                    resDate.setUTCHours(0,0,0,0);
+                    setSelectedDate(resDate)
+                    return data;
+                }
+            })
+
+}
+
+
+
 return(
     <div id={style.book_background}>
         <div id={style.modal}>
             <div className={style.title}>Book a Reservation</div>
-            <X onClick={() => {setBookings(null)}} className={style.icon}/>
+            <X onClick={() => {setBookRes(null)}} className={style.icon}/>
             <div className={style.date}>
                 <div className={style.top_scroll_space}></div>
                 {dates.map((date) => {
@@ -141,7 +277,7 @@ return(
                     const weekday = date.toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short'});
                     const weekdayChar = weekday.slice(0,1);
                     return (
-                        <div onClick={() => dispatch(getReservations(date.toISOString()))} key={date.toISOString()} className={`${style.date_cell} ${selectedBookDate.toISOString() === date.toISOString() ? style.selected : style.null}`}>
+                        <div onClick={() => handleDateChange(date.toISOString())} key={date.toISOString()} className={`${style.date_cell} ${selectedBookDate.toISOString() === date.toISOString() ? style.selected : style.null}`}>
                             <div className={style.weekday}>{weekdayChar}</div>
                             <div className={style.date_text}>{dateText}</div>
                         </div>
@@ -206,8 +342,26 @@ return(
                 <div className={`${style.section_cell} ${selectedSection ? style.null : style.selected} ${isLoading ? style.is_loading : style.loaded}`} onClick={() => setSelectedSection(null)}>Unassigned Table</div>
                 <div className={`${style.bottom_scroll_space} ${isLoading ? style.is_loading : style.loaded}`}></div>
             </div>
-            <AddGuest></AddGuest>
+            <AddGuest
+                setSelectedGuest={setSelectedGuest}
+                selectedGuest={selectedGuest}
+                setShowConfirmRes={setShowConfirmRes}
+                errors={errors}
+                setErrors={setErrors}
+                showErrorsModal={showErrorsModal}
+                setShowErrorsModal={setShowErrorsModal}
+            />
         </div>
+        {}
+        {showConfirmRes && (
+            <Modal onClose={() => setShowConfirmRes(false)}>
+                <ConfirmResModal
+                    handleNewResSubmit={handleNewResSubmit}
+                    handleResUpdate={handleResUpdate}
+                />
+            </Modal>
+        )}
+
     </div>
 )
 }

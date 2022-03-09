@@ -5,14 +5,17 @@ import './index.css';
 import App from './App';
 import configureStore from './store';
 import 'react-dates/initialize';
+import { ModalProvider } from './context/Modal.js';
 
 const store = configureStore();
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-        <App />
-      </Provider>
+      <ModalProvider>
+          <App />
+      </ModalProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,29 +1,21 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { EstablishmentContext } from '..';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import style from "./AddGuest.module.css";
 import {ReactComponent as CheckCircle} from './assets/check-circle-solid.svg';
 import {ReactComponent as Circle} from  './assets/circle-regular.svg';
 import {ReactComponent as EditIcon} from './assets/edit-regular.svg';
 import {ReactComponent as DeleteTag} from '../AddReservation/assets/times-solid.svg';
-import ConfirmResModal from './ConfirmResModal';
-import ConfirmWaitlistModal from './ConfirmWaitlistModal';
-import { removeTag } from '../../../store/selectedDateAvailability';
+import { removeTag } from '../../../store/reservations';
 import { removePartyTag } from '../../../store/selectedDateWaitlist';
+import { Modal } from '../../context/Modal';
+import ErrorsModal from './ErrorsModal';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
-const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait, availableTable}) => {
-    const selectedGuestCheck = (function() {
-        if (editReservation) return editReservation.guest_info;
-        if (editWaitlist) return editWaitlist.guest_info;
-        return null;
-    })()
+const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait, selectedGuest, setSelectedGuest, setShowConfirmRes, errors, setErrors, showErrorsModal, setShowErrorsModal}) => {
     const dispatch = useDispatch()
-    const sevenDayAvailability = useSelector((state) => state.sevenDayAvailability);
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
-    const [selectedGuest, setSelectedGuest] = useState(selectedGuestCheck);
     const [searchResults, setSearchResults] = useState([]);
 
     // edit buttons
@@ -39,11 +31,10 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
 
-    // errors
-    const [errors, setErrors] = useState([]);
+
 
     // confirm modal
-    const [showConfirmRes, setShowConfirmRes] = useState(false);
+
     const [showConfirmWaitlist, setShowConfirmWaitlist] = useState(false);
 
     // console.log('DATE INDEX : ', selectDateIndex)
@@ -61,11 +52,11 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         setSearchResults(data.searchResults)
     }, [searchInput])
 
-    useEffect(() => {
-        if (editReservation) {
-            setSelectedGuest(editReservation.guest_info)
-        }
-    }, [editReservation])
+    // useEffect(() => {
+    //     if (editReservationDetails) {
+    //         setSelectedGuest(editReservationDetails.guest_info)
+    //     }
+    // }, [editReservationDetails])
 
     useEffect(() => {
         handleSearch()
@@ -144,14 +135,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         return errors;
     }
 
-    const validateDate = () => {
-        if (setShowMakeRes) {
-            const errors = [];
-            if (new Date(sevenDayAvailability[selectDateIndex].availability[selectTimeIndex].datetime).getTime() < new Date().getTime()) errors.push("reservation time has already passed, please adjust your date and/or time")
-            return errors;
-        }
-        return [];
-    }
+
     const validateNameAndPhone = () => {
         const errors = [];
         let trimmedName = name.trim();
@@ -173,6 +157,60 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
         return errors;
     }
 
+    const handleNewGuestSubmit = async () => {
+        const newGuest = {
+            name: name,
+            notes: notes,
+            phone_number: phoneNumber,
+            email: email
+        }
+        const response = await fetch('/api/guests/add', {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(newGuest)
+        })
+        const data = await response.json();
+        if (response.ok) {
+            setSelectedGuest(data)
+        }
+    }
+
+    const handleGuestUpdate = async () => {
+        const guestToUpdate = {
+            id: selectedGuest.id,
+            name: name,
+            email: email,
+            notes: notes,
+            phone_number: phoneNumber
+        }
+        // then post update guest
+        const response = await fetch('/api/guests/update', {
+            method: 'PUT',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(guestToUpdate)
+        })
+        const data = await response.json()
+        if (response.ok) {
+            setSelectedGuest(data)
+
+        }
+    }
+
+    const handleSubmitRouter = () => {
+        if (selectedGuest && (editNameField || editEmailField || editNotesField || editNumberField)) {
+            handleGuestUpdate()
+            .then((res) => {
+                setShowConfirmRes(true)
+            }).catch(err => setErrors([...err]))
+        } else if (selectedGuest) {
+            setShowConfirmRes(true)
+        } else {
+            handleNewGuestSubmit()
+            .then((res) => {
+                setShowConfirmRes(true)
+            }).catch(err => setErrors([...err]))
+        }
+    }
 
     return(
         <div className={style.add_guest}>
@@ -195,7 +233,7 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                 {selectedGuest && <div className={style.selected_guest}>
                     <div className={style.selected_guest_name}>{selectedGuest.name}</div>
                     <div onClick={()=>{
-                        setSelectedGuest(undefined);
+                        setSelectedGuest(null);
                         setEditNameField(false);
                         setEditNumberField(false);
                         setEditEmailField(false);
@@ -289,17 +327,17 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                         <div className={style.tags_block}>
                             <label>Add</label>
                             <input  value={tags} placeholder={"enter tags seperated by a comma"} onChange={(e)=>{setTags(e.target.value)}} className={style.tag_input}></input>
-                            {editReservation && editReservation.tags &&
+                            {/* {editReservationDetails && editReservationDetails.tags &&
                             <>
-                                {editReservation.tags.map((tag)=>{
+                                {editReservationDetails.tags.map((tag)=>{
                                     return(
                                         <div key={tag.id} className={style.tag}>
                                             <span className={style.tag_name}>{tag.name}</span>
-                                            <DeleteTag onClick={()=>handleRemoveTag(editReservation.id, tag.id)}className={style.delete_tag}/>
+                                            <DeleteTag onClick={()=>handleRemoveTag(editReservationDetails.id, tag.id)}className={style.delete_tag}/>
                                         </div>
                                     )
                                 })}
-                            </>}
+                            </>} */}
                             {editWaitlist && editWaitlist.tags &&
                             <>
                                 {editWaitlist.tags.map((tag)=>{
@@ -314,61 +352,25 @@ const AddGuest = ({editReservation, setEditReservation, setShowMakeRes, selectDa
                         </div>
                     </div>
                 </form>}
-                {(selectedGuest || validateNameAndPhone()) && (editReservation || editWaitlist) &&
+                {/* {(selectedGuest || validateNameAndPhone()) && (editReservationDetails || editWaitlist) &&
                 <div  onClick={() => {
                     const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
                     setErrors(errors);
                     editWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
-                    }} className={style.place_reservation_button}>{editReservation ? 'Update Reservation' : 'Update Waitlist'}</div>
+                    }} className={style.place_reservation_button}>{editReservationDetails ? 'Update Reservation' : 'Update Waitlist'}</div>
+                } */}
+                {selectedGuest &&
+                    <div onClick={handleSubmitRouter} className={style.place_reservation_button}>{setShowAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>
                 }
-                {((selectedGuest || validateNameAndPhone()) && (!editReservation && !editWaitlist)) && <div  onClick={() => {
-                    const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
-                    setErrors(errors);
-                    showAddWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
-                    }} className={style.place_reservation_button}>{setShowAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>}
-                {(!selectedGuest && !validateNameAndPhone()) && <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>}
-                {showConfirmRes &&
-                    <ConfirmResModal
-                        errors={errors}
-                        selectedGuest={selectedGuest}
-                        editReservation={editReservation}
-                        setEditReservation={setEditReservation}
-                        setShowMakeRes={setShowMakeRes}
-                        setShowConfirmRes={setShowConfirmRes}
-                        date={availableTable ? availableTable.datetime : sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].datetime}
-                        table={availableTable ? availableTable.table.id : sevenDayAvailability[selectDateIndex]?.availability[selectTimeIndex].table.id}
-                        partySize={partySize}
-                        name={name}
-                        notes={notes}
-                        phoneNumber={phoneNumber}
-                        email={email}
-                        tags={tags}
-                        editNameField={editNameField}
-                        editEmailField={editEmailField}
-                        editNumberField={editNumberField}
-                        editNotesField={editNotesField}
-                    />}
-                {showConfirmWaitlist &&
-                    <ConfirmWaitlistModal
-                        errors={errors}
-                        partySize={partySize}
-                        estimatedWait={estimatedWait}
-                        selectedGuest={selectedGuest}
-                        name={name}
-                        notes={notes}
-                        phoneNumber={phoneNumber}
-                        email={email}
-                        tags={tags}
-                        editWaitlist={editWaitlist}
-                        setEditWaitlist={setEditWaitlist}
-                        setShowAddWaitlist={setShowAddWaitlist}
-                        setShowConfirmWaitlist={setShowConfirmWaitlist}
-                        editNameField={editNameField}
-                        editEmailField={editEmailField}
-                        editNumberField={editNumberField}
-                        editNotesField={editNotesField}
-                    />}
+                {!selectedGuest &&
+                    <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>
+                }
             </div>
+            {showErrorsModal && (
+            <Modal onClose={() => setShowErrorsModal}>
+                <ErrorsModal errors={errors} setErrors={setErrors}/>
+            </Modal>
+        )}
         </div>
     )
 }

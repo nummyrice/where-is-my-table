@@ -228,8 +228,8 @@
 
 	width:80px;
 	height:80px;
-	border-top:7px solid #06F;
-	border-bottom:7px solid #06F;
+	border-top:7px solid #808080;
+	border-bottom:7px solid #808080;
 	border-left:7px solid transparent;
 	border-right:7px solid transparent;
 
@@ -239,17 +239,17 @@
 	-ms-border-radius:80px;
 	-o-border-radius:80px;
 
-	box-shadow:0 0 20px #06F;
-	-mozbox-shadow:0 0 20px #06F;
-	-ms-box-shadow:0 0 20px #06F;
-	-o-box-shadow:0 0 20px #06F;
-	-webkit-box-shadow:0 0 20px #06F;
+	/* box-shadow:0 0 20px #808080;
+	-mozbox-shadow:0 0 20px #808080;
+	-ms-box-shadow:0 0 20px #808080;
+	-o-box-shadow:0 0 20px #808080;
+	-webkit-box-shadow:0 0 20px #808080; */
 
-	-webkit-animation: cwSpin 1s linear .2s infinite;
-	-moz-animation: cwSpin .666s linear .2s infinite;
-	-o-animation: cwSpin .666s linear .2s infinite;
-	-ms-animation: cwSpin .666s linear .2s infinite;
-	animation: cwSpin .666s linear .2s infinite;
+	-webkit-animation: cwSpin 1s linear .05s infinite;
+	-moz-animation: cwSpin .666s linear .05s infinite;
+	-o-animation: cwSpin .666s linear .05s infinite;
+	-ms-animation: cwSpin .666s linear .05s infinite;
+	animation: cwSpin .666s linear .05s infinite;
 }
 
 @-webkit-keyframes cwSpin

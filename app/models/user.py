@@ -3,6 +3,7 @@ from .db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from .tags_join import guest_tags
 
 
 
@@ -22,7 +23,7 @@ class User(db.Model, UserMixin):
     reservations = db.relationship("Reservation", back_populates="guest", cascade="all, delete")
     waitlist = db.relationship("Waitlist", back_populates='guest', cascade="all, delete")
     establishment = db.relationship("Establishment", back_populates='user', cascade='all, delete', uselist=False)
-    # tags = db.relationship()
+    tags = db.relationship("Tag", secondary=guest_tags, back_populates="guests")
 
     @property
     def password(self):
@@ -68,6 +69,18 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'establishment': self.establishment.to_dict(),
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
+
+    def to_guest_dict(self):
+        return {
+            "id": self.id,
+            'name': self.name,
+            'email': self.email,
+            'phone_number': self.phone_number,
+            'notes': self.notes,
+            'tags': {tag.id: tag.name for tag in self.tags},
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

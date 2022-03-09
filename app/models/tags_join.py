@@ -14,3 +14,10 @@ waitlist_tags = db.Table('waitlist_tags',
     db.Column('created_at', db.DateTime(), nullable=False, server_default=func.now()),
     db.Column('updated_at', db.DateTime(), onupdate=func.now(), default=func.now())
 )
+
+guest_tags = db.Table('guest_tags',
+    db.Column('guest_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id')),
+    db.Column('created_at', db.DateTime(), nullable=False, server_default=func.now()),
+    db.Column('updated_at', db.DateTime(), onupdate=func.now(), default=func.now())
+)

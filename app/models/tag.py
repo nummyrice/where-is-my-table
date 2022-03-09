@@ -1,6 +1,6 @@
 from .db import db
 from sqlalchemy.sql import func
-from .tags_join import reservation_tags, waitlist_tags
+from .tags_join import reservation_tags, waitlist_tags, guest_tags
 
 class Tag(db.Model):
     __tablename__ = "tags"
@@ -13,6 +13,7 @@ class Tag(db.Model):
     # associations
     reservations = db.relationship("Reservation", secondary=reservation_tags, back_populates="tags")
     waitlist = db.relationship("Waitlist", secondary=waitlist_tags, back_populates="tags")
+    guests = db.relationship("User", secondary=guest_tags, back_populates="tags")
 
 
     def to_dict(self):

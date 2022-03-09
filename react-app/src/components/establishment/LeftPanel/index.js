@@ -20,19 +20,17 @@ const LeftPanel = () => {
     const [viewWaitlist, setViewWaitlist] = useState(true);
     const [showMakeRes, setShowMakeRes] = useState(false);
     const [showAddWaitlist, setShowAddWaitlist] = useState(false);
-    const [bookings, setBookings] = useState(null);
+    const [bookRes, setBookRes] = useState(null);
     const { selectedDate } = useContext(EstablishmentContext);
 
-    function startNewBooking() {
 
-    }
     return (
         <div className={style.left_panel}>
             {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}
         {showAddWaitlist && <AddWaitlist setShowAddWaitlist={setShowAddWaitlist} showAddWaitlist={showAddWaitlist}/>}
             <input className={style.search}></input>
             <div className={style.filter_bar}>
-                <div onClick={()=>setBookings({})} className={style.sort_by}>Sort By</div>
+                <div onClick={()=>setBookRes('new')} className={style.sort_by}>Sort By</div>
                 <div className={style.order}>Order</div>
             </div>
             <div className={style.booked_bar}>
@@ -59,7 +57,7 @@ const LeftPanel = () => {
                 {!viewWaitlist && <LeftCaret onClick={() => {setViewWaitlist(true)}} className={style.icon}/>}
             </div>
             {viewWaitlist && <Waitlist/>}
-            {bookings && <BookReservation setBookings={setBookings}/>}
+            {bookRes && <BookReservation setShowBookRes={setBookRes} bookRes={bookRes}/>}
         </div>
     )
 }
