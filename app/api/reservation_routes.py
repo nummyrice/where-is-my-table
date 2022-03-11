@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil import parser
 from app.forms import ReservationForm, UpdateReservationForm
 from .auth_routes import validation_errors_to_error_messages
+from sqlalchemy import exc
 import json
 import pytz
 
@@ -173,11 +174,8 @@ def reservation_lock():
 # SUBMIT RESERVATION
 @reservation_routes.route('/new', methods=['POST'])
 def reservation_submit():
-    # call new message form
     form = ReservationForm()
-    # check csrf
     form['csrf_token'].data = request.cookies['csrf_token']
-    # if validate on submit
     if form.validate_on_submit():
         reservation_time = parser.parse(form.data['reservation_time'])
         # reservation_time = datetime.fromisoformat(form.data['reservation_time'])
@@ -191,9 +189,9 @@ def reservation_submit():
                 reservation_exists['guest_id'] = form.data['guest_id']
                 reservation_exists['status_id'] = 3
                 reservation_exists['party_size'] = form.data['party_size']
-                reservation_exists['table_id'] = form.data['table_id']
+                reservation_exists['section_id'] = form.data['section_id']
                 db.session.commit()
-                return {'result': "succesfully reserved", "reservation": reservation_exists.to_dict()}, 200
+                return reservation_exists.to_dict(), 200
             else:
                 return {"errors": ["time unavailable, please choose a different time"]}, 400
         else:
@@ -202,13 +200,11 @@ def reservation_submit():
                     party_size = form.data['party_size'],
                     status_id = 3,
                     reservation_time = reservation_time.replace(tzinfo = None),
-                    table_id = form.data['table_id']
+                    section_id = form.data['section_id']
                 )
             db.session.add(reservation)
             db.session.commit()
-            print('returned from database: ______',         reservation.to_dict()['reservation_time'])
-            return {'result': "successfully reserved", 'reservation': reservation.to_dict()}, 201
-
+            return reservation.to_dict(), 201
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 # UPDATE RESERVATION

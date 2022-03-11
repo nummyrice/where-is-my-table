@@ -5,9 +5,11 @@ import style from './BookReservation.module.css';
 import AddGuest from '../AddGuest';
 import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg'
 import { getReservations } from '../../../store/reservations';
-import { Modal } from '../../context/Modal.js';
+import { Modal } from '../../../context/Modal';
 import ConfirmResModal from '../AddGuest/ConfirmResModal';
 import { newReservation, updateReservation } from '../../../store/reservations';
+import ErrorsModal from '../DisplayErrors';
+import { clearErrors } from '../../../store/errors'
 // create data model for calendar (next 30 days including selected date)
     // [date1, date2, date3, date4]
     // create data model for guest number
@@ -36,10 +38,9 @@ import { newReservation, updateReservation } from '../../../store/reservations';
 function BookReservation({bookRes, setBookRes}) {
     const dispatch = useDispatch()
     const { selectedDate, setSelectedDate } = useContext(EstablishmentContext);
-    // console.log("selectedDate: ", selectedDate.toISOString())
     let editDate
     if (bookRes !== "new") {
-        const editDate = new Date(bookRes.reservation_time)
+        editDate = new Date(bookRes.reservation_time)
         editDate.setUTCHours(0,0,0,0);
     }
     const [isLoading, setIsLoading] = useState(false)
@@ -50,7 +51,7 @@ function BookReservation({bookRes, setBookRes}) {
     const [selectedGuest, setSelectedGuest] = useState(bookRes === 'new' ? null : bookRes.guest_info)
     const [showConfirmRes, setShowConfirmRes] = useState(false)
     const [showErrorsModal, setShowErrorsModal] = useState(false)
-    const [errors, setErrors] = useState([]);
+    // const [errors, setErrors] = useState([]);
     useEffect(() => {
         setIsLoading(true)
         dispatch(getReservations(selectedBookDate.toISOString()))
@@ -64,9 +65,10 @@ function BookReservation({bookRes, setBookRes}) {
     }, [dispatch, selectedBookDate])
     const establishment = useSelector(state => state.session.user.establishment)
     const reservations = useSelector(state => state.reservations)
+    const errors = useSelector(state => state.errors)
     const timezoneOffset = establishment.timezone_offset
     const todaysScheduleBySection = {}
-    const weekday = selectedBookDate.toLocaleDateString('en-US',{weekday: 'long'}).toLowerCase();
+    const weekday = selectedBookDate.toLocaleDateString('en-US',{timeZone: 'America/New_York', weekday: 'long'}).toLowerCase();
     for (const id in establishment.sections) {
         if (weekday in establishment.sections[id].schedule) {
             todaysScheduleBySection[id] = establishment.sections[id].schedule[weekday]
@@ -148,7 +150,6 @@ function BookReservation({bookRes, setBookRes}) {
             }
         }
     }
-
     function handleDateChange(dateString) {
         setIsLoading(true)
         dispatch(getReservations(selectedBookDate.toISOString()))
@@ -171,86 +172,33 @@ function BookReservation({bookRes, setBookRes}) {
     //     return [];
     // }
 
-    // handle res submit
-    // if selected user with id then skip the user register/update handler
-    // new reservation
-
         // NEW RESERVATION
-        const handleNewResSubmit = async () => {
-            // if guest is selected but none of the edits are present
-            dispatch(newReservation(selectedGuest.id, date, partySize, selectedSection))
-                .then((data) => {
-                    if (data.errors) {
-                        setErrors(data.errors)
-                        return data;
-                    } else {
-                        setShowConfirmRes(false)
-                        setBookRes(null)
-                        const resDate = new Date(date);
-                        resDate.setUTCHours(0,0,0,0);
-                        setSelectedDate(resDate)
-                        return data;
-                    }
-                })
-
-            // if guest is selected and any edit is present
-            // if (selectedGuest && (editEmailField || editNameField || editNumberField || editNotesField)) {
-            //     const updatedGuestResult = await updateGuestFetch(selectedGuest.id, name, notes, phoneNumber, email)
-            //     // if update is success
-            //     if (updatedGuestResult.result) {
-            //         dispatch(newReservation(selectedGuest.id, date, partySize, table, tags))
-            //         .then((data) => {
-            //             if (data.errors) {
-            //                 setServerErrors(data.errors)
-            //                 return data;
-            //             } else {
-            //                 setShowConfirmRes(false)
-            //                 setShowMakeRes(false)
-            //                 const resDate = new Date(date);
-            //                 resDate.setUTCHours(0,0,0,0);
-            //                 setSelectedDate(resDate)
-            //                 return data;
-            //             }
-            //         })
-            //     }
-            //     if (updatedGuestResult.errors) setServerErrors(updatedGuestResult.errors);
-            //     return updatedGuestResult;
-            // }
-            // if not guest is selected
-            // if (!selectedGuest) {
-            //     const newGuestResult = await newGuestFetch(name, notes, phoneNumber, email);
-            //     if (newGuestResult.result) {
-            //         dispatch(newReservation(newGuestResult.guest.id, date, partySize, table, tags))
-            //         .then((data) => {
-            //             if (data.errors) {
-            //                 setServerErrors(data.errors)
-            //                 return data;
-            //             } else {
-            //                 setShowConfirmRes(false)
-            //                 setShowMakeRes(false)
-            //                 const resDate = new Date(date);
-            //                 resDate.setUTCHours(0,0,0,0);
-            //                 setSelectedDate(resDate)
-            //                 return data;
-            //             }
-            //         })
-            //     }
-            //     if (newGuestResult.errors) setServerErrors(newGuestResult.errors);
-            //     return newGuestResult;
-            // }
-            // const uknownError = {"errors": ["not hitting any handleResSubmit conditions"]}
-            // setErrors(uknownError.errors)
-            // return uknownError
-        }
+    const handleNewResSubmit = async () => {
+        // if guest is selected but none of the edits are present
+        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex], party_size: partySize, section_id: selectedSection}))
+            .then((data) => {
+                if (data.errors) {
+                    setShowConfirmRes(false)
+                    setShowErrorsModal(true)
+                } else {
+                    setShowConfirmRes(false)
+                    setBookRes(null)
+                    const resDate = new Date(date);
+                    resDate.setUTCHours(0,0,0,0);
+                    setSelectedDate(resDate)
+                    return data;
+                }
+            })
+    }
 
             // UPDATE RESERVATION
     const handleResUpdate = async () => {
         // if guest is selected but none of the edits are present
         dispatch(updateReservation(bookRes.id, selectedGuest.id, date, partySize, selectedSection))
             .then((data) => {
-                if (data.errors) {
-                    setErrors(data.errors)
-                    return data;
+                if (errors) {
+                    setShowConfirmRes(false)
+                    setShowErrorsModal(true)
                 } else {
                     setShowConfirmRes(false)
                     setBookRes(null)
@@ -261,12 +209,14 @@ function BookReservation({bookRes, setBookRes}) {
                 }
             })
 
-}
+    }
 
-
-
+    const errorClose = () => {
+        setShowErrorsModal(false)
+        dispatch(clearErrors())
+    }
 return(
-    <div id={style.book_background}>
+    <>
         <div id={style.modal}>
             <div className={style.title}>Book a Reservation</div>
             <X onClick={() => {setBookRes(null)}} className={style.icon}/>
@@ -347,22 +297,33 @@ return(
                 selectedGuest={selectedGuest}
                 setShowConfirmRes={setShowConfirmRes}
                 errors={errors}
-                setErrors={setErrors}
+                errorClose={errorClose}
                 showErrorsModal={showErrorsModal}
                 setShowErrorsModal={setShowErrorsModal}
             />
         </div>
-        {}
         {showConfirmRes && (
             <Modal onClose={() => setShowConfirmRes(false)}>
                 <ConfirmResModal
                     handleNewResSubmit={handleNewResSubmit}
                     handleResUpdate={handleResUpdate}
+                    errors={errors}
+                    errorClose={errorClose}
+                    setShowConfirmRes={setShowConfirmRes}
+                    bookRes={bookRes}
+                    selectedSection={selectedSection}
+                    resTime={availableTimes[selectedTimeIndex]}
+                    partySize={partySize}
                 />
             </Modal>
         )}
+        {showErrorsModal && (
+            <Modal onClose={errorClose}>
+                <ErrorsModal errors={errors}/>
+            </Modal>
+        )}
 
-    </div>
+    </>
 )
 }
 

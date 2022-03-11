@@ -4,8 +4,8 @@
     height: 100vh;
     top: 0px;
     left: 0px;
-    background-color: rgba(8, 9, 9, 0.8);
-    z-index: 999;
+    /* background-color: rgba(8, 9, 9, 0.8); */
+    /* z-index: 999; */
     display: flex;
     justify-content: center;
     align-items: center;

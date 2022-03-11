@@ -1,8 +1,9 @@
 import React from 'react';
+import style from './DisplayErrors.module.css'
 
-const ErrorsModal = ({errors, setErrors}) => {
+const DisplayErrors = ({errors}) => {
     return(
-        <div>
+        <div id={style.error_container}>
             <ul>
                 {errors.map(error => {
                     return(
@@ -14,4 +15,4 @@ const ErrorsModal = ({errors, setErrors}) => {
     )
 }
 
-export default ErrorsModal
+export default DisplayErrors

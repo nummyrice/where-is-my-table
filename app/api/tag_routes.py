@@ -34,7 +34,7 @@ def add_res_tags():
             except exc.SQLAlchemyError as e:
                 print('Error from ADD TAGS SERVER ROUTE ', e)
                 return {"errors": ["there was an error adding your tag to the database. please try again"]}, 400
-        return {"result": 'succsesfully applied tags', "reservation": target_res.to_dict()}
+        return {"result": 'succesfully applied tags', "reservation": target_res.to_dict()}
     return {"errors": ["the length of one or more of your declared tags is greater than 40 characters. please be sure each tag is seperated by a comma and space"]}, 400
 
 

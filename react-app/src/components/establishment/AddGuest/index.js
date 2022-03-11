@@ -7,8 +7,7 @@ import {ReactComponent as EditIcon} from './assets/edit-regular.svg';
 import {ReactComponent as DeleteTag} from '../AddReservation/assets/times-solid.svg';
 import { removeTag } from '../../../store/reservations';
 import { removePartyTag } from '../../../store/selectedDateWaitlist';
-import { Modal } from '../../context/Modal';
-import ErrorsModal from './ErrorsModal';
+import { Modal } from '../../../context/Modal';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
@@ -208,7 +207,10 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
             handleNewGuestSubmit()
             .then((res) => {
                 setShowConfirmRes(true)
-            }).catch(err => setErrors([...err]))
+            }).catch(err => {
+                setErrors([...err])
+                setShowErrorsModal(true)
+            })
         }
     }
 
@@ -366,11 +368,6 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                     <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>
                 }
             </div>
-            {showErrorsModal && (
-            <Modal onClose={() => setShowErrorsModal}>
-                <ErrorsModal errors={errors} setErrors={setErrors}/>
-            </Modal>
-        )}
         </div>
     )
 }

@@ -38,7 +38,7 @@ class Reservation(db.Model):
             "party_size": self.party_size,
             "reservation_time": self.reservation_time.isoformat(),
             "table_id": self.table_id,
-            "table": self.table.to_dict(),
+            "table": self.table.to_dict() if self.table_id else None,
             "section": self.section_id,
             "section_info": self.section.to_dict(),
             "status_id": self.status_id,

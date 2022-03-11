@@ -23,7 +23,7 @@ const TopBar = () => {
                     yesterday.setDate(selectedDate.getDate() - 1)
                     setSelectedDate(yesterday)
                 }} className={style.back_date}/>
-                <div className={style.todays_date}>{selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                <div className={style.todays_date}>{selectedDate.toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric' })}</div>
                 <Calendar onClick={()=> setShowDatePicker(true)} className={style.calendar}/>
                 <SingleDatePicker
                     id="datePicker"

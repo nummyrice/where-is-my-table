@@ -24,7 +24,7 @@ function App() {
   }, [dispatch]);
 
   const user = useSelector(state => state.session?.user)
-  console.log('USER', user)
+  // console.log('USER', user)
   if (!loaded) {
     return null;
   }

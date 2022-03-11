@@ -1,4 +1,5 @@
 import { postTags } from "../components/establishment/utils";
+import { setErrors } from "./errors";
 
 const SET_RESERVATIONS = 'selectedDateAvailability/SET_RESERVATIONS'
 const SET_RES = 'selectedDateAvailability/SET_RES';
@@ -35,7 +36,6 @@ export const getReservations = (selectedDate) => async (dispatch) => {
         body: JSON.stringify({"selected_date": selectedDate})
     });
     const data = await response.json()
-    console.log('RESERVATIONS: ', data)
     if (response.ok) {
         dispatch(setReservations(data))
         return
@@ -47,28 +47,20 @@ export const newReservation = (reservationDetails) => async (dispatch) => {
     // console.log('RESERVATION TIME: ', reservationTime)
     reservationDetails.reservation_time = reservationDetails.reservation_time.toISOString()
     const response = await fetch('/api/reservations/new', {
-        method: 'POST',
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(reservationDetails)
-    });
-    const data = await response.json();
-    // console.log('RETURNED FROM API: ', data)
-    if (response.ok) {
-        dispatch(setRes(data.reservation))
-        if (reservationDetails.guest_info.tags) {
-            const tagAppliedData = await postTags(data.reservation.id, reservationDetails.guest_info.tags);
-            if (tagAppliedData.result) {
-                dispatch(setUpdatedRes(tagAppliedData.reservation));
-                return tagAppliedData;
-            }
-            const returnErrors = { errors: [...tagAppliedData.errors, 'reservation successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
-            return returnErrors
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(reservationDetails)
+        });
+        const data = await response.json()
+        if (!response.ok) {
+            dispatch(setErrors(data.errors))
+            return data
         }
-        return data;
+        dispatch(setRes(data))
+        return data
     }
 
-    return data;
-}
+
 
 // UPDATE RESERVATION
 export const updateReservation = (reservationId, guestId, reservationTime, partySize, tableId, tags) => async (dispatch) => {
