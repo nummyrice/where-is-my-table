@@ -44,8 +44,17 @@ export const getReservations = (selectedDate) => async (dispatch) => {
 
 // NEW RESERVATION
 export const newReservation = (reservationDetails) => async (dispatch) => {
-    // console.log('RESERVATION TIME: ', reservationTime)
-    reservationDetails.reservation_time = reservationDetails.reservation_time.toISOString()
+    reservationDetails.reservation_time = reservationDetails.reservation_time.toISO()
+    console.log('NEW RES ISO FROM THUNK: ', reservationDetails.reservation_time)
+
+    if (!reservationDetails.section_id) {
+        delete reservationDetails.section_id
+    }
+    console.log('RESERVATION DETAILS: ', !reservationDetails.section_id)
+    if (!reservationDetails.table_id) {
+        delete reservationDetails.table_id
+    }
+    console.log('RESERVATION DETAILS: ', reservationDetails)
     const response = await fetch('/api/reservations/new', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
@@ -63,35 +72,37 @@ export const newReservation = (reservationDetails) => async (dispatch) => {
 
 
 // UPDATE RESERVATION
-export const updateReservation = (reservationId, guestId, reservationTime, partySize, tableId, tags) => async (dispatch) => {
-    const resToUpdate = {
-        reservation_id: reservationId,
-        guest_id: guestId,
-        reservation_time: reservationTime,
-        party_size: partySize,
-        table_id: tableId
+export const updateReservation = (reservationDetails) => async (dispatch) => {
+    reservationDetails.reservation_time = reservationDetails.reservation_time.toISO()
+    if (!reservationDetails.section_id) {
+        delete reservationDetails.section_id
     }
+    if (!reservationDetails.table_id) {
+        delete reservationDetails.table_id
+    }
+    console.log('RESERVATION DETAILS: ', reservationDetails)
     const response = await fetch('/api/reservations/update', {
         method: 'PUT',
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(resToUpdate)
+        body: JSON.stringify(reservationDetails)
     })
     const data = await response.json()
 
-    if (response.ok) {
-        dispatch(setUpdatedRes(data.reservation))
-        if (tags) {
-            const tagAppliedData = await postTags(data.reservation.id, tags);
-            if (tagAppliedData.result) {
-                dispatch(setUpdatedRes(tagAppliedData.reservation));
-                return tagAppliedData;
-            }
-            const returnErrors= { errors: [...tagAppliedData.errors, 'reservation successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
-            return returnErrors;
-
-        }
-        return data;
+    if (!response.ok) {
+        dispatch(setErrors(data.errors))
+        return data
     }
+        dispatch(setUpdatedRes(data))
+        // if (tags) {
+        //     const tagAppliedData = await postTags(data.reservation.id, tags);
+        //     if (tagAppliedData.result) {
+        //         dispatch(setUpdatedRes(tagAppliedData.reservation));
+        //         return tagAppliedData;
+        //     }
+        //     const returnErrors= { errors: [...tagAppliedData.errors, 'reservation successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
+        //     return returnErrors;
+
+        // }
     return data;
 }
     // UPDATE STATUS

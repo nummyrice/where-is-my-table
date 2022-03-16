@@ -1,8 +1,8 @@
 """Initial migration.
 
-Revision ID: 36de00145840
+Revision ID: ffb42b9d3411
 Revises: 
-Create Date: 2022-03-08 20:31:33.324201
+Create Date: 2022-03-15 19:10:36.795309
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '36de00145840'
+revision = 'ffb42b9d3411'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,6 +34,14 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
+    op.create_table('timezones',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('luxon_string', sa.String(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=40), nullable=False),
@@ -51,8 +59,9 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
-    sa.Column('timezone_offset', sa.Integer(), nullable=False),
+    sa.Column('timezone_id', sa.Integer(), nullable=False),
     sa.Column('daylight_savings', sa.Boolean(), nullable=False),
+    sa.ForeignKeyConstraint(['timezone_id'], ['timezones.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -112,9 +121,11 @@ def upgrade():
     sa.Column('reservation_time', sa.DateTime(), nullable=True),
     sa.Column('section_id', sa.Integer(), nullable=True),
     sa.Column('table_id', sa.Integer(), nullable=True),
+    sa.Column('establishment_id', sa.Integer(), nullable=True),
     sa.Column('status_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['establishment_id'], ['establishments.id'], ),
     sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['statuses.id'], ),
@@ -143,6 +154,7 @@ def downgrade():
     op.drop_table('guest_tags')
     op.drop_table('establishments')
     op.drop_table('users')
+    op.drop_table('timezones')
     op.drop_table('tags')
     op.drop_table('statuses')
     # ### end Alembic commands ###

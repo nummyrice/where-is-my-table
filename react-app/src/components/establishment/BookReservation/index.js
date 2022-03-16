@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from './BookReservation.module.css';
@@ -8,8 +8,9 @@ import { getReservations } from '../../../store/reservations';
 import { Modal } from '../../../context/Modal';
 import ConfirmResModal from '../AddGuest/ConfirmResModal';
 import { newReservation, updateReservation } from '../../../store/reservations';
-import ErrorsModal from '../DisplayErrors';
+import DisplayErrors from '../DisplayErrors';
 import { clearErrors } from '../../../store/errors'
+import { DateTime } from 'luxon'
 // create data model for calendar (next 30 days including selected date)
     // [date1, date2, date3, date4]
     // create data model for guest number
@@ -38,23 +39,23 @@ import { clearErrors } from '../../../store/errors'
 function BookReservation({bookRes, setBookRes}) {
     const dispatch = useDispatch()
     const { selectedDate, setSelectedDate } = useContext(EstablishmentContext);
+    console.log("bookres: ", bookRes)
     let editDate
     if (bookRes !== "new") {
-        editDate = new Date(bookRes.reservation_time)
-        editDate.setUTCHours(0,0,0,0);
+        editDate = DateTime.fromISO(bookRes.reservation_time).startOf('day')
     }
     const [isLoading, setIsLoading] = useState(false)
     const [partySize, setPartySize] = useState(1)
     const [selectedBookDate, setSelectedBookDate] = useState(bookRes === 'new' ? selectedDate : editDate)
     const [selectedTimeIndex, setSelectedTimeIndex] = useState(0)
-    const [selectedSection, setSelectedSection] = useState(bookRes === 'new' ? null : bookRes.section_id)
+    const [selectedSection, setSelectedSection] = useState(bookRes === 'new' ? null : bookRes.section)
     const [selectedGuest, setSelectedGuest] = useState(bookRes === 'new' ? null : bookRes.guest_info)
     const [showConfirmRes, setShowConfirmRes] = useState(false)
     const [showErrorsModal, setShowErrorsModal] = useState(false)
     // const [errors, setErrors] = useState([]);
     useEffect(() => {
         setIsLoading(true)
-        dispatch(getReservations(selectedBookDate.toISOString()))
+        dispatch(getReservations(selectedBookDate.toISO()))
         .then(async result => {
             console.log("successfully acquired reservations")
         }).catch(err => {
@@ -66,96 +67,87 @@ function BookReservation({bookRes, setBookRes}) {
     const establishment = useSelector(state => state.session.user.establishment)
     const reservations = useSelector(state => state.reservations)
     const errors = useSelector(state => state.errors)
-    const timezoneOffset = establishment.timezone_offset
-    const todaysScheduleBySection = {}
-    const weekday = selectedBookDate.toLocaleDateString('en-US',{timeZone: 'America/New_York', weekday: 'long'}).toLowerCase();
-    for (const id in establishment.sections) {
-        if (weekday in establishment.sections[id].schedule) {
-            todaysScheduleBySection[id] = establishment.sections[id].schedule[weekday]
+    const todaysScheduleBySection = useMemo(() => {
+        const todaysScheduleBySection = {}
+        const weekday = selectedBookDate.toLocaleString({ weekday: 'long'}).toLowerCase();
+        for (const id in establishment.sections) {
+            if (weekday in establishment.sections[id].schedule) {
+                todaysScheduleBySection[id] = establishment.sections[id].schedule[weekday]
+            }
         }
-    }
+        return todaysScheduleBySection;
+    }, [establishment.sections, selectedBookDate])
     // console.log('weekday: ', todaysScheduleBySection)
     const dates = Array(30).fill(0).map((_, day) => {
-        const selectedDateCopy = new Date(selectedDate)
-        selectedDateCopy.setDate(selectedDate.getDate() + day)
-        return selectedDateCopy;
+        return selectedDate.plus({day: day});
     })
 
     const party = Array(30).fill(0).map((_, num) => {
         return num + 1;
     })
-    let date = new Date(selectedBookDate)
-    // TODO: math.abs should not be used here. Test different est. time zones and determine how offset should work through the app
-    // TODO: add time for each table
-    // TODO: add max capacity to establishment for each 15 minute period
-    date.setUTCHours(Math.abs(timezoneOffset), 0, 0, 0)
-    const times = Array(96).fill(0).map((_, minutesMultiplier) => {
-        const timeIncrement = new Date(date)
-        timeIncrement.setMinutes(15 * minutesMultiplier)
-        return timeIncrement;
-    })
-     const availableTimes = times.filter(time => {
-        for (let id in todaysScheduleBySection) {
-            for (let block in todaysScheduleBySection[id]) {
-                const selectedBookDateStart = new Date(selectedBookDate)
-                selectedBookDateStart.setUTCHours(Math.abs(timezoneOffset), 0, 0, 0)
-                const selectedBookDateEnd = new Date(selectedBookDate)
-                selectedBookDateEnd.setUTCHours(Math.abs(timezoneOffset), 0, 0, 0)
-                const start = selectedBookDateStart.setHours(selectedBookDateStart.getHours() + todaysScheduleBySection[id][block].start.hour, selectedBookDateStart.getMinutes() + todaysScheduleBySection[id][block].start.minute)
-                const end = selectedBookDateEnd.setHours(selectedBookDateEnd.getHours() + todaysScheduleBySection[id][block].end.hour, selectedBookDateEnd.getMinutes() + todaysScheduleBySection[id][block].end.minute)
-                if (time > start && time < end) {
-                    return true;
+    const availableTimes = useMemo(() => {
+        const times = Array(96).fill(0).map((_, minutesMultiplier) => {
+            return selectedBookDate.plus({minute:15 * minutesMultiplier});
+        })
+        return (times.filter(time => {
+            for (let id in todaysScheduleBySection) {
+                for (let block in todaysScheduleBySection[id]) {
+                    const start = selectedBookDate.set({hour: todaysScheduleBySection[id][block].start.hour, minute: todaysScheduleBySection[id][block].start.minute})
+                    const end = selectedBookDate.set({hour: todaysScheduleBySection[id][block].end.hour, minute: todaysScheduleBySection[id][block].end.minute})
+                    if (time > start && time < end) {
+                        return true;
+                    }
                 }
             }
-        }
-        return false;
-    })
+            return false;
+        }))
+    }, [selectedBookDate, todaysScheduleBySection])
     // get sections available at selected time
     // get number of tables that are not taken
         // declare table counter
         // look at reservations that are within two hours from the selected time
         // for each reservation subtract from the total available
-    const availableSections = [];
-    if (availableTimes[selectedTimeIndex]) {
-        for (let id in todaysScheduleBySection) {
-            for (let block in todaysScheduleBySection[id]) {
-                const selectedBookDateStart = new Date(selectedBookDate)
-                selectedBookDateStart.setUTCHours(Math.abs(timezoneOffset), 0, 0, 0)
-                const selectedBookDateEnd = new Date(selectedBookDate)
-                selectedBookDateEnd.setUTCHours(Math.abs(timezoneOffset), 0, 0, 0)
-                const start = selectedBookDateStart.setHours(selectedBookDateStart.getHours() + todaysScheduleBySection[id][block].start.hour, selectedBookDateStart.getMinutes() + todaysScheduleBySection[id][block].start.minute)
-                const end = selectedBookDateEnd.setHours(selectedBookDateEnd.getHours() + todaysScheduleBySection[id][block].end.hour, selectedBookDateEnd.getMinutes() + todaysScheduleBySection[id][block].end.minute)
-                if (availableTimes[selectedTimeIndex] > start && availableTimes[selectedTimeIndex] < end) {
-                    let tableTotal = Object.keys(establishment.sections[id].tables).length
-                    const resIds = Object.keys(reservations)
-                    resIds.forEach((id) => {
-                        const res = reservations[id]
-                        const reservationTime = new Date(res.reservation_time)
-                        const timeDiff =  Math.abs(reservationTime.getTime() - availableTimes[selectedTimeIndex].getTime()) / 60000
-                        if (res.section_id === id &&  timeDiff < 120) {
-                            tableTotal--;
-                        }
-                    })
-                    if (tableTotal) {
-                        const section = {
-                            id: id,
-                            name: establishment.sections[id].name,
-                            availableTables: tableTotal,
+    const availableSections = useMemo(() => {
+        const availableSections = [];
+        if (availableTimes[selectedTimeIndex]) {
+            for (let id in todaysScheduleBySection) {
+                for (let block in todaysScheduleBySection[id]) {
+                    const start = selectedBookDate.set({hour: todaysScheduleBySection[id][block].start.hour, minute: todaysScheduleBySection[id][block].start.minute})
+                    const end = selectedBookDate.set({hour: todaysScheduleBySection[id][block].end.hour, minute: todaysScheduleBySection[id][block].end.minute})
+                    if (availableTimes[selectedTimeIndex] > start && availableTimes[selectedTimeIndex] < end) {
+                        let tableTotal = Object.keys(establishment.sections[id].tables).length
+                        const resIds = Object.keys(reservations)
+                        resIds.forEach((id) => {
+                            const res = reservations[id]
+                            const reservationTime = DateTime.fromISO(res.reservation_time)
+                            const timeDiff =  reservationTime.diff(availableTimes[selectedTimeIndex], 'minutes').toObject().minutes
+                            if (res.section === parseInt(id, 10) &&  timeDiff < 120) {
+                                tableTotal--;
+                            }
+                        })
+                        if (tableTotal) {
+                            const section = {
+                                id: parseInt(id, 10),
+                                name: establishment.sections[id].name,
+                                availableTables: tableTotal,
 
-                        };
-                        availableSections.push(section)
-                        break;
+                            };
+                            availableSections.push(section)
+                            break;
+                        }
                     }
                 }
             }
         }
-    }
+        return availableSections;
+    }, [availableTimes, establishment.sections, reservations, selectedBookDate, selectedTimeIndex, todaysScheduleBySection])
+
     function handleDateChange(dateString) {
         setIsLoading(true)
-        dispatch(getReservations(selectedBookDate.toISOString()))
+        dispatch(getReservations(selectedBookDate.toISO()))
         .then(async result => {
             console.log("successfully acquired reservations")
-            setSelectedBookDate(new Date(dateString))
+            setSelectedBookDate(DateTime.fromISO(dateString))
         }).catch(err => {
             console.log("failed to acquire reservations")
         }).finally(() => {
@@ -175,7 +167,7 @@ function BookReservation({bookRes, setBookRes}) {
         // NEW RESERVATION
     const handleNewResSubmit = async () => {
         // if guest is selected but none of the edits are present
-        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex], party_size: partySize, section_id: selectedSection}))
+        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex], party_size: partySize, section_id: selectedSection, table_id: null}))
             .then((data) => {
                 if (data.errors) {
                     setShowConfirmRes(false)
@@ -183,9 +175,7 @@ function BookReservation({bookRes, setBookRes}) {
                 } else {
                     setShowConfirmRes(false)
                     setBookRes(null)
-                    const resDate = new Date(date);
-                    resDate.setUTCHours(0,0,0,0);
-                    setSelectedDate(resDate)
+                    setSelectedDate(DateTime.fromISO(data.reservation_time).startOf('day'))
                     return data;
                 }
             })
@@ -194,17 +184,15 @@ function BookReservation({bookRes, setBookRes}) {
             // UPDATE RESERVATION
     const handleResUpdate = async () => {
         // if guest is selected but none of the edits are present
-        dispatch(updateReservation(bookRes.id, selectedGuest.id, date, partySize, selectedSection))
+        dispatch(updateReservation({reservation_id: bookRes.id, guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex], party_size: partySize, section_id: selectedSection, table_id: null}))
             .then((data) => {
-                if (errors) {
+                if (data.errors) {
                     setShowConfirmRes(false)
                     setShowErrorsModal(true)
                 } else {
                     setShowConfirmRes(false)
                     setBookRes(null)
-                    const resDate = new Date(date);
-                    resDate.setUTCHours(0,0,0,0);
-                    setSelectedDate(resDate)
+                    setSelectedDate(DateTime.fromISO(data.reservation_time).startOf('day'))
                     return data;
                 }
             })
@@ -223,11 +211,11 @@ return(
             <div className={style.date}>
                 <div className={style.top_scroll_space}></div>
                 {dates.map((date) => {
-                    const dateText = date.toLocaleDateString('en-US', {timeZone: 'America/New_York', month: 'short', day: 'numeric'});
-                    const weekday = date.toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short'});
+                    const dateText = date.toLocaleString({month: 'short', day: 'numeric'});
+                    const weekday = date.toLocaleString({weekday: 'short'});
                     const weekdayChar = weekday.slice(0,1);
                     return (
-                        <div onClick={() => handleDateChange(date.toISOString())} key={date.toISOString()} className={`${style.date_cell} ${selectedBookDate.toISOString() === date.toISOString() ? style.selected : style.null}`}>
+                        <div onClick={() => handleDateChange(date.toISO())} key={date.toISO()} className={`${style.date_cell} ${selectedBookDate.toISO() === date.toISO() ? style.selected : style.null}`}>
                             <div className={style.weekday}>{weekdayChar}</div>
                             <div className={style.date_text}>{dateText}</div>
                         </div>
@@ -249,20 +237,28 @@ return(
                 <div className={style.bottom_scroll_space}></div>
             </div>
             <div className={style.time}>
-                <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>                {availableTimes.map((time, i) => {
-                    const localTimeString = time.toLocaleTimeString('en-Us', {timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+                <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
+                {availableTimes.map((time, i) => {
+                    const localTimeString = time.toLocaleString({hour: 'numeric', minute: '2-digit' });
                     let capacity = 0;
                     const resIds = Object.keys(reservations)
                     resIds.forEach((id) => {
                         const res = reservations[id]
-                        const reservationTime = new Date(res.reservation_time)
-                        const timeDiff =  Math.abs(reservationTime.getTime() - time.getTime()) / 60000
-                        if (timeDiff < 120) {
-                            capacity++;
+                        console.log('res.section: ', typeof res.section)
+                        console.log('selectedSection: ', typeof selectedSection)
+                        if (res.section === selectedSection) {
+                            const reservationTime = DateTime.fromISO(res.reservation_time)
+                            const timeDiff =  reservationTime.diff(time, 'minutes').toObject().minutes
+                            console.log('ISO: ', res.reservation_time)
+                            console.log('time: ', reservationTime)
+                            console.log('book reservation time diff: ', timeDiff)
+                            if (timeDiff < 120) {
+                                capacity+=res.party_size;
+                            }
                         }
                     })
                     return(
-                        <div onClick={() => setSelectedTimeIndex(i)} key={time.toISOString()}className={`${style.time_cell} ${selectedTimeIndex === i ? style.selected : style.null} ${isLoading ? style.is_loading : style.loaded}`}>
+                        <div onClick={() => setSelectedTimeIndex(i)} key={time.toISO()}className={`${style.time_cell} ${selectedTimeIndex === i ? style.selected : style.null} ${isLoading ? style.is_loading : style.loaded}`}>
                             <div className={style.time_text}>{localTimeString}</div>
                             <div className={style.capacity}>{`${capacity}/20`}</div>
                         </div>
@@ -273,7 +269,8 @@ return(
                     <span id={style.outerCircle}></span>
                		</span>
                 </div>}
-                <div className={`${style.bottom_scroll_space} ${isLoading ? style.is_loading : style.loaded}`}></div>            </div>
+                <div className={`${style.bottom_scroll_space} ${isLoading ? style.is_loading : style.loaded}`}></div>
+                </div>
             <div className={style.section}>
                 <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
                 {availableSections.map((section => {
@@ -314,12 +311,16 @@ return(
                     selectedSection={selectedSection}
                     resTime={availableTimes[selectedTimeIndex]}
                     partySize={partySize}
+                    selectedGuest={selectedGuest}
                 />
             </Modal>
         )}
         {showErrorsModal && (
             <Modal onClose={errorClose}>
-                <ErrorsModal errors={errors}/>
+                <DisplayErrors
+                    errors={errors}
+                    errorClose={errorClose}
+                />
             </Modal>
         )}
 

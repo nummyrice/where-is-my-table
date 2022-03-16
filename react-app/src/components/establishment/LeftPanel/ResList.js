@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { EstablishmentContext } from '..';
 import StatusBar from '../StatusBar';
 import BookReservation from '../BookReservation';
-import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 import style from './LeftPanel.module.css';
+import { DateTime } from 'luxon';
 import { ReactComponent as EditIcon } from './assets/chevron-right-solid.svg';
 import { ReactComponent as CancelIcon } from '../StatusBar//assets/times-circle-regular.svg';
 import { ReactComponent as LateIcon } from '../StatusBar//assets/exclamation-circle-solid.svg';
@@ -15,18 +15,19 @@ import { ReactComponent as SeatedIcon } from '../StatusBar//assets/check-circle-
 import { ReactComponent as ReservedIcon } from '../StatusBar//assets/circle-solid.svg';
 import { ReactComponent as LeftMessageIcon } from '../StatusBar//assets/spinner-solid.svg';
 
-const ResList = () => {
-    const dispatch = useDispatch();
+
+const ResList = ({bookRes, setBookRes}) => {
+    // const dispatch = useDispatch();
     const reservations = useSelector(state => state.reservations)
     const reservationIds = Object.keys(reservations)
-    const {selectedDate} = useContext(EstablishmentContext);
+    // const {selectedDate} = useContext(EstablishmentContext);
     const [showStatusBar, setShowStatusBar] = useState(null);
-    const [bookRes, setBookRes] = useState('')
     return(
         <div id={style.scroll_res_list}>
             {reservationIds &&
                 reservationIds.map((id) => {
                     const reservation = reservations[id]
+                    // console.log('RESERVATION TIMEZONE: ', DateTime.fromISO(reservation))
                     return(
                         <div key={reservation.id} className={style.res_entry}>
                             <div id={style.status_icon}>
@@ -62,11 +63,10 @@ const ResList = () => {
                             <div id={style.res_info_sec}>
                                 <div>{reservation.guest}</div>
                                 <div id={style.table_name}>{reservation.section_info?.name}</div>
-                                <div>{new Date(reservation.reservation_time).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
+                                <div>{DateTime.fromISO(reservation.reservation_time).toLocaleString({ hour: 'numeric', minute: '2-digit' })}</div>
                                 <div id={style.party_size}>{`Guests: ${reservation.party_size}`}</div>
                             </div>
                             <div onClick={()=> setBookRes(reservation)} id={style.edit_button}><EditIcon id={style.edit_icon}/></div>
-                            {bookRes && <BookReservation bookRes={bookRes} setBookRes={setBookRes}/>}
                         </div>
                     )
                 })

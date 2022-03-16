@@ -2,6 +2,7 @@ from app.models.utils import UTCDateTime
 from .db import db
 from sqlalchemy.sql import func
 from .tags_join import reservation_tags
+import pytz
 
 class Reservation(db.Model):
     __tablename__ = 'reservations'
@@ -16,6 +17,7 @@ class Reservation(db.Model):
     reservation_time = db.Column(db.DateTime)
     section_id = db.Column(db.Integer, db.ForeignKey('sections.id'))
     table_id = db.Column(db.Integer, db.ForeignKey('tables.id'))
+    establishment_id = db.Column(db.Integer, db.ForeignKey('establishments.id'))
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'))
     created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
     updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
@@ -26,21 +28,23 @@ class Reservation(db.Model):
     tags = db.relationship("Tag", secondary=reservation_tags, back_populates="reservations")
     table = db.relationship("Table", back_populates="reservations")
     section = db.relationship("Section", back_populates="reservations")
-
+    establishment = db.relationship("Establishment", back_populates="reservations")
 
 
     def to_dict(self):
+        timezone = pytz.timezone(self.establishment.get_timezone())
+
         return {
             "id": self.id,
             "guest_id": self.guest_id,
             "guest": self.guest.name,
             "guest_info": self.guest.to_safe_dict(),
             "party_size": self.party_size,
-            "reservation_time": self.reservation_time.isoformat(),
+            "reservation_time": timezone.localize(self.reservation_time, is_dst=True).isoformat(),
             "table_id": self.table_id,
             "table": self.table.to_dict() if self.table_id else None,
             "section": self.section_id,
-            "section_info": self.section.to_dict(),
+            "section_info": self.section.to_dict() if self.section_id else None,
             "status_id": self.status_id,
             "status": self.status.to_dict(),
             "tags": [tag.to_dict() for tag in self.tags],

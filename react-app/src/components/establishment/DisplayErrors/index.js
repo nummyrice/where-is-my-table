@@ -1,7 +1,7 @@
 import React from 'react';
 import style from './DisplayErrors.module.css'
 
-const DisplayErrors = ({errors}) => {
+const DisplayErrors = ({errors, setShowErrorsModal}) => {
     return(
         <div id={style.error_container}>
             <ul>

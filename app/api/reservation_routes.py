@@ -134,18 +134,15 @@ def weeks_available_tables():
 # GET RESERVATIONS FOR SET DATE
 @reservation_routes.route('/selected-date', methods=['POST'])
 def get_reservations():
-    est = current_user.to_dict()['establishment']
     data = request.json
     client_datetime = parser.isoparse(data['selected_date'])
-    esta_offset = client_datetime + relativedelta(hours=est['timezone_offset'])
-    end_offset = esta_offset + relativedelta(days=1)
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
+    end_offset = client_datetime + relativedelta(days=1)
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_offset)).all()
     return {reservation.id: reservation.to_dict() for reservation in todays_res}
 
 # CREATE RESERVATION TIME AND SET PENDING
 @reservation_routes.route('/lock', methods=['POST'])
 def reservation_lock():
-    # print('DATETIME NOWWWWWWW_______: ', datetime.now())
     data = request.json
     target_datetime = parser.isoparse(data['lock_reservation'])
     reservation = db.session.query(Reservation).filter(Reservation.reservation_time == target_datetime).one_or_none()
@@ -177,8 +174,10 @@ def reservation_submit():
     form = ReservationForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
-        reservation_time = parser.parse(form.data['reservation_time'])
-        # reservation_time = datetime.fromisoformat(form.data['reservation_time'])
+        # reservation_time = parser.parse(form.data['reservation_time'])
+        reservation_time = datetime.fromisoformat(form.data['reservation_time'])
+        print('RESERVATION TIME ?????????????????????????: ', reservation_time)
+        print('RESERVATION TIME ?????????????????????????: ', reservation_time.tzinfo)
         reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
         if  reservation_exists:
             res_updated_at = reservation_exists.updated_at
@@ -200,7 +199,9 @@ def reservation_submit():
                     party_size = form.data['party_size'],
                     status_id = 3,
                     reservation_time = reservation_time.replace(tzinfo = None),
-                    section_id = form.data['section_id']
+                    # reservation_time = reservation_time,
+                    section_id = form.data['section_id'],
+                    establishment_id = current_user.establishment.id
                 )
             db.session.add(reservation)
             db.session.commit()
@@ -220,10 +221,11 @@ def edit_reservation():
         if not target_reservation.status_id == 2 or (target_reservation.status_id == 2 and (pending_status / 60) > 10):
             target_reservation.guest_id = form.data['guest_id']
             target_reservation.party_size = form.data['party_size']
-            target_reservation.reservation_time = reservation_time
+            target_reservation.reservation_time = reservation_time.replace(tzinfo = None)
             target_reservation.table_id = form.data['table_id']
+            target_reservation.section_id = form.data['section_id']
             db.session.commit()
-            return {"result": "successfully updated", "reservation": target_reservation.to_dict()}
+            return target_reservation.to_dict(), 201
         return {'errors': ["reservation already exists for this time"]}, 400
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 

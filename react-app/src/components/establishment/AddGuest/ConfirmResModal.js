@@ -9,6 +9,7 @@ const ConfirmResModal = ({ bookRes, name, setShowConfirmRes, resTime, selectedSe
                 // create new guest with info entered
                 // update reservation with the new guest and date/time/tags/party if changed
                 // console.log('TYPE OF RESTIME: ', resTime)
+                console.log('selected guest: ', selectedGuest)
     return(
 
         <div className={style.error_submission_modal}>
@@ -16,8 +17,8 @@ const ConfirmResModal = ({ bookRes, name, setShowConfirmRes, resTime, selectedSe
             <ul className={style.reservation_details}>
                 <li key={'title'}>Your reservation:</li>
                 <li key={'party'}>{`${partySize} ${partySize === 1 ? 'Guest' : 'Guests'}`}</li>
-                <li key={'time'}>{`at ${resTime.toLocaleTimeString('en-Us', {timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' })}`}</li>
-                <li key={'date'}>{`on ${resTime.toLocaleDateString('en-US', {timeZone: 'America/New_York', month: 'short', day: 'numeric'})}`}</li>
+                <li key={'time'}>{`at ${resTime.toLocaleString({hour: 'numeric', minute: '2-digit' })}`}</li>
+                <li key={'date'}>{`on ${resTime.toLocaleString({month: 'short', day: 'numeric'})}`}</li>
                 <li key={'name'}> {`for ${selectedGuest ? selectedGuest.name : name}`}</li>
             </ul>
                 <div className={style.button_area}>

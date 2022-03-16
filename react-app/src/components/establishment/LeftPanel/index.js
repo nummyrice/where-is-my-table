@@ -38,7 +38,7 @@ const LeftPanel = () => {
                 {viewBooked && <DownCaret onClick={() => {setViewBooked(false)}} className={style.icon}/>}
                 {!viewBooked && <LeftCaret onClick={() => {setViewBooked(true)}} className={style.icon}/>}
             </div>
-            {viewBooked && <ResList/>}
+            {viewBooked && <ResList bookRes={bookRes} setBookRes={setBookRes}/>}
             <div className={style.waitlist_bar}>
                 <div className={style.label}> Waitlist </div>
                 <div onClick={() => {setShowAddWaitlist(true)}} className={style.add_button}>

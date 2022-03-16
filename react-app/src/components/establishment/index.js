@@ -7,22 +7,22 @@ import style from "./Establishment.module.css";
 import ResSchedule from './ResSchedule';
 import TopBar from './TopBar';
 import LeftPanel from './LeftPanel';
+import { DateTime, Settings } from 'luxon';
 
 export const EstablishmentContext = createContext();
 
 const Establishment = () => {
     const establishment = useSelector(state => state.session.user.establishment)
     const dispatch = useDispatch();
+    Settings.defaultZone = establishment.timezone.luxon_string
     // const user = useSelector(state => state.session.user)
-    const today = new Date();
-    today.setUTCHours(establishment.timezone_offset,0,0,0);
-    console.log(today.toLocaleDateString('en-US', {timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric' }))
-    const [selectedDate, setSelectedDate] = useState(today);
+    const local = DateTime.local().startOf('day')
+    const [selectedDate, setSelectedDate] = useState(local);
     useEffect(() => {
-        dispatch(getReservations(selectedDate.toISOString())).then((data)=>{
+        dispatch(getReservations(selectedDate.toISO())).then((data)=>{
             // console.log("SELECTED DATA ISO: ", selectedDate.toISOString() )
         })
-        dispatch(getSelectedDateWaitlist(selectedDate.toISOString())).then((data) => {
+        dispatch(getSelectedDateWaitlist(selectedDate.toISO())).then((data) => {
             // console.log("Waitlist DATA", data)
         })
     }, [selectedDate, dispatch])
