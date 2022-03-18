@@ -159,7 +159,6 @@ function BookReservation({bookRes, setBookRes}) {
                     setShowConfirmRes(false)
                     setBookRes(null)
                     setSelectedDate(DateTime.fromISO(data.reservation_time).startOf('day'))
-                    return data;
                 }
             })
     }
@@ -176,7 +175,6 @@ function BookReservation({bookRes, setBookRes}) {
                     setShowConfirmRes(false)
                     setBookRes(null)
                     setSelectedDate(DateTime.fromISO(data.reservation_time).startOf('day'))
-                    return data;
                 }
             })
 
@@ -313,8 +311,6 @@ return(
                 <ConfirmResModal
                     handleNewResSubmit={handleNewResSubmit}
                     handleResUpdate={handleResUpdate}
-                    errors={errors}
-                    errorClose={errorClose}
                     setShowConfirmRes={setShowConfirmRes}
                     bookRes={bookRes}
                     selectedSection={selectedSection}

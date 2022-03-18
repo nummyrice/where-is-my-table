@@ -17,11 +17,11 @@ import { ReactComponent as LeftMessageIcon } from '../StatusBar//assets/spinner-
 import { ReactComponent as EditPartyIcon } from '../AddGuest/assets/edit-regular.svg';
 import { ReactComponent as TrashIcon } from './assets/trash-alt-solid.svg';
 
-const Waitlist = () => {
+const Waitlist = ({setEditWaitlist}) => {
     const dispatch = useDispatch();
     const waitlist = useSelector(state => state.selectedDateWaitlist)
     const [showStatusBar, setShowStatusBar] = useState(null);
-    const [editWaitlist, setEditWaitlist] = useState('')
+
     return(
         <div id={style.scroll_res_list}>
             {waitlist.length > 0 &&
@@ -72,7 +72,6 @@ const Waitlist = () => {
                                     <TrashIcon className={style.waitlist_icon}/>
                                 </div>
                             </div>
-                            {editWaitlist && <AddWaitlist editWaitlist={editWaitlist} setEditWaitlist={setEditWaitlist}/>}
                         </div>
                     )
                 })

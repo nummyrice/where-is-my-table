@@ -1,4 +1,5 @@
 import { postPartyTags } from '../components/establishment/utils.js';
+import { setErrors } from './errors.js';
 
 const SET_WAITLIST = 'selectedDateWaitlist/SET_WAITLIST';
 const SET_PARTY = 'selectedDateWaitlist/SET_PARTY';
@@ -60,20 +61,22 @@ export const newWaitlistParty = (guestId, partySize, estimatedWait, tags) => asy
         body: JSON.stringify(newParty)
     })
     const data = await response.json()
-    if (response.ok) {
-        dispatch(setParty(data.party));
-        if (tags) {
-            const tagAppliedData = await postPartyTags(data.party.id, tags)
-            if (tagAppliedData.result) {
-                dispatch(updateParty(tagAppliedData.party))
-                return tagAppliedData;
-            }
-            const returnErrors= { errors: [...tagAppliedData.errors, 'party successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
-            return returnErrors
-        }
-        return data;
+    if (!response.ok) {
+        dispatch(setErrors(data.errors))
+        return data
     }
-    return data;
+    dispatch(setParty(data));
+    if (tags) {
+        const tagResponse = await postPartyTags(data.id, tags);
+        const tagData = tagResponse.json()
+        if (!tagResponse.ok) {
+            setErrors(tagData.errors)
+            return tagData
+        }
+        dispatch(updateParty(tagData));
+        return tagData;
+    }
+return data;
 }
 
 //UPDATE WAITLIST PARTY
@@ -91,19 +94,21 @@ export const updateWaitlistParty = (waitlistId, guestId, partySize, estimatedWai
         body: JSON.stringify(updatedParty)
     })
     const data = await response.json();
-    if (response.ok) {
-        dispatch(updateParty(data.party))
-        if (tags) {
-            const tagAppliedData = await postPartyTags(data.party.id, tags);
-            if (tagAppliedData.result) {
-                dispatch(updateParty(tagAppliedData.party))
-                return tagAppliedData;
-            }
-            const returnErrors= { errors: [...tagAppliedData.errors, 'party successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
-            return returnErrors
+    if (!response.ok) {
+        dispatch(setErrors(data.errors))
+        return data
+    }
+    dispatch(updateParty(data));
+    if (tags) {
+        const tagResponse = await postPartyTags(data.id, tags);
+        const tagData = tagResponse.json()
+        if (!tagResponse.ok) {
+            setErrors(tagData.errors)
+            return tagData
         }
-        return data;
-    };
+        dispatch(updateParty(tagData));
+        return tagData;
+    }
     return data;
 }
 
@@ -122,7 +127,7 @@ export const updateAndSetPartyStatus = (partyId, newStatusId) => async (dispatch
     return data;
 }
 
-//RENMOVE TAG
+//REMOVE TAG
 export const removePartyTag = (waitlistId, tagId) => async (dispatch) => {
     const response = await fetch(`/api/tags/${waitlistId}/${tagId}/remove`, {method:"DELETE"})
     const data = await response.json()

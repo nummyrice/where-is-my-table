@@ -15,15 +15,14 @@ import { Modal } from '../../../context/Modal'
 const LeftPanel = () => {
     const [viewBooked, setViewBooked] = useState(true);
     const [viewWaitlist, setViewWaitlist] = useState(true);
-    const [showMakeRes, setShowMakeRes] = useState(false);
     const [showAddWaitlist, setShowAddWaitlist] = useState(false);
     const [bookRes, setBookRes] = useState(null);
+    const [editWaitlist, setEditWaitlist] = useState('')
 
 
     return (
         <div className={style.left_panel}>
-            {showMakeRes && <AddReservation setShowMakeRes={setShowMakeRes}/>}
-        {showAddWaitlist && <AddWaitlist setShowAddWaitlist={setShowAddWaitlist} showAddWaitlist={showAddWaitlist}/>}
+
             <input className={style.search}></input>
             <div className={style.filter_bar}>
                 <div className={style.sort_by}>Sort By</div>
@@ -48,11 +47,21 @@ const LeftPanel = () => {
                 {viewWaitlist && <DownCaret onClick={() => {setViewWaitlist(false)}} className={style.icon}/>}
                 {!viewWaitlist && <LeftCaret onClick={() => {setViewWaitlist(true)}} className={style.icon}/>}
             </div>
-            {viewWaitlist && <Waitlist/>}
+            {viewWaitlist && <Waitlist setEditWaitlist={setEditWaitlist}/>}
             {bookRes &&
-            <Modal onClose={() => setBookRes(false)}>
-                <BookReservation setBookRes={setBookRes} bookRes={bookRes}/>
-            </Modal>}
+                <Modal onClose={() => setBookRes(false)}>
+                    <BookReservation setBookRes={setBookRes} bookRes={bookRes}/>
+                </Modal>}
+            {showAddWaitlist &&
+                <Modal onClose={()=> setShowAddWaitlist(false)}>
+                    <AddWaitlist setShowAddWaitlist={setShowAddWaitlist} showAddWaitlist={showAddWaitlist}/>
+                </Modal>
+            }
+            {editWaitlist &&
+                <Modal onClose={()=> setEditWaitlist(false)}>
+                    <AddWaitlist setEditWaitlist={setEditWaitlist} editWaitlist={editWaitlist}/>
+                </Modal>
+            }
         </div>
     )
 }

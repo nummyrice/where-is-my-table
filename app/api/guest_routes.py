@@ -19,7 +19,7 @@ def search_guests():
         results = User.query.filter(or_(User.name.ilike(f"%{data['search_string']}%"), User.phone_number.ilike(f"%{data['search_string']}%"))).all()
         return {"searchResults": [guest.to_safe_dict() for guest in results]}
     except:
-        return {"error": "error retrieving guest data"}, 400
+        return {"error": ["error retrieving guest data"]}, 400
 
 # ADD GUEST
 @guest_routes.route('add', methods=['POST'])
@@ -42,10 +42,9 @@ def add_guest():
             db.session.commit()
         except SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
-            print("Error: ", error)
             return {'errors': ['server error adding guest user, please try again']}, 400
         # commit user
-        return {"result": "succesfully added guest", "guest": new_guest.to_safe_dict()}
+        return new_guest.to_safe_dict(), 201
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 
@@ -67,7 +66,7 @@ def update_guest():
             if form.data['notes']:
                 user_to_update.notes = form.data['notes']
             db.session.commit()
-            return {"result": "succesffully updated guest info", "guest": user_to_update.to_safe_dict()}
+            return user_to_update.to_safe_dict(), 201
         except:
             return {"errors": ['server error getting user to update, please try again']}, 400
     return {"errors": validation_errors_to_error_messages(form.errors)}, 400
@@ -82,7 +81,7 @@ def validate_name():
         else:
             return {"result": True}, 200
     except exc.SQLAlchemyError as e:
-        return {"errors": "name validation server error"}, 400
+        return {"errors": ["name validation server error"]}, 400
 
 @guest_routes.route('validate-phone', methods=['POST'])
 def validate_phone():
@@ -103,7 +102,7 @@ def validate_phone():
             return {"result": True}, 200
     except exc.SQLAlchemyError as e:
         print('ERROR_________________: ', e)
-        return {"errors": 'phone number validation server error'}, 400
+        return {"errors": ['phone number validation server error']}, 400
 
 @guest_routes.route('validate-email', methods=['POST'])
 def validate_email():
@@ -118,4 +117,4 @@ def validate_email():
             return {"result": True}, 200
     except exc.SQLAlchemyError as e:
         print('ERROR_____________: ', e)
-        return {"errors": 'email validation server error'}
+        return {"errors": ['email validation server error']}

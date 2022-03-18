@@ -45,16 +45,16 @@ export const getReservations = (selectedDate) => async (dispatch) => {
 // NEW RESERVATION
 export const newReservation = (reservationDetails) => async (dispatch) => {
     reservationDetails.reservation_time = reservationDetails.reservation_time.toISO()
-    console.log('NEW RES ISO FROM THUNK: ', reservationDetails.reservation_time)
+    // console.log('NEW RES ISO FROM THUNK: ', reservationDetails.reservation_time)
 
     if (!reservationDetails.section_id) {
         delete reservationDetails.section_id
     }
-    console.log('RESERVATION DETAILS: ', !reservationDetails.section_id)
+    // console.log('RESERVATION DETAILS: ', !reservationDetails.section_id)
     if (!reservationDetails.table_id) {
         delete reservationDetails.table_id
     }
-    console.log('RESERVATION DETAILS: ', reservationDetails)
+    // console.log('RESERVATION DETAILS: ', reservationDetails)
     const response = await fetch('/api/reservations/new', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
@@ -72,7 +72,6 @@ export const newReservation = (reservationDetails) => async (dispatch) => {
             if (!tagResponse.ok) {
                 setErrors(tagData.errors)
                 return tagData
-
             }
             dispatch(setUpdatedRes(tagData));
             return tagData;

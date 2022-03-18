@@ -13,7 +13,7 @@ import AlertBubble from '../../utils/AlertBubble';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
-const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait, selectedGuest, setSelectedGuest, setShowConfirmRes, showErrorsModal, setShowErrorsModal, visitTags, newVisitTags, setNewVisitTags, handleRemoveVisitTag, bookRes}) => {
+const AddGuest = ({editWaitlist, showAddWaitlist, selectedGuest, setSelectedGuest, setShowConfirmParty, setShowConfirmRes, showErrorsModal, setShowErrorsModal, visitTags, newVisitTags, setNewVisitTags, handleRemoveVisitTag, bookRes}) => {
     const dispatch = useDispatch()
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
@@ -31,9 +31,6 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
     const [notes, setNotes] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
-    // confirm modal
-
-    const [showConfirmWaitlist, setShowConfirmWaitlist] = useState(false);
 
     // validation alerts
     const [showValidateNameBubble, setShowValidateNameBubble] = useState(false)
@@ -221,6 +218,7 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
             notes: notes,
             phone_number: phoneNumber
         }
+        console.log('guest to update: ', guestToUpdate)
         // then post update guest
         const response = await fetch('/api/guests/update', {
             method: 'PUT',
@@ -237,17 +235,21 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
         if (selectedGuest && (editNameField || editEmailField || editNotesField || editNumberField)) {
             handleGuestUpdate()
             .then((res) => {
-                setShowConfirmRes(true)
-            }).catch(err => setErrors([...err]))
+                if (bookRes) return setShowConfirmRes(true);
+                if (showAddWaitlist || editWaitlist) return setShowConfirmParty(true);
+            }).catch(err => {setErrors([...err]); setShowErrorsModal(true); console.log('error has occured, ', err)})
         } else if (selectedGuest) {
-            setShowConfirmRes(true)
+            if (bookRes) return setShowConfirmRes(true);
+            if (showAddWaitlist || editWaitlist) return setShowConfirmParty(true);
         } else {
             handleNewGuestSubmit()
             .then((res) => {
-                setShowConfirmRes(true)
+                if (bookRes) return setShowConfirmRes(true);
+                if (showAddWaitlist || editWaitlist) return setShowConfirmParty(true);
             }).catch(err => {
                 setErrors([...err])
                 setShowErrorsModal(true)
+                console.log('error has occured, ', err)
             })
         }
     }
@@ -416,12 +418,10 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                     </div>
                 </form>}
                 {(submitStatus === 'update res' || submitStatus === 'update party') &&
-                <div  onClick={() => {
-                    editWaitlist ? setShowConfirmWaitlist(true) : handleSubmitRouter();
-                    }} className={style.place_reservation_button}>{bookRes !== 'new' ? 'Update Reservation' : 'Update Waitlist'}</div>
+                    <div  onClick={handleSubmitRouter} className={style.place_reservation_button}>{bookRes !== 'new' ? 'Update Reservation' : 'Update Waitlist'}</div>
                 }
                 {(submitStatus === 'submit res' || submitStatus === 'submit party') &&
-                    <div onClick={handleSubmitRouter} className={style.place_reservation_button}>{setShowAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>
+                    <div onClick={handleSubmitRouter} className={style.place_reservation_button}>{showAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>
                 }
                 {submitStatus === 'add guest' &&
                     <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>
@@ -443,5 +443,3 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
 
 
 export default AddGuest;
-
-// editReservation, setEditReservation, setShowMakeRes, selectDateIndex, selectTimeIndex, partySize,
