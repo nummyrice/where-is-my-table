@@ -1,3 +1,4 @@
+import { setErrors } from "../../store/errors"
 
 // NEW GUEST
 export const newGuestFetch = async (name, notes, phone, email) => {
@@ -23,8 +24,8 @@ export const updateGuestFetch = async (guestId, name, notes, phone, email) => {
             headers: {'Content-Type': "application/json"},
             body: JSON.stringify(newTags)
         })
-        const data = await response.json()
-        return data;
+
+        return response;
 }
 
 

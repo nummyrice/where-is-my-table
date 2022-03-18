@@ -9,7 +9,7 @@ const ConfirmResModal = ({ bookRes, name, setShowConfirmRes, resTime, selectedSe
                 // create new guest with info entered
                 // update reservation with the new guest and date/time/tags/party if changed
                 // console.log('TYPE OF RESTIME: ', resTime)
-                console.log('selected guest: ', selectedGuest)
+                // console.log('selected guest: ', selectedGuest)
     return(
 
         <div className={style.error_submission_modal}>

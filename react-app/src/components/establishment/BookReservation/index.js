@@ -4,7 +4,7 @@ import { EstablishmentContext } from '..';
 import style from './BookReservation.module.css';
 import AddGuest from '../AddGuest';
 import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg'
-import { getReservations } from '../../../store/reservations';
+import { getReservations, removeTag } from '../../../store/reservations';
 import { Modal } from '../../../context/Modal';
 import ConfirmResModal from '../AddGuest/ConfirmResModal';
 import { newReservation, updateReservation } from '../../../store/reservations';
@@ -39,7 +39,6 @@ import { DateTime } from 'luxon'
 function BookReservation({bookRes, setBookRes}) {
     const dispatch = useDispatch()
     const { selectedDate, setSelectedDate } = useContext(EstablishmentContext);
-    console.log("bookres: ", bookRes)
     let editDate
     if (bookRes !== "new") {
         editDate = DateTime.fromISO(bookRes.reservation_time).startOf('day')
@@ -52,6 +51,7 @@ function BookReservation({bookRes, setBookRes}) {
     const [selectedGuest, setSelectedGuest] = useState(bookRes === 'new' ? null : bookRes.guest_info)
     const [showConfirmRes, setShowConfirmRes] = useState(false)
     const [showErrorsModal, setShowErrorsModal] = useState(false)
+    const [newVisitTags, setNewVisitTags] = useState('')
     // const [errors, setErrors] = useState([]);
     useEffect(() => {
         setIsLoading(true)
@@ -85,62 +85,45 @@ function BookReservation({bookRes, setBookRes}) {
     const party = Array(30).fill(0).map((_, num) => {
         return num + 1;
     })
+
+    // availableTimes model
+    /*
+        [
+            {
+                time: datetime,
+                sections: [1, 2, 3],
+
+            },
+            {
+                time: datetime,
+                sections: [2, 3]
+            }
+        ]
+    */
     const availableTimes = useMemo(() => {
         const times = Array(96).fill(0).map((_, minutesMultiplier) => {
             return selectedBookDate.plus({minute:15 * minutesMultiplier});
         })
-        return (times.filter(time => {
+        for (let i = 0; i < times.length; i++) {
+            const time = times[i]
+            const timeObj = {
+                datetime: time,
+                sections: []
+            }
             for (let id in todaysScheduleBySection) {
                 for (let block in todaysScheduleBySection[id]) {
                     const start = selectedBookDate.set({hour: todaysScheduleBySection[id][block].start.hour, minute: todaysScheduleBySection[id][block].start.minute})
                     const end = selectedBookDate.set({hour: todaysScheduleBySection[id][block].end.hour, minute: todaysScheduleBySection[id][block].end.minute})
                     if (time > start && time < end) {
-                        return true;
+                        timeObj.sections.push(parseInt(id, 10))
+                        break;
                     }
                 }
             }
-            return false;
-        }))
-    }, [selectedBookDate, todaysScheduleBySection])
-    // get sections available at selected time
-    // get number of tables that are not taken
-        // declare table counter
-        // look at reservations that are within two hours from the selected time
-        // for each reservation subtract from the total available
-    const availableSections = useMemo(() => {
-        const availableSections = [];
-        if (availableTimes[selectedTimeIndex]) {
-            for (let id in todaysScheduleBySection) {
-                for (let block in todaysScheduleBySection[id]) {
-                    const start = selectedBookDate.set({hour: todaysScheduleBySection[id][block].start.hour, minute: todaysScheduleBySection[id][block].start.minute})
-                    const end = selectedBookDate.set({hour: todaysScheduleBySection[id][block].end.hour, minute: todaysScheduleBySection[id][block].end.minute})
-                    if (availableTimes[selectedTimeIndex] > start && availableTimes[selectedTimeIndex] < end) {
-                        let tableTotal = Object.keys(establishment.sections[id].tables).length
-                        const resIds = Object.keys(reservations)
-                        resIds.forEach((id) => {
-                            const res = reservations[id]
-                            const reservationTime = DateTime.fromISO(res.reservation_time)
-                            const timeDiff =  reservationTime.diff(availableTimes[selectedTimeIndex], 'minutes').toObject().minutes
-                            if (res.section === parseInt(id, 10) &&  timeDiff < 120) {
-                                tableTotal--;
-                            }
-                        })
-                        if (tableTotal) {
-                            const section = {
-                                id: parseInt(id, 10),
-                                name: establishment.sections[id].name,
-                                availableTables: tableTotal,
-
-                            };
-                            availableSections.push(section)
-                            break;
-                        }
-                    }
-                }
-            }
+            times[i] = timeObj;
         }
-        return availableSections;
-    }, [availableTimes, establishment.sections, reservations, selectedBookDate, selectedTimeIndex, todaysScheduleBySection])
+        return times.filter((time) => time.sections.length);
+    }, [selectedBookDate, todaysScheduleBySection])
 
     function handleDateChange(dateString) {
         setIsLoading(true)
@@ -164,10 +147,10 @@ function BookReservation({bookRes, setBookRes}) {
     //     return [];
     // }
 
-        // NEW RESERVATION
+    // NEW RESERVATION
     const handleNewResSubmit = async () => {
         // if guest is selected but none of the edits are present
-        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex], party_size: partySize, section_id: selectedSection, table_id: null}))
+        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex].datetime, party_size: partySize, section_id: selectedSection, table_id: null, tags: newVisitTags}))
             .then((data) => {
                 if (data.errors) {
                     setShowConfirmRes(false)
@@ -181,10 +164,10 @@ function BookReservation({bookRes, setBookRes}) {
             })
     }
 
-            // UPDATE RESERVATION
+    // UPDATE RESERVATION
     const handleResUpdate = async () => {
         // if guest is selected but none of the edits are present
-        dispatch(updateReservation({reservation_id: bookRes.id, guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex], party_size: partySize, section_id: selectedSection, table_id: null}))
+        dispatch(updateReservation({reservation_id: bookRes.id, guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex].datetime, party_size: partySize, section_id: selectedSection, table_id: null, tags: newVisitTags}))
             .then((data) => {
                 if (data.errors) {
                     setShowConfirmRes(false)
@@ -197,6 +180,17 @@ function BookReservation({bookRes, setBookRes}) {
                 }
             })
 
+    }
+    // REMOVE VISIT TAG
+    const handleRemoveVisitTag = async (tagId) => {
+        dispatch(removeTag(bookRes.id, tagId))
+            .then(data => {
+                if (data.errors) {
+                    setShowErrorsModal(true)
+                } else {
+                    return data
+                }
+            })
     }
 
     const errorClose = () => {
@@ -238,21 +232,22 @@ return(
             </div>
             <div className={style.time}>
                 <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
-                {availableTimes.map((time, i) => {
+                {availableTimes.map((timeObj, i) => {
+                    const time = timeObj.datetime
                     const localTimeString = time.toLocaleString({hour: 'numeric', minute: '2-digit' });
                     let capacity = 0;
                     const resIds = Object.keys(reservations)
                     resIds.forEach((id) => {
                         const res = reservations[id]
-                        console.log('res.section: ', typeof res.section)
-                        console.log('selectedSection: ', typeof selectedSection)
+                        // console.log('res.section: ', typeof res.section)
+                        // console.log('selectedSection: ', typeof selectedSection)
                         if (res.section === selectedSection) {
                             const reservationTime = DateTime.fromISO(res.reservation_time)
                             const timeDiff =  reservationTime.diff(time, 'minutes').toObject().minutes
-                            console.log('ISO: ', res.reservation_time)
-                            console.log('time: ', reservationTime)
-                            console.log('book reservation time diff: ', timeDiff)
-                            if (timeDiff < 120) {
+                            // console.log('ISO: ', res.reservation_time)
+                            // console.log('time: ', reservationTime)
+                            // console.log('book reservation time diff: ', timeDiff)
+                            if (Math.abs(timeDiff) < 120) {
                                 capacity+=res.party_size;
                             }
                         }
@@ -273,11 +268,20 @@ return(
                 </div>
             <div className={style.section}>
                 <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
-                {availableSections.map((section => {
+                {availableTimes[selectedTimeIndex].sections.map((sectionId => {
+                    const section = establishment.sections[sectionId]
+                    let availableTables = Object.keys(section.tables).length
+                    const resIds = Object.keys(reservations)
+                    resIds.forEach((id) => {
+                        const res = reservations[id]
+                        const reservationTime = DateTime.fromISO(res.reservation_time)
+                        const timeDiff =  reservationTime.diff(availableTimes[selectedTimeIndex].datetime, 'minutes').toObject().minutes
+                        if (res.section === sectionId && Math.abs(timeDiff) < 120) availableTables--;
+                    })
                     return (
                         <div key={section.id} className={`${style.section_cell} ${selectedSection === section.id ? style.selected : style.null} ${isLoading ? style.is_loading : style.loaded}`} onClick={() => setSelectedSection(section.id)}>
                             <div className={style.section_name}>{section.name}</div>
-                            <div className={style.section_tables}>{`${section.availableTables} available`}</div>
+                            <div className={style.section_tables}>{`${availableTables} available`}</div>
                         </div>
                     )
                 }))}
@@ -297,6 +301,11 @@ return(
                 errorClose={errorClose}
                 showErrorsModal={showErrorsModal}
                 setShowErrorsModal={setShowErrorsModal}
+                newVisitTags={newVisitTags}
+                setNewVisitTags={setNewVisitTags}
+                visitTags={!(bookRes === 'new') && bookRes.tags ? bookRes.tags : null}
+                handleRemoveVisitTag={handleRemoveVisitTag}
+                bookRes={bookRes}
             />
         </div>
         {showConfirmRes && (
@@ -309,7 +318,7 @@ return(
                     setShowConfirmRes={setShowConfirmRes}
                     bookRes={bookRes}
                     selectedSection={selectedSection}
-                    resTime={availableTimes[selectedTimeIndex]}
+                    resTime={availableTimes[selectedTimeIndex].datetime}
                     partySize={partySize}
                     selectedGuest={selectedGuest}
                 />

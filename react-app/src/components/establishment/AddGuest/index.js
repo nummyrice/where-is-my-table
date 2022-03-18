@@ -8,10 +8,12 @@ import {ReactComponent as DeleteTag} from '../AddReservation/assets/times-solid.
 import { removeTag } from '../../../store/reservations';
 import { removePartyTag } from '../../../store/selectedDateWaitlist';
 import { Modal } from '../../../context/Modal';
+import { setErrors } from '../../../store/errors';
+import AlertBubble from '../../utils/AlertBubble';
 // import {ReactComponent as X} from '../AddReservation/assets/times-solid.svg';
 // import validator from 'validator';
 
-const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait, selectedGuest, setSelectedGuest, setShowConfirmRes, errors, setErrors, showErrorsModal, setShowErrorsModal}) => {
+const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist, showAddWaitlist, estimatedWait, selectedGuest, setSelectedGuest, setShowConfirmRes, showErrorsModal, setShowErrorsModal, visitTags, newVisitTags, setNewVisitTags, handleRemoveVisitTag, bookRes}) => {
     const dispatch = useDispatch()
     const [displayDetails, setDisplayDetails] = useState(false);
     const [searchInput, setSearchInput] = useState("");
@@ -29,17 +31,19 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
     const [notes, setNotes] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
-
-
-
     // confirm modal
 
     const [showConfirmWaitlist, setShowConfirmWaitlist] = useState(false);
 
-    // console.log('DATE INDEX : ', selectDateIndex)
-    // console.log('TIME INDEX : ', selectTimeIndex)
-    // console.log('PARTY: ', partySize)
+    // validation alerts
+    const [showValidateNameBubble, setShowValidateNameBubble] = useState(false)
+    const [showValidateNotesBubble, setShowValidateNotesBubble] = useState(false)
+    const [showValidateTagsBubble, setShowValidateTagsBubble] = useState(false)
+    const [showValidatePhoneBubble, setShowValidatePhoneBubble] = useState(false)
+    const [showValidateEmailBubble, setShowValidateEmailBubble] = useState(false)
+    const [submitStatus, setSubmitStatus] = useState('add guest')
 
+    // searches for guests as user types
     const handleSearch =  useCallback(async () => {
         const response = await fetch('/api/guests', {
             method: 'POST',
@@ -51,17 +55,16 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
         setSearchResults(data.searchResults)
     }, [searchInput])
 
-    // useEffect(() => {
-    //     if (editReservationDetails) {
-    //         setSelectedGuest(editReservationDetails.guest_info)
-    //     }
-    // }, [editReservationDetails])
-
     useEffect(() => {
         handleSearch()
     }, [handleSearch])
 
     const handleNameSelect = (guest) => {
+        setShowValidateNameBubble(false)
+        setShowValidateNotesBubble(false)
+        setShowValidateEmailBubble(false)
+        setShowValidatePhoneBubble(false)
+        setShowValidateTagsBubble(false)
         setSelectedGuest(guest)
         setSearchInput(guest.name)
     }
@@ -77,83 +80,119 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
             console.log('DELETE TAG DISPATCH: ', data)
         });
     }
-    // new guest validate
-    const validateNewGuest = () => {
-        const errors = [];
-        if (!selectedGuest && name) {
-            let trimmedName = name.trim();
-            if (trimmedName.length > 40 || trimmedName.length < 1) errors.push("name must be greater than one and less than forty characters");
-        };
-        if (!selectedGuest && notes) {
-            let trimmedNotes = notes.trim();
-            if (trimmedNotes.length > 500) errors.push("notes must be less than five-hundred characters");
-        };
-        if (!selectedGuest && phoneNumber) {
-            let trimmedPhone = phoneNumber.replace(/\D/g,'');
-            if (trimmedPhone.length < 10 || trimmedPhone.length > 11) errors.push("phone numbers must only include numbers and must be include area code");
-        };
-        if (!selectedGuest && email) {
-            if (!String(email)
-            .toLowerCase()
-            .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            )) {
-                errors.push("email must follow standard format")
-            }
-        };
 
-        return errors;
-    }
-
-
-    // guest update validate
-    const validateGuestUpdate = () => {
-        const errors = [];
-        if (selectedGuest && editNameField) {
-            let trimmedName = name.trim();
-        if (trimmedName.length > 40 || trimmedName.length < 1) errors.push("name must be greater than one and less than forty characters");
-        };
-        if (selectedGuest && editNotesField) {
-            let trimmedNotes = notes.trim();
-        if (trimmedNotes.length > 500) errors.push("notes must be less than five-hundred characters");
-        };
-        if (selectedGuest && editNumberField) {
-            let trimmedPhone = phoneNumber.replace(/\D/g,'');
-            if (trimmedPhone.length < 10 || trimmedPhone.length > 11) errors.push("phone numbers must only include numbers and must be include area code");
-        };
-        if (selectedGuest && editEmailField) {
-            if (!String(email)
-        .toLowerCase()
-        .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        )) {
-            errors.push("email must follow standard format")
-        };
-        };
-        console.log('update errors', errors)
-        return errors;
-    }
-
-
-    const validateNameAndPhone = () => {
-        const errors = [];
+    const validateName = async () => {
+        if (name === '') return setShowValidateNameBubble("name number is required");
         let trimmedName = name.trim();
-        if (trimmedName.length > 40 || trimmedName.length < 1) errors.push("name must be greater than one and less than forty characters");
+        if (trimmedName.length > 40 || trimmedName.length < 1) return setShowValidateNameBubble("name must be greater than one and less than forty characters");
+        const response = await fetch('/api/guests/validate-name', {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({name})
+        })
+        if (!response.ok) {
+            dispatch(setErrors())
+            showErrorsModal(true)
+            return
+        }
+        const data = await response.json()
+        console.log('test', data, !data.result)
+
+        if (!data.result) {
+            setShowValidateNameBubble("Please choose a different name.")
+        } else {
+            setShowValidateNameBubble(false)
+            //TODO: set boarder to green and display a check
+        }
+    }
+
+    const validateNotes = () => {
+        let trimmedNotes = notes.trim();
+        if (trimmedNotes.length > 500) setShowValidateNotesBubble(`Notes too long; ${trimmedNotes.length}/500`);
+    }
+    useEffect(() => {
+        if (selectedGuest) {
+            if ((editNameField || editNotesField || editNumberField || editEmailField) && (showValidateNameBubble || showValidateNotesBubble || showValidateTagsBubble || showValidatePhoneBubble || showValidateEmailBubble)) {
+                return setSubmitStatus('add guest')
+            }
+            if (editWaitlist) return setSubmitStatus('update party');
+            if (bookRes === 'new') return setSubmitStatus('submit res');
+            if (showAddWaitlist) return setSubmitStatus('submit party')
+            if (bookRes !== 'new') return setSubmitStatus('update res');
+        } else {
+            if (showValidateNameBubble || showValidateNotesBubble || showValidateTagsBubble || showValidatePhoneBubble || showValidateEmailBubble) {
+                return setSubmitStatus('add guest')
+            }
+            if (!name || !phoneNumber) return setSubmitStatus('add guest')
+            if (editWaitlist) return setSubmitStatus('update party')
+            if (showAddWaitlist) return setSubmitStatus('submit party')
+            if (bookRes === 'new') return setSubmitStatus('submit res');
+            if (bookRes !== 'new') return setSubmitStatus('update res');
+        }
+    }, [bookRes, editEmailField, editNameField, editNotesField, editNumberField, editWaitlist, name, phoneNumber, selectedGuest, showAddWaitlist, showValidateEmailBubble, showValidateNameBubble, showValidateNotesBubble, showValidatePhoneBubble, showValidateTagsBubble])
+
+    const validatePhone = async () => {
+        if (phoneNumber === '') return setShowValidatePhoneBubble("phone number is required");
         let trimmedPhone = phoneNumber.replace(/\D/g,'');
-        if (trimmedPhone.length < 10 || trimmedPhone.length > 11) errors.push("phone numbers must only include numbers and must be include area code");
-        return errors.length < 1;
+        if (trimmedPhone.length < 10 || trimmedPhone.length > 11) {
+            setShowValidatePhoneBubble("phone numbers must only include numbers and must be include area code");
+            return;
+        } else {
+            const response = await fetch('/api/guests/validate-phone', {
+                method: 'POST',
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({phoneNumber})
+            })
+            const data = await response.json()
+            if (!response.ok) {
+                dispatch(setErrors(data.errors))
+                showErrorsModal(true)
+                return
+            }
+            if (!data.result) {
+                setShowValidatePhoneBubble(data.message)
+                return;
+            }
+            return data;
+        }
     }
 
     const validateTags = () => {
-        const errors = [];
         const tagArray = tags.split(',');
         if (tagArray.some((tag) => {
             let trimmedTag = tag.trim()
             return trimmedTag.length > 40
         })) {
-            errors.push("individual tags must be less than forty characters and seperated by spaces")
+            setShowValidateTagsBubble("each tag must be less than forty characters and seperated by a comma and spaces")
         };
-        return errors;
+        return;
+        //TODO: set boarder to green
+    }
+
+    const validateEmail = async () => {
+        if (email === '') return;
+        if (!String(email)
+            .toLowerCase()
+            .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )) {
+            return setShowValidateEmailBubble("incorrect email format");
+        }
+        const response = await fetch('/api/guests/validate-email', {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email})
+        })
+        const data = await response.json()
+        if (!response.ok) {
+            dispatch(setErrors(data.errors))
+            return
+        }
+        if (!data.result) {
+            setShowValidateEmailBubble(data.message)
+            return
+        }
+        return
     }
 
     const handleNewGuestSubmit = async () => {
@@ -191,7 +230,6 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
         const data = await response.json()
         if (response.ok) {
             setSelectedGuest(data)
-
         }
     }
 
@@ -269,10 +307,11 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                                     }} className={style.edit_icon}/>
                             </>}
                             {selectedGuest && editNameField &&
-                            <>
-                                <input onChange={(e) => {setName(e.target.value)}} value={name} className={style.guest_name}></input>
-                            </>}
-                            {!selectedGuest && <input onChange={(e) => {setName(e.target.value)}} value={name} className={style.name_input}></input>}
+                                <input onFocus={()=>setShowValidateNameBubble(false)} onBlur={validateName} onChange={(e) => {setName(e.target.value)}} value={name} className={style.guest_name}/>
+                            }
+                            {!selectedGuest && <input onFocus={()=>setShowValidateNameBubble(false)}  onBlur={validateName} onChange={(e) => {setName(e.target.value)}} value={name} className={style.name_input}/>
+                            }
+                            {showValidateNameBubble && <AlertBubble message={showValidateNameBubble}/>}
                         </div>
                         <div className={style.notes_block}>
                             <label>NOTES</label>
@@ -286,9 +325,29 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                             </>}
                             {selectedGuest && editNotesField &&
                             <>
-                                <textarea onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input} name="notes" cols="20" rows="2"></textarea>
+                                <textarea onFocus={()=>setShowValidateNotesBubble(false)} onBlur={validateNotes} onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input} name="notes" cols="20" rows="2"></textarea>
                             </>}
-                            {!selectedGuest  && <textarea onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input} name="notes" cols="20" rows="2"></textarea>}
+                            {!selectedGuest  &&
+                                <textarea onFocus={()=>setShowValidateNotesBubble(false)}  onBlur={validateNotes} onChange={(e) => {setNotes(e.target.value)}} value={notes} className={style.notes_input} name="notes" cols="20" rows="2">
+                                </textarea>
+                            }
+                            {showValidateNotesBubble && <AlertBubble message={showValidateNotesBubble}/>}
+                        </div>
+                        <div className={style.guest_tags}>
+                            <label>
+                                Add Guest Tag
+                            </label>
+                            <input  onFocus={()=>setShowValidateTagsBubble(false)} onBlur={validateTags()} value={tags} placeholder={"enter tags seperated by a comma"} onChange={(e)=>{setTags(e.target.value)}} className={style.tag_input}/>
+                            {selectedGuest?.tags && selectedGuest.tags.map((tag)=>{
+                                    return(
+                                        <div key={tag.id} className={style.tag}>
+                                            <span className={style.tag_name}>{tag.name}</span>
+                                            <DeleteTag onClick={()=>handleRemoveTag(tag.id)}className={style.delete_tag}/>
+                                        </div>
+                                    )
+                                })
+                            }
+                            {showValidateTagsBubble && <AlertBubble message={showValidateTagsBubble}/>}
                         </div>
                         <div className={style.contact_label}>Contact Info</div>
                         <div className={style.phone_block}>
@@ -303,9 +362,10 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                             </>}
                             {selectedGuest && editNumberField &&
                             <>
-                                <input value={phoneNumber} onChange={(e) => {setPhoneNumber(e.target.value)}} className={style.phone_input}></input>
+                                <input onBlur={validatePhone} onFocus={()=>setShowValidatePhoneBubble(false)} value={phoneNumber} onChange={(e) => {setPhoneNumber(e.target.value)}} className={style.phone_input}></input>
                             </>}
-                            {!selectedGuest && <input onChange={(e) => {setPhoneNumber(e.target.value)}} value={phoneNumber} className={style.phone_input}></input>}
+                            {!selectedGuest && <input onBlur={validatePhone} onFocus={()=>setShowValidatePhoneBubble(false)} onChange={(e) => {setPhoneNumber(e.target.value)}} value={phoneNumber} className={style.phone_input}></input>}
+                            {showValidatePhoneBubble && <AlertBubble message={showValidatePhoneBubble}/>}
                         </div>
                         <div className={style.email_block}>
                             <label>Email</label>
@@ -319,27 +379,28 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                             </>}
                             {selectedGuest && editEmailField &&
                             <>
-                                <input onChange={(e) => {setEmail(e.target.value)}} value={email} className={style.email_input}></input>
+                                <input onBlur={validateEmail} onFocus={()=>setShowValidateEmailBubble(false)} onChange={(e) => {setEmail(e.target.value)}} value={email} className={style.email_input}></input>
                             </>}
-                            {!selectedGuest && <input onChange={(e) => {setEmail(e.target.value)}} value={email} className={style.email_input}></input>}
+                            {!selectedGuest && <input onBlur={validateEmail} onFocus={()=>setShowValidateEmailBubble(false)} onChange={(e) => {setEmail(e.target.value)}} value={email} className={style.email_input}></input>}
+                            {showValidateEmailBubble && <AlertBubble message={showValidateEmailBubble}/>}
                         </div>
                     </div>
                     <div className={style.tag_section}>
-                        <div className={style.tag_section_title}> Reservation Tags</div>
+                        <div className={style.tag_section_title}>Visit Tags</div>
                         <div className={style.tags_block}>
                             <label>Add</label>
-                            <input  value={tags} placeholder={"enter tags seperated by a comma"} onChange={(e)=>{setTags(e.target.value)}} className={style.tag_input}></input>
-                            {/* {editReservationDetails && editReservationDetails.tags &&
+                            <input  value={newVisitTags} placeholder={"enter tags seperated by a comma"} onChange={(e)=>{setNewVisitTags(e.target.value)}} className={style.tag_input}></input>
+                            {visitTags &&
                             <>
-                                {editReservationDetails.tags.map((tag)=>{
+                                {visitTags.map((tag)=>{
                                     return(
                                         <div key={tag.id} className={style.tag}>
                                             <span className={style.tag_name}>{tag.name}</span>
-                                            <DeleteTag onClick={()=>handleRemoveTag(editReservationDetails.id, tag.id)}className={style.delete_tag}/>
+                                            <DeleteTag onClick={()=>handleRemoveVisitTag(tag.id)}className={style.delete_tag}/>
                                         </div>
                                     )
                                 })}
-                            </>} */}
+                            </>}
                             {editWaitlist && editWaitlist.tags &&
                             <>
                                 {editWaitlist.tags.map((tag)=>{
@@ -354,23 +415,32 @@ const AddGuest = ({partySize, editWaitlist, setEditWaitlist, setShowAddWaitlist,
                         </div>
                     </div>
                 </form>}
-                {/* {(selectedGuest || validateNameAndPhone()) && (editReservationDetails || editWaitlist) &&
+                {(submitStatus === 'update res' || submitStatus === 'update party') &&
                 <div  onClick={() => {
-                    const errors = validateGuestUpdate().concat( validateNewGuest(), validateDate(), validateTags());
-                    setErrors(errors);
-                    editWaitlist ? setShowConfirmWaitlist(true) : setShowConfirmRes(true);
-                    }} className={style.place_reservation_button}>{editReservationDetails ? 'Update Reservation' : 'Update Waitlist'}</div>
-                } */}
-                {selectedGuest &&
+                    editWaitlist ? setShowConfirmWaitlist(true) : handleSubmitRouter();
+                    }} className={style.place_reservation_button}>{bookRes !== 'new' ? 'Update Reservation' : 'Update Waitlist'}</div>
+                }
+                {(submitStatus === 'submit res' || submitStatus === 'submit party') &&
                     <div onClick={handleSubmitRouter} className={style.place_reservation_button}>{setShowAddWaitlist ? 'Add to Waitlist' : 'Reserve Table'}</div>
                 }
-                {!selectedGuest &&
+                {submitStatus === 'add guest' &&
                     <div className={style.disabled_reservation_button}>{'Please add a guest'}</div>
                 }
             </div>
         </div>
     )
 }
+// book res
+// update res
+
+// if !selectedGuest || validation errors || !selectedGuest && (!name || !phoneNumber)
+// add guest *grey*
+
+// if waitlist options are truthy
+// book party
+// if editWaitlist is truthy
+// update party
+
 
 export default AddGuest;
 

@@ -287,11 +287,18 @@
     /* margin-left: 10px; */
 }
 
+.guest_tags {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .tag_section {
     display: flex;
     flex-direction: column;
     font-family: sans-serif;
     align-items: center;
+    /* position: relative; */
 
 }
 

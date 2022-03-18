@@ -66,8 +66,20 @@ export const newReservation = (reservationDetails) => async (dispatch) => {
             return data
         }
         dispatch(setRes(data))
-        return data
-    }
+        if (reservationDetails.tags) {
+            const tagResponse = await postTags(data.id, reservationDetails.tags);
+            const tagData = tagResponse.json()
+            if (!tagResponse.ok) {
+                setErrors(tagData.errors)
+                return tagData
+
+            }
+            dispatch(setUpdatedRes(tagData));
+            return tagData;
+
+        }
+    return data;
+}
 
 
 
@@ -93,16 +105,18 @@ export const updateReservation = (reservationDetails) => async (dispatch) => {
         return data
     }
         dispatch(setUpdatedRes(data))
-        // if (tags) {
-        //     const tagAppliedData = await postTags(data.reservation.id, tags);
-        //     if (tagAppliedData.result) {
-        //         dispatch(setUpdatedRes(tagAppliedData.reservation));
-        //         return tagAppliedData;
-        //     }
-        //     const returnErrors= { errors: [...tagAppliedData.errors, 'reservation successfully posted, but there was an error with your tags, please exit and edit reservation to attempt to add tags again']}
-        //     return returnErrors;
+        if (reservationDetails.tags) {
+            const tagResponse = await postTags(data.id, reservationDetails.tags);
+            const tagData = tagResponse.json()
+            if (!tagResponse.ok) {
+                setErrors(tagData.errors)
+                return tagData
 
-        // }
+            }
+            dispatch(setUpdatedRes(tagData));
+            return tagData;
+
+        }
     return data;
 }
     // UPDATE STATUS
@@ -124,10 +138,11 @@ export const removeTag = (reservationId, tagId) => async (dispatch) => {
     // console.log('MADE IT INTO TAG STORE: ', reservationId, tagId)
     const response = await fetch(`/api/tags/${reservationId}/${tagId}/remove`, {method:"DELETE"})
     const data = await response.json()
-    if (response.ok) {
-        dispatch(setRemoveTag(reservationId, tagId))
-        return data;
+    if (!response.ok) {
+        dispatch(setErrors(data.errors))
+        return data
     }
+    dispatch(setRemoveTag(reservationId, tagId))
     return data;
 }
 
