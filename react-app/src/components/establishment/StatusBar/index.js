@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch } from 'react-redux';
-import { updateAndSetResStatus } from '../../../store/selectedDateAvailability';
+import { updateAndSetResStatus } from '../../../store/reservations';
 import { updateAndSetPartyStatus } from '../../../store/selectedDateWaitlist';
 import style from './StatusBar.module.css'
 import { ReactComponent as CancelIcon } from './assets/times-circle-regular.svg';

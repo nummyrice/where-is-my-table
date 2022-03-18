@@ -5,6 +5,8 @@ from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
 from app.forms import NewGuestForm, UpdateGuestForm
 from .auth_routes import validation_errors_to_error_messages
+from sqlalchemy import exc
+import phonenumbers
 
 guest_routes = Blueprint('guests', __name__)
 
@@ -69,3 +71,51 @@ def update_guest():
         except:
             return {"errors": ['server error getting user to update, please try again']}, 400
     return {"errors": validation_errors_to_error_messages(form.errors)}, 400
+
+@guest_routes.route('validate-name', methods=['POST'])
+def validate_name():
+    data = request.json
+    try:
+        result = db.session.query(User).filter(User.name.ilike(data['name'])).one_or_none()
+        if result:
+            return {"result": False, 'message': "name already in use"}, 200
+        else:
+            return {"result": True}, 200
+    except exc.SQLAlchemyError as e:
+        return {"errors": "name validation server error"}, 400
+
+@guest_routes.route('validate-phone', methods=['POST'])
+def validate_phone():
+    data = request.json
+    try:
+        phone_number = phonenumbers.parse(data['phoneNumber'], 'US')
+        e164_f=phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
+        phone_number_string = e164_f[1:]
+        if not phonenumbers.is_possible_number(phone_number):
+            return {"result": False, "message": "not valid format"}
+    except:
+        return {"result": False, "message": "unable to parse phonenumber"}
+    try:
+        result = User.query.filter(User.phone_number == phone_number_string).one_or_none()
+        if result:
+            return {"result": False, "message": "phone number already in use"}, 200
+        else:
+            return {"result": True}, 200
+    except exc.SQLAlchemyError as e:
+        print('ERROR_________________: ', e)
+        return {"errors": 'phone number validation server error'}, 400
+
+@guest_routes.route('validate-email', methods=['POST'])
+def validate_email():
+    data = request.json
+    trimmedLowercaseEmail = data['email'].strip().lower()
+    try:
+        result = User.query.filter(User.email == trimmedLowercaseEmail).one_or_none()
+        print(result)
+        if result:
+            return {"result": False, "message": "email already in use"}, 200
+        else:
+            return {"result": True}, 200
+    except exc.SQLAlchemyError as e:
+        print('ERROR_____________: ', e)
+        return {"errors": 'email validation server error'}

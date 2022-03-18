@@ -32,6 +32,7 @@ def seed_reservations():
                 table_id = table_id,
                 party_size = party_size,
                 status_id = 3,
+                establishment_id = 1,
             )
 
             # db.session.add

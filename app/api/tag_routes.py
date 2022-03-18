@@ -34,7 +34,7 @@ def add_res_tags():
             except exc.SQLAlchemyError as e:
                 print('Error from ADD TAGS SERVER ROUTE ', e)
                 return {"errors": ["there was an error adding your tag to the database. please try again"]}, 400
-        return {"result": 'succsesfully applied tags', "reservation": target_res.to_dict()}
+        return target_res.to_dict(), 201
     return {"errors": ["the length of one or more of your declared tags is greater than 40 characters. please be sure each tag is seperated by a comma and space"]}, 400
 
 
@@ -48,7 +48,7 @@ def remove_res_tags(resId, tagId):
             for idx, tag in enumerate(reservation.tags):
                 if tag.id == tagId:
                     del reservation.tags[idx]
-                    return {'result': "succesfully deleted tag"}
+                    return {'result': "succesfully deleted tag"}, 200
 
             return {"errors": ["tag does not exist in target reservation"]}
     except exc.SQLAlchemyError as e:

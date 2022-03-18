@@ -8,9 +8,8 @@ import { ReactComponent as Food1} from './assets/food1.svg';
 import { ReactComponent as Food2 } from './assets/food2.svg';
 import guest_pic from './assets/guest_pic.png';
 import establishment_pic from './assets/establishment_pic.png';
-import { SingleDatePicker } from 'react-dates';
-import 'react-dates/lib/css/_datepicker.css';
-import moment from 'moment';
+// import { SingleDatePicker } from 'react-dates';
+// import 'react-dates/lib/css/_datepicker.css';
 import githubLogo from './assets/github.png';
 import linkedinLogo from './assets/linkedin.png';
 
@@ -78,7 +77,7 @@ const Landing = () => {
                 <div id={style.availability_section}>
                     <div id={style.avail_sec_title}>Reserve a Table...</div>
                     <div id={style.date_selection_bar}>
-                    <SingleDatePicker
+                    {/* <SingleDatePicker
                     id="datePicker"
                     date={moment(selectedDate)}
                     onDateChange={date => {
@@ -87,7 +86,7 @@ const Landing = () => {
                         setSelectedDate(newDate)}}
                     focused={showDatePicker}
                     onFocusChange={({focused}) => setShowDatePicker(focused)}
-                    />
+                    /> */}
                         {dateArray.map((date, index)=>{
                             // console.log("DATE LOG: ", date)
                             return(

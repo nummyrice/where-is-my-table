@@ -1,0 +1,12 @@
+#error_container {
+    background-color: #272a2d;
+    height: 400px;
+    width: 700px;
+    border-radius: 2px;
+    font-family: sans-serif;
+}
+
+ul {
+    display: flex;
+    flex-direction: column;
+}

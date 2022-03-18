@@ -10,19 +10,24 @@ class Establishment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String)
-    timezone_offset = db.Column(db.Integer, nullable=False, default=-5)
+    timezone_id = db.Column(db.Integer, db.ForeignKey('timezones.id'), nullable=False, default=1)
     # schedule_override = db.Column(JSONB, nullable=False, default=lambda: {})
     daylight_savings = db.Column(db.Boolean, nullable=False, default=True)
 
     # associations
     user = db.relationship("User", back_populates='establishment')
     sections = db.relationship("Section", back_populates='establishment')
+    timezone = db.relationship("Timezone", back_populates='establishments')
+    reservations = db.relationship("Reservation", back_populates='establishment')
+
+    def get_timezone(self):
+        return self.timezone.luxon_string
 
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
-            'timezone_offset': self.timezone_offset,
+            'timezone': self.timezone.to_dict(),
             'daylight_savings': self.daylight_savings,
             'sections': { section.id : section.to_dict() for section in self.sections }
         }

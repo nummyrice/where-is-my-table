@@ -5,6 +5,7 @@ from .tag import Tag
 from .reservation import Reservation
 from .waitlist import Waitlist
 from .table import Table
-from .tags_join import reservation_tags, waitlist_tags
+from .tags_join import reservation_tags, waitlist_tags, guest_tags
 from .establishment import Establishment
 from .section import Section
+from .timezone import Timezone
