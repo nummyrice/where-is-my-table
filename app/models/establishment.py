@@ -19,6 +19,7 @@ class Establishment(db.Model):
     sections = db.relationship("Section", back_populates='establishment')
     timezone = db.relationship("Timezone", back_populates='establishments')
     reservations = db.relationship("Reservation", back_populates='establishment')
+    waitlist = db.relationship("Waitlist", back_populates='establishment')
 
     def get_timezone(self):
         return self.timezone.luxon_string

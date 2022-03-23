@@ -5,14 +5,16 @@ def seed_waitlist():
         guest_id=7,
         party_size=4,
         estimated_wait=30,
-        status_id=5
+        status_id=5,
+        establishment_id=1
 
     )
     guest_2 = Waitlist(
         guest_id=8,
         party_size=2,
         estimated_wait=15,
-        status_id=5
+        status_id=5,
+        establishment_id=1
     )
 
     db.session.add(guest_1)

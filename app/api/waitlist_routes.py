@@ -36,6 +36,7 @@ def new_party():
                 party_size = form.data['party_size'],
                 estimated_wait = form.data['estimated_wait'],
                 status_id = 5,
+                establishment_id = current_user.establishment.id
             )
             db.session.add(newParty)
             db.session.commit()

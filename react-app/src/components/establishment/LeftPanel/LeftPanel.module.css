@@ -116,10 +116,10 @@
 
 .waitlist_entry {
     display: grid;
-    grid-template-columns: 50px 100px 100px 50px;
-    grid-template-rows: 70px;
+    grid-template-columns: 50px 200px 50px;
+    grid-template-rows: 100px;
     grid-template-areas:
-    "icon party-info time edit-delete";
+    "icon party-info edit-delete";
     /* overflow-y: scroll; */
     border-bottom: 1px solid grey;
 }
@@ -168,6 +168,7 @@
 /* STATUS */
 #status_icon {
     padding: 5px;
+    position: relative;
 }
 
 #status_icon:hover {
@@ -180,7 +181,7 @@
     /* position: relative; */
     /* left: 50px; */
     left: 50px;
-    position: fixed;
+    position: absolute;
     color: black;
 
 }
@@ -213,4 +214,25 @@
 #no_res_message {
     font-family: sans-serif;
     text-align: center;
+}
+
+.negative {
+    color: #ee4266;
+}
+
+.positive {
+    color: #10bc35;
+}
+
+.party_size_icon{
+    height: 12px;
+    /* width: 5px; */
+    margin-right: 3px;
+    color: white;
+}
+
+.checkin_icon {
+    height: 15px;
+    color: white;
+    margin-right: 3px;
 }

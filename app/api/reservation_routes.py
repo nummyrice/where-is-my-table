@@ -103,7 +103,7 @@ def todays_available_tables():
     est = est_query.to_dict()
     data = request.json
     client_date = parser.isoparse(data['client_date'])
-    data = get_availability(client_date, est["sections"], est["timezone_offset"], est["daylight_savings"])
+    data = get_availability(client_date, est["sections"], est["timezone"]["luxon_string"], est["daylight_savings"])
     return data
 
 # GET SELECTED DATE AVAILABILITY

@@ -41,7 +41,6 @@ const ResSchedule =() => {
         const columnRes = resKeys.filter((id) => {
             const res = reservations[id]
             const reservationTime = DateTime.fromISO(res.reservation_time)
-            console.log('res: ', res )
             if (columnTime.toMillis() === reservationTime.toMillis()) {
                 return true;
             }

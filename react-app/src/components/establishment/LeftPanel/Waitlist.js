@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import style from './LeftPanel.module.css';
 import StatusBar from '../StatusBar';
@@ -16,16 +16,29 @@ import { ReactComponent as ReservedIcon } from '../StatusBar//assets/circle-soli
 import { ReactComponent as LeftMessageIcon } from '../StatusBar//assets/spinner-solid.svg';
 import { ReactComponent as EditPartyIcon } from '../AddGuest/assets/edit-regular.svg';
 import { ReactComponent as TrashIcon } from './assets/trash-alt-solid.svg';
+import { ReactComponent as Guest } from '../ResSchedule/assets/user-solid.svg'
+import { ReactComponent as CheckIn } from '../TopBar/assets/calendar-check-regular.svg'
+import { DateTime } from 'luxon';
 
 const Waitlist = ({setEditWaitlist}) => {
     const dispatch = useDispatch();
     const waitlist = useSelector(state => state.selectedDateWaitlist)
     const [showStatusBar, setShowStatusBar] = useState(null);
-
+    const [counter, setCounter] = useState(1)
+    console.log('counter: ', counter)
+    useEffect(() => {
+        const intervalId = setInterval(()=>setCounter(prevCounter => prevCounter + 1), 60000)
+        return clearInterval(intervalId)
+    }, [counter])
     return(
         <div id={style.scroll_res_list}>
             {waitlist.length > 0 &&
                 waitlist.map((waitlistEntry, index) => {
+                    const createdAt = DateTime.fromISO(waitlistEntry.created_at)
+                    const deadline = createdAt.plus({minutes: waitlistEntry.estimated_wait})
+                    const now = DateTime.local()
+                    const diff = deadline.diff(now, 'minutes').toObject().minutes
+                    const roundedDiff = Math.ceil(diff)
                     return(
                         <div key={waitlistEntry.id} className={style.waitlist_entry}>
                             <div id={style.status_icon}>
@@ -60,8 +73,9 @@ const Waitlist = ({setEditWaitlist}) => {
                             </div>
                             <div id={style.party_info_sec}>
                                 <div>{waitlistEntry.guest_info.name}</div>
-                                <div id={style.party_size}>{`Guests: ${waitlistEntry.party_size}`}</div>
-                                <div>{new Date(waitlistEntry.created_at).toLocaleTimeString('en-Us', { hour: 'numeric', minute: '2-digit' })}</div>
+                                <div id={style.party_size}><Guest className={style.party_size_icon}/>{`${waitlistEntry.party_size}`}</div>
+                                <div><CheckIn className={style.checkin_icon}/>{`${DateTime.fromISO(waitlistEntry.created_at).toLocaleString({ hour: 'numeric', minute: '2-digit' })}`}</div>
+                                <div className={`${style.counter} ${roundedDiff < 0 ? style.negative : style.positive}`}>{`${Math.abs(roundedDiff)} m`}</div>
                             </div>
                             <div id={style.time_track}></div>
                             <div id={style.edit_delete_buttons}>
