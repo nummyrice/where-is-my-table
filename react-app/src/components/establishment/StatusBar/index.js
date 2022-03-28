@@ -12,7 +12,7 @@ import { ReactComponent as SeatedIcon } from './assets/check-circle-solid.svg';
 import { ReactComponent as ReservedIcon } from './assets/circle-solid.svg';
 import { ReactComponent as LeftMessageIcon } from './assets/spinner-solid.svg';
 
-const StatusBar = ({reservationId, statusId, setShowStatusBar, waitlistEntryId}) => {
+const StatusBar = ({reservationId, statusId, setShowStatusBar, waitlistEntryId, coords}) => {
     const dispatch = useDispatch();
     const [selectedStatus, setSelectedStatus] = useState(statusId)
     const handleStatusChange = (newStatusId) => {
@@ -54,7 +54,7 @@ const StatusBar = ({reservationId, statusId, setShowStatusBar, waitlistEntryId})
     }, [setShowStatusBar])
     // TODO: add confirmation modal when cancelled status is selected. Cancel should lock all status changes and rerender ResSchedule
     return(
-        <div  className={style.status_bar}>
+        <div  className={style.status_bar} style={{...coords}}>
             <div className={(selectedStatus === 3 || selectedStatus === 5) ? style.selected : style.status_reserved}
             onClick={() => {
                 handleStatusChange(waitlistEntryId ? 5 : 3);

@@ -143,6 +143,7 @@
     background-color: #434343;
     position: absolute;
     left: 103px;
+    /* top: 100px; */
     z-index: 100;
     font-family: sans-serif;
 }
@@ -218,4 +219,10 @@
 .footer_options {
     background-color: #222222;
     font-family: sans-serif;
+}
+
+.status_sizer {
+    width: 460px;
+    height: 80px;
+    position: relative;
 }

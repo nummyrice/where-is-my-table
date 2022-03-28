@@ -55,6 +55,7 @@ class Waitlist(db.Model):
         return {
             "id": self.id,
             "guest_id": self.guest_id,
+            "guest": self.guest.name,
             "guest_info": self.guest.to_safe_dict(),
             "status_id": self.status_id,
             "status": self.status.to_dict(),

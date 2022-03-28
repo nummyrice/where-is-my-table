@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import style from './LeftPanel.module.css';
 import StatusBar from '../StatusBar';
-import AddWaitlist from '../AddWaitlist';
-import { deleteAndUnsetParty } from '../../../store/selectedDateWaitlist';
-
+import { deleteAndUnsetParty, updateAndSetPartyStatus } from '../../../store/selectedDateWaitlist';
+import Portal from '../../Portal';
 import { ReactComponent as EditIcon } from './assets/chevron-right-solid.svg';
 import { ReactComponent as CancelIcon } from '../StatusBar//assets/times-circle-regular.svg';
 import { ReactComponent as LateIcon } from '../StatusBar//assets/exclamation-circle-solid.svg';
@@ -20,56 +19,159 @@ import { ReactComponent as Guest } from '../ResSchedule/assets/user-solid.svg'
 import { ReactComponent as CheckIn } from '../TopBar/assets/calendar-check-regular.svg'
 import { DateTime } from 'luxon';
 
-const Waitlist = ({setEditWaitlist}) => {
+const Waitlist = ({searchTerm, sort, order, setEditWaitlist}) => {
     const dispatch = useDispatch();
     const waitlist = useSelector(state => state.selectedDateWaitlist)
     const [showStatusBar, setShowStatusBar] = useState(null);
-    const [counter, setCounter] = useState(1)
-    console.log('counter: ', counter)
+    const [counter, setCounter] = useState(1);
+    const [coords, setCoords] = useState(null);
     useEffect(() => {
-        const intervalId = setInterval(()=>setCounter(prevCounter => prevCounter + 1), 60000)
+        const intervalId = setInterval(()=>setCounter(prevCounter => prevCounter + 1), 6000)
         return clearInterval(intervalId)
-    }, [counter])
+    }, [])
+
+    const lateStatusUpdate = (waitlistEntryId) => {
+        dispatch(updateAndSetPartyStatus(waitlistEntryId, 6))
+    }
+
+    const getCoords = (e) => {
+        const rect = e.target.getBoundingClientRect();
+        setCoords({
+          left: (rect.x + rect.width / 2) + 20,
+          top: (rect.y + window.scrollY) - 20
+        });
+      }
+
+    //default sorts earliest times to latest times
+    // created at
+    // created at + quoted
+    // now
+    // created at + quoted - now === diff
+    // sorted by lowest diff
+    const sortByTime = (a, b) => {
+        const now = DateTime.local()
+        const aDiff = DateTime.fromISO(a.created_at).plus({minutes: a.estimated_wait}).diff(now, 'minutes').toObject().minutes
+        const bDiff = DateTime.fromISO(b.created_at).plus({minutes: b.estimated_wait}).diff(now, 'minutes').toObject().minutes
+        if (aDiff > bDiff) return 1;
+        if (aDiff < bDiff) return -1;
+        return 0;
+    }
+
+    // default sorts alphabetical by guest name
+    const sortByGuest = (a, b) => {
+        const aPartyGuest = a.guest.toLowerCase()
+        const bPartyGuest = b.guest.toLowerCase()
+        if (aPartyGuest > bPartyGuest) return 1;
+        if (aPartyGuest < bPartyGuest) return -1;
+        return 0;
+    }
+
+    // default sorts least party to greatest
+    const sortByParty = (a, b) => {
+        const aPartySize = a.party_size
+        const bPartySize = b.party_size
+        if (aPartySize > bPartySize) return 1;
+        if (aPartySize < bPartySize) return -1;
+        return 0;
+    }
+
+    // default sorts status id asc
+    const sortByStatus = (a, b) => {
+        const aPartyStatus = a.status_id
+        const bPartyStatus = b.status_id
+        if (aPartyStatus > bPartyStatus) return 1;
+        if (aPartyStatus < bPartyStatus) return -1;
+        return 0;
+    }
+
+    // default sorts updated at earliest first
+    const sortByUpdated = (a, b) => {
+        const aUpdatedAt = DateTime.fromISO(a.updated_at)
+        const bUpdatedAt = DateTime.fromISO(b.updated_at)
+        if (aUpdatedAt > bUpdatedAt) return 1;
+        if (aUpdatedAt < bUpdatedAt) return -1;
+        return 0;
+    }
+
+    // default sorts created at earliest first
+    const sortCreatedAt = (a, b) => {
+        const aCreatedAt = DateTime.fromISO(a.created_at)
+        const bCreatedAt = DateTime.fromISO(b.created_at)
+        if (aCreatedAt > bCreatedAt) return 1;
+        if (aCreatedAt < bCreatedAt) return -1;
+        return 0;
+    }
+
+    const filterBySearchTerm = (waitlistEntry) => {
+        if (waitlistEntry.guest.toLowerCase().includes(searchTerm)) return true;
+        if (waitlistEntry.guest_info.email?.toLowerCase().includes(searchTerm)) return true;
+        if (waitlistEntry.guest_info.phone_number.includes(searchTerm)) return true;
+        return false;
+    }
+
+        // apply filters
+    const sortedWaitlist = useMemo(() => {
+        const waitlistCopy = [...waitlist]
+        if (sort === 'time') waitlistCopy.sort(sortByTime);
+        if (sort === 'guest') waitlistCopy.sort(sortByGuest);
+        if (sort === 'party-size') waitlistCopy.sort(sortByParty);
+        if (sort === 'section') waitlistCopy.sort(sortByTime);
+        if (sort === 'status') waitlistCopy.sort(sortByStatus);
+        if (sort === 'updated') waitlistCopy.sort(sortByUpdated);
+        if (sort === 'created') waitlistCopy.sort(sortCreatedAt);
+        if (order === 'desc') waitlistCopy.reverse();
+        if (searchTerm) return waitlistCopy.filter(filterBySearchTerm);
+        return waitlistCopy;
+    }, [order, waitlist, sort, searchTerm])
+
     return(
         <div id={style.scroll_res_list}>
-            {waitlist.length > 0 &&
-                waitlist.map((waitlistEntry, index) => {
+            {sortedWaitlist.length > 0 &&
+                sortedWaitlist.map((waitlistEntry, index) => {
                     const createdAt = DateTime.fromISO(waitlistEntry.created_at)
                     const deadline = createdAt.plus({minutes: waitlistEntry.estimated_wait})
                     const now = DateTime.local()
                     const diff = deadline.diff(now, 'minutes').toObject().minutes
                     const roundedDiff = Math.ceil(diff)
+                    if (roundedDiff < 0 && waitlistEntry.status_id === 5) {
+                        lateStatusUpdate(waitlistEntry.id)
+                    }
                     return(
                         <div key={waitlistEntry.id} className={style.waitlist_entry}>
                             <div id={style.status_icon}>
                                 {waitlistEntry.status_id === 5 &&
-                                    <ReservedIcon title="Reserved" className={style.icon_blue} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <ReservedIcon title="Reserved" className={style.icon_blue} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 4 &&
-                                    <LeftMessageIcon title="Left Message" className={style.icon_blue} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <LeftMessageIcon title="Left Message" className={style.icon_blue} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 6 &&
-                                    <LateIcon title="Late" className={style.icon_red} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <LateIcon title="Late" className={style.icon_red} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 7 &&
-                                    <PAIcon  title="Partially Arrived" className={style.icon_yellow} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <PAIcon  title="Partially Arrived" className={style.icon_yellow} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 8 &&
-                                    <ArrivedIcon  title="Arrived" className={style.icon_yellow} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <ArrivedIcon  title="Arrived" className={style.icon_yellow} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 9 &&
-                                    <PSIcon  title="Partially Seated" className={style.icon_green} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <PSIcon  title="Partially Seated" className={style.icon_green} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 10 &&
-                                    <SeatedIcon  title="Seated" className={style.icon_green} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <SeatedIcon  title="Seated" className={style.icon_green} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {waitlistEntry.status_id === 11 &&
-                                    <CancelIcon  title="Cancelled" className={style.icon_red} onClick={()=>setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}/>
+                                    <CancelIcon  title="Cancelled" className={style.icon_red} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : waitlistEntry.id)}}/>
                                 }
                                 {showStatusBar === waitlistEntry.id &&
-                                    <div id={style.status_sizer}>
-                                        <StatusBar setShowStatusBar={setShowStatusBar} waitlistEntryId={waitlistEntry.id} statusId={waitlistEntry.status_id}/>
-                                    </div>}
+
+                                        <Portal id={style.status_sizer}>
+                                            <div className={style.status_background} onClick={()=>setShowStatusBar(false)}>
+                                             <StatusBar coords={coords} setShowStatusBar={setShowStatusBar} waitlistEntryId={waitlistEntry.id} statusId={waitlistEntry.status_id}/>
+                                            </div>
+                                        </Portal>
+
+                                    }
                             </div>
                             <div id={style.party_info_sec}>
                                 <div>{waitlistEntry.guest_info.name}</div>

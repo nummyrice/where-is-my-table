@@ -7,6 +7,8 @@ import AddReservation from '../AddReservation';
 import StatusBar from '../StatusBar';
 import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 import { DateTime } from 'luxon';
+import { Modal } from '../../../context/Modal';
+import BookReservation from '../BookReservation';
 
 const ResSchedule =() => {
     const {selectedDate} = useContext(EstablishmentContext);
@@ -14,8 +16,7 @@ const ResSchedule =() => {
     // const [availableTables, setavailableTables] = useState();
     const [showMakeRes, setShowMakeRes] = useState(null);
     // const [reservations, setReservations] = useState();
-    const [editReservation, setEditReservation] = useState(null)
-    // const availableTables = useSelector(state => state.selectedDateAvailability.availability)
+    const [bookRes, setBookRes] = useState(null);    // const availableTables = useSelector(state => state.selectedDateAvailability.availability)
     const reservations = useSelector(state => state.reservations)
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
@@ -96,15 +97,17 @@ const ResSchedule =() => {
                                     </div> */}
                                 </div>
                                 <div  className={style.booked_hover_info_card}>
-                                    {/* <div className={style.hover_table_title}>{reservation.table.table_name}</div> */}
+                                    <div className={style.hover_table_title}>{"Reservation Details"}</div>
                                     <div className={style.table_details}>
-                                        <div className={style.hover_time}>{new Date(reservation.reservation_time).toLocaleTimeString([], {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}</div>
-                                        <div className={style.hover_date}>{new Date(reservation.reservation_time).toLocaleDateString([], {timeZone: 'America/New_York'})}</div>
+                                        <div className={style.hover_time}>{DateTime.fromISO(reservation.reservation_time).toLocaleString({hour: '2-digit', minute: '2-digit'})}</div>
+                                        <div className={style.hover_date}>{DateTime.fromISO(reservation.reservation_time).toLocaleString()}</div>
                                         {/* <div className={style.hover_min_max}>{`Min: ${reservation.table.min_seat}, Max: ${reservation.table.max_seat}`}</div> */}
                                         <div className={style.hover_tags}>{reservation.tags.reduce((prev, curr) => {
                                             return prev + ', ' + curr.name
                                         }, '')}</div>
-                                        <StatusBar reservationId={reservation.id} statusId={reservation.status_id}/>
+                                        <div className={style.status_sizer}>
+                                            <StatusBar reservationId={reservation.id} statusId={reservation.status_id}/>
+                                        </div>
                                     </div>
                                     <div className={style.hover_guest_title}>Guest Info</div>
                                     <div className={style.guest_details}>
@@ -114,13 +117,8 @@ const ResSchedule =() => {
                                         <div className={style.hover_number}>{reservation.guest_info.phone_number}</div>
                                         <div className={style.hover_email}>{reservation.guest_info.email}</div>
                                     </div>
-                                    <div onClick={()=>{
-                                        dispatch(getSevenDayAvailability(selectedDate)).then(() =>
-                                            {setEditReservation(reservation)}
-                                        )
-                                        }} className={style.edit_reservation_button}>Edit</div>
+                                    <div onClick={()=>setBookRes(reservation)} className={style.edit_reservation_button}>Edit</div>
                                 </div>
-                                {editReservation?.id === reservation.id && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
                             </React.Fragment>
                            )
                         })}
@@ -152,6 +150,10 @@ const ResSchedule =() => {
                     </div>
                 )
             })}
+                        {bookRes &&
+                <Modal onClose={() => setBookRes(false)}>
+                    <BookReservation setBookRes={setBookRes} bookRes={bookRes}/>
+                </Modal>}
             </div>
 
             <div className={style.footer_options}>More schedule options coming...</div>
