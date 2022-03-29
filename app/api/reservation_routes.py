@@ -10,6 +10,7 @@ from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
 import json
 import pytz
+from app.sockets import distribute_new_res
 
 reservation_routes = Blueprint('reservations', __name__)
 
@@ -205,6 +206,7 @@ def reservation_submit():
                 )
             db.session.add(reservation)
             db.session.commit()
+            distribute_new_res(reservation, reservation.establishment_id)
             return reservation.to_dict(), 201
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 

@@ -8,9 +8,10 @@ import ResSchedule from './ResSchedule';
 import TopBar from './TopBar';
 import LeftPanel from './LeftPanel';
 import { DateTime, Settings } from 'luxon';
+import { io } from "socket.io-client";
 
 export const EstablishmentContext = createContext();
-
+let socket;
 const Establishment = () => {
     const establishment = useSelector(state => state.session.user.establishment)
     const dispatch = useDispatch();
@@ -27,6 +28,17 @@ const Establishment = () => {
         })
     }, [selectedDate, dispatch])
 
+    useEffect(()=>{
+        socket = io()
+        socket.on("connect", ()=>{
+            console.log('successfully connected web socket')
+        })
+        socket.emit('join', `establishment_${establishment.id}`)
+        socket.on("my response", (data) => {
+            console.log(data)
+        })
+        return () => socket.disconnect();
+    }, [])
     return (
         <EstablishmentContext.Provider value={{selectedDate, setSelectedDate}}>
             <div className={style.establishment}>
