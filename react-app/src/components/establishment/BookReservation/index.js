@@ -57,9 +57,9 @@ function BookReservation({bookRes, setBookRes}) {
         setIsLoading(true)
         dispatch(getReservations(selectedBookDate.toISO()))
         .then(async result => {
-            console.log("successfully acquired reservations")
+            console.log("successfully acquired reservations in <BookReservation>")
         }).catch(err => {
-            console.log("failed to acquire reservations")
+            console.log("failed to acquire reservations in <BookReservation>")
         }).finally(() => {
             setIsLoading(false);
         })
@@ -185,8 +185,16 @@ function BookReservation({bookRes, setBookRes}) {
             .then(data => {
                 if (data.errors) {
                     setShowErrorsModal(true)
+                    console.log("visit tag handler errors: ", data.data.errors)
                 } else {
+                    console.log("visit tag handler response: ", data)
+                    const tagToRemoveIndex = bookRes.tags.findIndex(tag => tag.id === data.tagId)
+                    const newState = {...bookRes}
+                    newState.tags.splice(tagToRemoveIndex, 1)
+                    const updatedRes = {...newState, tags: [...newState.tags]}
+                    setBookRes(updatedRes)
                     return data
+
                 }
             })
     }

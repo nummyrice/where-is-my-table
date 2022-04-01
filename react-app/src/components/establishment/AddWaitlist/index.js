@@ -61,7 +61,9 @@ const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist, showAdd
             .then(data => {
                 if (data.errors) {
                     setShowErrorsModal(true)
+                    console.log("visit tag handler errors: ", data.errors)
                 } else {
+                    console.log("visit tag handler response: ", data)
                     return data
                 }
             })

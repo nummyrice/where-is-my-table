@@ -14,13 +14,13 @@ class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     guest_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     party_size = db.Column(db.Integer)
-    reservation_time = db.Column(db.DateTime)
+    reservation_time = db.Column(db.DateTime(timezone=True))
     section_id = db.Column(db.Integer, db.ForeignKey('sections.id'))
     table_id = db.Column(db.Integer, db.ForeignKey('tables.id'))
     establishment_id = db.Column(db.Integer, db.ForeignKey('establishments.id'))
     status_id = db.Column(db.Integer, db.ForeignKey('statuses.id'))
-    created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
-    updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     # associations
     status = db.relationship("Status", back_populates="reservations")
@@ -33,6 +33,7 @@ class Reservation(db.Model):
 
     def to_dict(self):
         timezone = pytz.timezone(self.establishment.get_timezone())
+        # print("RESERVATION TIME:_________________", self.created_at.tzinfo)
 
         return {
             "id": self.id,
@@ -40,7 +41,7 @@ class Reservation(db.Model):
             "guest": self.guest.name,
             "guest_info": self.guest.to_safe_dict(),
             "party_size": self.party_size,
-            "reservation_time": timezone.localize(self.reservation_time, is_dst=True).isoformat(),
+            "reservation_time": self.reservation_time.isoformat(),
             "table_id": self.table_id,
             "table": self.table.to_dict() if self.table_id else None,
             "section": self.section_id,
@@ -48,6 +49,6 @@ class Reservation(db.Model):
             "status_id": self.status_id,
             "status": self.status.to_dict(),
             "tags": [tag.to_dict() for tag in self.tags],
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }

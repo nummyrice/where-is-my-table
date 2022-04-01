@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from app.forms import WaitlistForm, UpdateWaitlistForm
 from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
+from app.sockets import distribute_new_party, distribute_update_party
 
 
 
@@ -40,6 +41,7 @@ def new_party():
             )
             db.session.add(newParty)
             db.session.commit()
+            distribute_new_party(newParty.to_dict(), f'establishment_{newParty.establishment_id}')
             return newParty.to_dict(), 201
         except exc.SQLAlchemyError as e:
             return {'errors': ['server error uploading to database']}, 400
@@ -57,6 +59,7 @@ def update_party():
             updated_party.party_size = form.data['party_size']
             updated_party.estimated_wait = form.data['estimated_wait']
             db.session.commit()
+            distribute_update_party(updated_party.to_dict(), f'establishment_{updated_party.establishment_id}')
             return updated_party.to_dict(), 201
         except exc.SQLAlchemyError as e:
             return {'errors': ['server error uploading to database']}, 400

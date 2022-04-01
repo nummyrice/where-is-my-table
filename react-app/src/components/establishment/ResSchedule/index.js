@@ -1,22 +1,23 @@
 import React, { useState, useContext } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from "./ResSchedule.module.css";
 import { ReactComponent as UserIcon }from './assets/user-solid.svg';
-import AddReservation from '../AddReservation';
+// import AddReservation from '../AddReservation';
 import StatusBar from '../StatusBar';
-import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
+// import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
 import { DateTime } from 'luxon';
 import { Modal } from '../../../context/Modal';
 import BookReservation from '../BookReservation';
 
 const ResSchedule =() => {
     const {selectedDate} = useContext(EstablishmentContext);
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     // const [availableTables, setavailableTables] = useState();
-    const [showMakeRes, setShowMakeRes] = useState(null);
+    // const [showMakeRes, setShowMakeRes] = useState(null);
     // const [reservations, setReservations] = useState();
     const [bookRes, setBookRes] = useState(null);    // const availableTables = useSelector(state => state.selectedDateAvailability.availability)
+    const [scheduleScale, setScheduleScale] = useState({slots: 96, interval: 15})
     const reservations = useSelector(state => state.reservations)
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
@@ -34,15 +35,23 @@ const ResSchedule =() => {
     //     })
     // },[selectedDate])
 
+    //scheduleScale
+        // 15 minutes
+            // slots: 96
+        // 30 minutes
+            // slots: 48
+        // 60 minutes
+            // slots 24
 
     // SET 24 TEMPLATE COLUMNS
-    const resScheduleModel = Array(96).fill(0).map((_, minutesMultiplier) => {
-        const columnTime = selectedDate.plus({minute:15 * minutesMultiplier});
+    const resScheduleModel = Array(scheduleScale.slots).fill(0).map((_, minutesMultiplier) => {
+        const columnTime = selectedDate.plus({minute:scheduleScale.interval * minutesMultiplier});
+        const nextColumnTime = columnTime.plus({minute:scheduleScale.interval})
         const resKeys = Object.keys(reservations)
         const columnRes = resKeys.filter((id) => {
             const res = reservations[id]
             const reservationTime = DateTime.fromISO(res.reservation_time)
-            if (columnTime.toMillis() === reservationTime.toMillis()) {
+            if (columnTime.toMillis() <= reservationTime.toMillis() && nextColumnTime.toMillis() > reservationTime.toMillis()) {
                 return true;
             }
             return false;
@@ -156,7 +165,14 @@ const ResSchedule =() => {
                 </Modal>}
             </div>
 
-            <div className={style.footer_options}>More schedule options coming...</div>
+            <div className={style.footer_options}>
+                <div id={style.interval_options}>
+                    <label>Adjust Interval</label>
+                    <div id={style.fifteen} className={`${scheduleScale.interval === 15 ? style.interval_select : null}`} onClick={() => setScheduleScale({slots: 96, interval: 15})}>{"15m"}</div>
+                    <div id={style.thirty} className={`${scheduleScale.interval === 30 ? style.interval_select : null}`} onClick={() => setScheduleScale({slots: 48, interval: 30})}>{"30m"}</div>
+                    <div id={style.sixty} className={`${scheduleScale.interval === 60 ? style.interval_select : null}`} onClick={() => setScheduleScale({slots: 24, interval: 60})}>{"1hr"}</div>
+                </div>
+            </div>
         </div>
     )
 }

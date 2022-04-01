@@ -1,8 +1,8 @@
 """Initial migration.
 
-Revision ID: 3b520c925211
+Revision ID: cfe43576128a
 Revises: 
-Create Date: 2022-03-22 20:50:45.018886
+Create Date: 2022-03-31 14:31:39.176507
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '3b520c925211'
+revision = 'cfe43576128a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,16 +21,16 @@ def upgrade():
     op.create_table('statuses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=40), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
     op.create_table('tags',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=40), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -38,8 +38,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('luxon_string', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -49,8 +49,8 @@ def upgrade():
     sa.Column('phone_number', sa.String(length=255), nullable=False),
     sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('hashed_password', sa.String(length=255), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name'),
     sa.UniqueConstraint('phone_number')
@@ -61,6 +61,8 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('timezone_id', sa.Integer(), nullable=False),
     sa.Column('daylight_savings', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['timezone_id'], ['timezones.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -68,8 +70,8 @@ def upgrade():
     op.create_table('guest_tags',
     sa.Column('guest_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], )
     )
@@ -78,6 +80,8 @@ def upgrade():
     sa.Column('establishment_id', sa.Integer(), nullable=True),
     sa.Column('schedule', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['establishment_id'], ['establishments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -88,8 +92,8 @@ def upgrade():
     sa.Column('party_size', sa.Integer(), nullable=False),
     sa.Column('estimated_wait', sa.Integer(), nullable=False),
     sa.Column('establishment_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', CURRENT_TIMESTAMP)"), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['establishment_id'], ['establishments.id'], ),
     sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['statuses.id'], ),
@@ -103,16 +107,16 @@ def upgrade():
     sa.Column('section_id', sa.Integer(), nullable=True),
     sa.Column('customer_view_name', sa.String(), nullable=True),
     sa.Column('table_type', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('waitlist_tags',
     sa.Column('waitlist_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
     sa.ForeignKeyConstraint(['waitlist_id'], ['waitlist.id'], )
     )
@@ -120,13 +124,13 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('guest_id', sa.Integer(), nullable=True),
     sa.Column('party_size', sa.Integer(), nullable=True),
-    sa.Column('reservation_time', sa.DateTime(), nullable=True),
+    sa.Column('reservation_time', sa.DateTime(timezone=True), nullable=True),
     sa.Column('section_id', sa.Integer(), nullable=True),
     sa.Column('table_id', sa.Integer(), nullable=True),
     sa.Column('establishment_id', sa.Integer(), nullable=True),
     sa.Column('status_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['establishment_id'], ['establishments.id'], ),
     sa.ForeignKeyConstraint(['guest_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
@@ -137,8 +141,8 @@ def upgrade():
     op.create_table('reservation_tags',
     sa.Column('reservation_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['reservation_id'], ['reservations.id'], ),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], )
     )

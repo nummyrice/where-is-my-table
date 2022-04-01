@@ -7,27 +7,27 @@ const UPDATE_PARTY = 'selectedDateWaitlist/UPDATE_PARTY';
 const DELETE_PARTY = 'selectedDateWaitlist/DELETE_PARTY';
 const REMOVE_TAG = 'selectedDateWaitlis/REMOVE_TAGt';
 
-const setWaitlist = (waitlist) => ({
+export const setWaitlist = (waitlist) => ({
     type: SET_WAITLIST,
     payload: waitlist
 })
 
-const setParty = (party) => ({
+export const setParty = (party) => ({
     type: SET_PARTY,
     payload: party
 })
 
-const updateParty = (party) => ({
+export const updateParty = (party) => ({
     type: UPDATE_PARTY,
     payload: party
 })
 
-const deleteParty = (partyId) => ({
+export const deleteParty = (partyId) => ({
     type: DELETE_PARTY,
     payload: partyId
 })
 
-const setRemoveTag = (waitlistId, tagId) => ({
+export const setRemoveTag = (waitlistId, tagId) => ({
     type: REMOVE_TAG,
     payload: {waitlistId, tagId}
 })
@@ -73,7 +73,7 @@ export const newWaitlistParty = (guestId, partySize, estimatedWait, tags) => asy
             setErrors(tagData.errors)
             return tagData
         }
-        dispatch(updateParty(tagData));
+        dispatch(updateParty(tagData.party));
         return tagData;
     }
 return data;
@@ -106,7 +106,7 @@ export const updateWaitlistParty = (waitlistId, guestId, partySize, estimatedWai
             setErrors(tagData.errors)
             return tagData
         }
-        dispatch(updateParty(tagData));
+        dispatch(updateParty(tagData.party));
         return tagData;
     }
     return data;
@@ -129,7 +129,7 @@ export const updateAndSetPartyStatus = (partyId, newStatusId) => async (dispatch
 
 //REMOVE TAG
 export const removePartyTag = (waitlistId, tagId) => async (dispatch) => {
-    const response = await fetch(`/api/tags/${waitlistId}/${tagId}/remove`, {method:"DELETE"})
+    const response = await fetch(`/api/tags/${waitlistId}/${tagId}/remove-party-tag`, {method:"DELETE"})
     const data = await response.json()
     if (response.ok) {
         dispatch(setRemoveTag(waitlistId, tagId))
@@ -158,6 +158,7 @@ export default function reducer(state = initialState, action) {
             return action.payload
         case SET_PARTY:
             // console.log("WE'VE MADE IT TO SET PARTY", action.payload)
+            if (newState.find(party => party.id === action.payload.id)) return newState;
             newState.push(action.payload);
             return newState;
         case UPDATE_PARTY:

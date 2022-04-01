@@ -9,9 +9,12 @@ import TopBar from './TopBar';
 import LeftPanel from './LeftPanel';
 import { DateTime, Settings } from 'luxon';
 import { io } from "socket.io-client";
+import * as reservationActions from "../../store/reservations";
+import * as waitlistActions from "../../store/selectedDateWaitlist";
 
 export const EstablishmentContext = createContext();
 let socket;
+// const CONNECTION = 'localhost:3000'
 const Establishment = () => {
     const establishment = useSelector(state => state.session.user.establishment)
     const dispatch = useDispatch();
@@ -30,15 +33,34 @@ const Establishment = () => {
 
     useEffect(()=>{
         socket = io()
-        socket.on("connect", ()=>{
-            console.log('successfully connected web socket')
-        })
         socket.emit('join', `establishment_${establishment.id}`)
-        socket.on("my response", (data) => {
-            console.log(data)
+        socket.on("status", (data) => {
+            console.log("FROM SERVER: ", data.msg)
+        })
+        socket.on('new_reservation', newRes => {
+            dispatch(reservationActions.setRes(newRes))
+        })
+        socket.on('update_reservation', updatedRes => {
+            dispatch(reservationActions.setUpdatedRes(updatedRes))
+        })
+        socket.on('remove_tag', data => {
+            dispatch(reservationActions.setRemoveTag(data.res_id, data.tag_id))
+        })
+        socket.on('new_party', newParty => {
+            dispatch(waitlistActions.setParty(newParty))
+        })
+        socket.on('update_party',updatedParty => {
+            dispatch(waitlistActions.updateParty(updatedParty))
+        })
+        socket.on('remove_party_tag', data => {
+            dispatch(waitlistActions.setRemoveTag(data.party_id, data.tag_id))
+        })
+        socket.on('error', ()=> {
+            console.log("error from socket")
         })
         return () => socket.disconnect();
     }, [])
+
     return (
         <EstablishmentContext.Provider value={{selectedDate, setSelectedDate}}>
             <div className={style.establishment}>

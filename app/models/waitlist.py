@@ -14,9 +14,9 @@ class utcnow(expression.FunctionElement):
 def pg_utcnow(element, compiler, **kw):
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
 
-@compiles(utcnow, 'mssql')
-def ms_utcnow(element, compiler, **kw):
-    return "GETUTCDATE()"
+# @compiles(utcnow, 'mssql')
+# def ms_utcnow(element, compiler, **kw):
+#     return "GETUTCDATE()"
 
 
 class Waitlist(db.Model):
@@ -35,8 +35,8 @@ class Waitlist(db.Model):
     party_size=db.Column(db.Integer, nullable=False)
     estimated_wait=db.Column(db.Integer, nullable=False)
     establishment_id=db.Column(db.Integer, db.ForeignKey('establishments.id'))
-    created_at = db.Column(db.DateTime(), nullable=False, server_default=utcnow())
-    updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
 
     # associations
@@ -49,7 +49,7 @@ class Waitlist(db.Model):
     def to_dict(self):
         print('created_at______________: ', self.created_at.tzinfo)
         # timezone = pytz.timezone(self.establishment.get_timezone())
-        timezone = pytz.timezone('Etc/UTC')
+        # timezone = pytz.timezone('Etc/UTC')
 
 
         return {
@@ -62,7 +62,7 @@ class Waitlist(db.Model):
             "party_size": self.party_size,
             "estimated_wait": self.estimated_wait,
             "tags": [tag.to_dict() for tag in self.tags],
-            'created_at': timezone.localize(self.created_at, is_dst=True).isoformat(),
-            # 'created_at': self.created_at,
-            'updated_at': self.updated_at
+            # 'created_at': timezone.localize(self.created_at, is_dst=True).isoformat(),
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }

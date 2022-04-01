@@ -132,7 +132,7 @@ const ResList = ({searchTerm, sort, order, bookRes, setBookRes}) => {
                         lateStatusUpdate(reservation.id)
                     }
                     return(
-                        <div key={reservation.id} className={style.res_entry}>
+                        <div key={id} className={style.res_entry}>
                             <div id={style.status_icon}>
                                 {reservation.status_id === 3 &&
                                     <ReservedIcon title="Reserved" className={style.icon_blue} onClick={(e)=>{getCoords(e); setShowStatusBar(showStatusBar ? null : reservation.id)}}/>
@@ -180,7 +180,7 @@ const ResList = ({searchTerm, sort, order, bookRes, setBookRes}) => {
             {!Object.keys(reservations).length &&
                 <div id={style.no_res_message}>No Reservations for Today</div>
             }
-            {(Object.keys(reservations).length && searchTerm) &&
+            {(!reservationIds.length && searchTerm) &&
                 <div id={style.no_res_message}>Search does not match any reservation</div>
             }
 

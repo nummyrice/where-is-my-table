@@ -16,8 +16,8 @@ class User(db.Model, UserMixin):
     phone_number = db.Column(db.String(255), nullable=False, unique=True)
     notes = db.Column(db.Text)
     hashed_password = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
-    updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     # associations
     reservations = db.relationship("Reservation", back_populates="guest", cascade="all, delete")
@@ -45,8 +45,8 @@ class User(db.Model, UserMixin):
             'notes': self.notes,
             'establishment': self.establishment.to_dict() if self.establishment else None,
             'hashed_password': self.hashed_password,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }
 
     def to_safe_dict(self):
@@ -57,8 +57,8 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'establishment': self.establishment.to_dict() if self.establishment else None,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }
 
     def to_establishment_dict(self):
@@ -69,8 +69,8 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'establishment': self.establishment.to_dict(),
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }
 
     def to_guest_dict(self):
@@ -81,6 +81,6 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'tags': {tag.id: tag.name for tag in self.tags},
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }

@@ -127,12 +127,13 @@ const Waitlist = ({searchTerm, sort, order, setEditWaitlist}) => {
     return(
         <div id={style.scroll_res_list}>
             {sortedWaitlist.length > 0 &&
-                sortedWaitlist.map((waitlistEntry, index) => {
+                sortedWaitlist.map((waitlistEntry) => {
                     const createdAt = DateTime.fromISO(waitlistEntry.created_at)
                     const deadline = createdAt.plus({minutes: waitlistEntry.estimated_wait})
                     const now = DateTime.local()
                     const diff = deadline.diff(now, 'minutes').toObject().minutes
                     const roundedDiff = Math.ceil(diff)
+                    console.log('guest info: ', waitlistEntry)
                     if (roundedDiff < 0 && waitlistEntry.status_id === 5) {
                         lateStatusUpdate(waitlistEntry.id)
                     }
@@ -195,8 +196,10 @@ const Waitlist = ({searchTerm, sort, order, setEditWaitlist}) => {
             {!waitlist.length &&
                 <div id={style.no_res_message}>Today's waitlist is empty.</div>
             }
-
-        </div>
+            {(!sortedWaitlist.length && searchTerm) &&
+                <div id={style.no_res_message}>Search does not match any party</div>
+            }
+            </div>
     )
 }
 
