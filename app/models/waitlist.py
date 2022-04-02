@@ -47,11 +47,8 @@ class Waitlist(db.Model):
 
 
     def to_dict(self):
-        print('created_at______________: ', self.created_at.tzinfo)
         # timezone = pytz.timezone(self.establishment.get_timezone())
         # timezone = pytz.timezone('Etc/UTC')
-
-
         return {
             "id": self.id,
             "guest_id": self.guest_id,

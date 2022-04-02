@@ -133,7 +133,6 @@ const Waitlist = ({searchTerm, sort, order, setEditWaitlist}) => {
                     const now = DateTime.local()
                     const diff = deadline.diff(now, 'minutes').toObject().minutes
                     const roundedDiff = Math.ceil(diff)
-                    console.log('guest info: ', waitlistEntry)
                     if (roundedDiff < 0 && waitlistEntry.status_id === 5) {
                         lateStatusUpdate(waitlistEntry.id)
                     }

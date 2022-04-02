@@ -58,6 +58,14 @@ const ResSchedule =() => {
         }).map((id)=>reservations[id])
         return {columnTime, reservations:columnRes}
     })
+
+    const getNowIndicatorPosition = (interval) => {
+        const todaysMinutes = Math.ceil(DateTime.local().diff(DateTime.local().startOf('day'), 'minutes').toObject().minutes)
+        console.log("todays MInutes: ", todaysMinutes)
+        if (interval === 15) return {left:  `${todaysMinutes * 7.28 - 42}px`};
+        if (interval === 30) return {left: `${todaysMinutes * 3.71 - 42}px`};
+        if (interval === 60) return {left: `${todaysMinutes * 1.83 - 42}px`};
+    }
     // SET 24 SCHEDULE MODEL
     // const resScheduleModel = timeColumns.map((datetime, hourIndex) => {
     //     const scheduleColumn = {
@@ -82,6 +90,13 @@ const ResSchedule =() => {
     return(
         <div className={style.res_schedule}>
             <div className={style.schedule_scroll}>
+                {DateTime.local().toISODate() === selectedDate.toISODate() &&
+                    <div
+                        // style={{left: `${420 + 42.5}px`}}
+                        style={getNowIndicatorPosition(scheduleScale.interval)}
+                        id={style.current_time_indicator}>{DateTime.local().toLocaleString({hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                }
             {resScheduleModel.map((column, index) => {
                 return(
                     <div key={`column ${index}`} className={style.column}>

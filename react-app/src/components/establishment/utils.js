@@ -1,7 +1,4 @@
-import { setErrors } from "../../store/errors"
-
 // TAGS
-
 //add tags to reservation
  export const postTags = async (reservationId, tags) => {
         const newTags = {
@@ -13,7 +10,6 @@ import { setErrors } from "../../store/errors"
             headers: {'Content-Type': "application/json"},
             body: JSON.stringify(newTags)
         })
-
         return response;
 }
 

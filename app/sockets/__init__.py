@@ -39,3 +39,12 @@ def distribute_update_party(updated_party, establishment_id):
 
 def distribute_remove_party_tag(party_id, tag_id, establishment_id):
     socketio.emit('remove_party_tag', {"party_id": party_id, "tag_id": tag_id}, to=establishment_id)
+
+def distribute_delete_party(party_id, establishment_id):
+    socketio.emit('delete_party', {"party_id": party_id}, to=establishment_id)
+
+def distribute_res_status_change(updated_res, establishment_id):
+    socketio.emit('update_res_status', updated_res, to=establishment_id)
+
+def distribute_party_status_change(updated_party, establishment_id):
+    socketio.emit('update_party_status', updated_party, to=establishment_id)

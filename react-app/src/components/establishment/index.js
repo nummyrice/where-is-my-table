@@ -41,6 +41,8 @@ const Establishment = () => {
             dispatch(reservationActions.setRes(newRes))
         })
         socket.on('update_reservation', updatedRes => {
+            console.log('reservatino status socketio: ', updatedRes)
+
             dispatch(reservationActions.setUpdatedRes(updatedRes))
         })
         socket.on('remove_tag', data => {
@@ -54,6 +56,15 @@ const Establishment = () => {
         })
         socket.on('remove_party_tag', data => {
             dispatch(waitlistActions.setRemoveTag(data.party_id, data.tag_id))
+        })
+        socket.on('delete_party', data => {
+            dispatch(waitlistActions.deleteParty(data.party_id))
+        })
+        socket.on('update_res_status', updatedRes => {
+            dispatch(reservationActions.setUpdatedRes(updatedRes))
+        })
+        socket.on('update_party_status', updatedParty => {
+            dispatch(waitlistActions.updateParty(updatedParty))
         })
         socket.on('error', ()=> {
             console.log("error from socket")

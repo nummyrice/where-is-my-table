@@ -84,7 +84,6 @@ def add_party_tags():
                     target_party.tags.append(new_tag)
                 db.session.add(target_party)
                 db.session.commit()
-                # print("NEW TAG: *********************", new_tag)
             except exc.SQLAlchemyError as e:
                 print('Error from ADD PARTY TAGS SERVER ROUTE ', e)
                 return {"errors": ["there was an error adding your tag to the database. please try again"]}, 400
@@ -103,7 +102,7 @@ def remove_party_tags(partyId, tagId):
                 if tag.id == tagId:
                     del target_party.tags[idx]
                     db.session.commit()
-                    distribute_remove_party_tag({"party_id": partyId, "tag_id": tagId}, f'establishment_{target_party.establishment_id}')
+                    distribute_remove_party_tag(partyId, tagId, f'establishment_{target_party.establishment_id}')
                     return {'result': "succesfully deleted tag"}, 200
             return {"errors": ["tag does not exist in target reservation"]}, 400
     except exc.SQLAlchemyError as e:

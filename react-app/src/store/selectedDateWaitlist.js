@@ -68,7 +68,7 @@ export const newWaitlistParty = (guestId, partySize, estimatedWait, tags) => asy
     dispatch(setParty(data));
     if (tags) {
         const tagResponse = await postPartyTags(data.id, tags);
-        const tagData = tagResponse.json()
+        const tagData = await tagResponse.json()
         if (!tagResponse.ok) {
             setErrors(tagData.errors)
             return tagData
@@ -87,7 +87,6 @@ export const updateWaitlistParty = (waitlistId, guestId, partySize, estimatedWai
         party_size: partySize,
         estimated_wait: estimatedWait,
     }
-    console.log('UPDATE WAITLIST PARTY: ', updatedParty)
     const response = await fetch('/api/waitlist/update', {
         method: 'PUT',
         headers: {"Content-Type": "application/json"},
@@ -101,7 +100,7 @@ export const updateWaitlistParty = (waitlistId, guestId, partySize, estimatedWai
     dispatch(updateParty(data));
     if (tags) {
         const tagResponse = await postPartyTags(data.id, tags);
-        const tagData = tagResponse.json()
+        const tagData = await tagResponse.json()
         if (!tagResponse.ok) {
             setErrors(tagData.errors)
             return tagData
@@ -135,6 +134,7 @@ export const removePartyTag = (waitlistId, tagId) => async (dispatch) => {
         dispatch(setRemoveTag(waitlistId, tagId))
         return data;
     }
+    setErrors(data.errors)
     return data;
 }
 
@@ -145,6 +145,7 @@ export const deleteAndUnsetParty = (partyId) => async (dispatch) => {
     if (response.ok) {
         dispatch(deleteParty(partyId))
     }
+    setErrors(data.errors)
     return data;
 }
 
@@ -172,10 +173,12 @@ export default function reducer(state = initialState, action) {
         case REMOVE_TAG:
             const partyIndex = newState.findIndex((party)=> party.id === action.payload.waitlistId);
             const tagToRemoveIndex = newState[partyIndex].tags.findIndex((tag)=> tag.id === action.payload.tagId)
-            newState[partyIndex].tags.splice(tagToRemoveIndex, 1)
-            const newTags = [...newState[partyIndex].tags]
-            const newParty = {...newState[partyIndex], tags: newTags}
-            newState.splice(partyIndex, 1, newParty)
+            if (tagToRemoveIndex) {
+                newState[partyIndex].tags.splice(tagToRemoveIndex, 1)
+                const newTags = [...newState[partyIndex].tags]
+                const newParty = {...newState[partyIndex], tags: newTags}
+                newState.splice(partyIndex, 1, newParty)
+            }
             return newState;
         default:
             return state;

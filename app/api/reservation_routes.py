@@ -10,7 +10,7 @@ from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
 import json
 import pytz
-from app.sockets import distribute_new_res, distribute_update_res
+from app.sockets import distribute_new_res, distribute_update_res, distribute_res_status_change
 
 reservation_routes = Blueprint('reservations', __name__)
 
@@ -264,9 +264,10 @@ def edit_status():
         reservation = db.session.query(Reservation).get(data['reservation_id'])
         reservation.status_id = data['status_id']
         db.session.commit()
-        return {"result": "successfully updated reservation status", "reservation": reservation.to_dict()}
+        distribute_res_status_change(reservation.to_dict(), f'establishment_{reservation.establishment_id}')
+        return {"result": "successfully updated reservation status", "reservation": reservation.to_dict()}, 200
     except:
-        return {"errors": "there was a server error updating the reservation status"}
+        return {"errors": "there was a server error updating the reservation status"}, 400
 
 
 # DELETE RESERVATION

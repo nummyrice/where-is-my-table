@@ -18,7 +18,9 @@ const StatusBar = ({reservationId, statusId, setShowStatusBar, waitlistEntryId, 
     const handleStatusChange = (newStatusId) => {
         if (reservationId) {
             dispatch(updateAndSetResStatus(reservationId, newStatusId)).then((data) => {
-                setSelectedStatus(data.reservation.status_id);
+                if (!data.errors) {
+                    setSelectedStatus(data.reservation.status_id);
+                }
                 if (setShowStatusBar) {
                     setShowStatusBar(null)
                 }

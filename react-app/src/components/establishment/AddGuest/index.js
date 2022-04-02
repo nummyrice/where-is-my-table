@@ -403,17 +403,6 @@ const AddGuest = ({editWaitlist, showAddWaitlist, selectedGuest, setSelectedGues
                                     )
                                 })}
                             </>}
-                            {editWaitlist && editWaitlist.tags &&
-                            <>
-                                {editWaitlist.tags.map((tag)=>{
-                                    return(
-                                        <div key={tag.id} className={style.tag}>
-                                            <span className={style.tag_name}>{tag.name}</span>
-                                            <DeleteTag onClick={()=>handleRemovePartyTag(editWaitlist.id, tag.id)}className={style.delete_tag}/>
-                                        </div>
-                                    )
-                                })}
-                            </>}
                         </div>
                     </div>
                 </form>}

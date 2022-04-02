@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from app.forms import WaitlistForm, UpdateWaitlistForm
 from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
-from app.sockets import distribute_new_party, distribute_update_party
+from app.sockets import distribute_new_party, distribute_update_party, distribute_delete_party, distribute_party_status_change
 
 
 
@@ -61,7 +61,7 @@ def update_party():
             db.session.commit()
             distribute_update_party(updated_party.to_dict(), f'establishment_{updated_party.establishment_id}')
             return updated_party.to_dict(), 201
-        except exc.SQLAlchemyError as e:
+        except:
             return {'errors': ['server error uploading to database']}, 400
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
@@ -73,6 +73,7 @@ def edit_status():
         party = db.session.query(Waitlist).get(data['party_id'])
         party.status_id = data['status_id']
         db.session.commit()
+        distribute_party_status_change(party.to_dict(), f'establishment_{party.establishment_id}')
         return {"result": "successfully updated party status", "party": party.to_dict()}
     except:
         return {"errors": ["there was a server error updating the party status"]}, 400
@@ -82,8 +83,10 @@ def edit_status():
 def delete_party(partyId):
     try:
         party = db.session.query(Waitlist).get(partyId)
+        establishment_id = party.establishment_id
         db.session.delete(party)
         db.session.commit()
+        distribute_delete_party(partyId, f'establishment_{establishment_id}')
         return {'result': 'successfully deleted party'}, 200
     except:
         return {'errors': ["there was a server error deleting the party"]}, 400

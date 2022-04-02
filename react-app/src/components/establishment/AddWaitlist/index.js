@@ -64,6 +64,9 @@ const AddWaitlist = ({editWaitlist, setEditWaitlist, setShowAddWaitlist, showAdd
                     console.log("visit tag handler errors: ", data.errors)
                 } else {
                     console.log("visit tag handler response: ", data)
+                    const tagToRemoveIndex = editWaitlist.tags.findIndex(tag => tag.id === tagId)
+                    editWaitlist.tags.splice(tagToRemoveIndex, 1)
+                    setEditWaitlist({...editWaitlist, tags: [...editWaitlist.tags]})
                     return data
                 }
             })
