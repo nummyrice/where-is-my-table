@@ -6,6 +6,7 @@
     color: #afafaf;
     font-family: sans-serif;
     align-items: center;
+    width: 100vw;
 }
 
 .restaurant_title {
@@ -22,19 +23,22 @@
 .todays_date,
 .dining_period {
     background-color: #434343;
-    border-radius:3px;
+    border-radius:6px;
     color: whitesmoke;
+    font-size: 16px;
     height: 40px;
-    width:100px;
-    font-size: 12px;
-    padding: 0px 0px 0px 15px;
-    font-weight: bold;
-    line-height: 40px;
-    text-align: middle;
-    text-justify: center;
-    margin: 0px 4px 0px 4px;
+    width: 120px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #4c5868;
 }
 
+.dining_period:hover {
+    cursor: pointer;
+    border: 2px solid black;
+}
 .forward_date,
 .back_date,
 .calendar {

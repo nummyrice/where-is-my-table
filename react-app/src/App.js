@@ -10,6 +10,7 @@ import UsersList from './components/UsersList';
 import User from './components/User';
 import Establishment from './components/establishment';
 import Landing from './components/Landing';
+import EstablishmentSetup from './components/auth/EstablishmentSetup';
 import { authenticate } from './store/session';
 
 function App() {
@@ -50,6 +51,10 @@ function App() {
         <ProtectedRoute path='/users/:userId' exact={true} >
           <NavBar/>
           <User />
+        </ProtectedRoute>
+        <ProtectedRoute path='/establishment-setup' exact={true}>
+          <NavBar/>
+          <EstablishmentSetup/>
         </ProtectedRoute>
         <Route path='/' exact={true} >
           <NavBar/>

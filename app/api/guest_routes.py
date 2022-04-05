@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_login import current_user, login_required
 from app.models import db, User
 from sqlalchemy import or_

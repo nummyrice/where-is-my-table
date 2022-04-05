@@ -27,7 +27,7 @@
     position: relative;
 }
 
-#current_time_indicator {
+.current_time_indicator {
     background-color: green;
     height: 30px;
     width: 85px;
@@ -40,7 +40,7 @@
     z-index: 2;
 }
 
-#current_time_indicator:before {
+.current_time_indicator:before {
     content: "";
     width: 0px;
     height: 0px;
@@ -65,6 +65,9 @@
 
 
 }
+.column:hover {
+    background-color: #1c1c1c;
+}
 
 .column_time {
     font-family: sans-serif;
@@ -76,7 +79,7 @@
     background-color: #5394cd;
     /* padding: 5px; */
     width: 100px;
-    /* height: 500px !important; */
+    height: 85px;
     display: flex;
     flex-direction: column;
     font-family: sans-serif;
@@ -94,7 +97,6 @@
 }
 
 .table_name {
-
 }
 
 .booked_party {
@@ -154,6 +156,7 @@
     visibility: hidden;
     display: none;
 
+
 }
 
 .booked_reservation_card:hover + .booked_hover_info_card,
@@ -169,6 +172,11 @@
     /* top: 100px; */
     z-index: 100;
     font-family: sans-serif;
+    box-shadow: 2px 2px 5px rgba(75, 75, 75, 0.5),
+            10px 10px 15px rgba(75, 75, 75, 0.5),
+            -1px -1px 30px rgba(49, 49, 49, 0.2);
+    border-radius: 6px;
+    border: 2px solid rgb(85, 85, 85);
 }
 
 .hover_table_title {

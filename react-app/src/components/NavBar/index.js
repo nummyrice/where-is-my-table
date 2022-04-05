@@ -20,7 +20,6 @@ const NavBar = () => {
   const demoEstablishmentLogin = () => {
     dispatch(login('establishment_demo@aa.io', 'password1'))
   };
-
   if (user?.id === 1) return <Redirect to='/establishment'/>
   return (
     <nav className={style.navbar_main}>
@@ -51,6 +50,11 @@ const NavBar = () => {
         <li>
           <NavLink style={{textDecoration: "none"}} to='/sign-up' exact={true} activeClassName='active'>
             Sign Up
+          </NavLink>
+        </li>}
+        {user && !user.establishment && <li>
+          <NavLink style={{textDecoration: "none"}} to='/establishment-setup' exact={true} activeClassName='active'>
+            Restaurant Setup
           </NavLink>
         </li>}
         {user && <li>

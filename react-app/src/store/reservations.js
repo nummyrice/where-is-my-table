@@ -44,7 +44,7 @@ export const getReservations = (selectedDate) => async (dispatch) => {
 
 // NEW RESERVATION
 export const newReservation = (reservationDetails) => async (dispatch) => {
-    reservationDetails.reservation_time = reservationDetails.reservation_time.toISO()
+    reservationDetails.reservation_time = reservationDetails.reservation_time?.toISO()
     // console.log('NEW RES ISO FROM THUNK: ', reservationDetails.reservation_time)
 
     if (!reservationDetails.section_id) {

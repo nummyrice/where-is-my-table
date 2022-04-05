@@ -8,19 +8,18 @@ from app.forms import WaitlistForm, UpdateWaitlistForm
 from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
 from app.sockets import distribute_new_party, distribute_update_party, distribute_delete_party, distribute_party_status_change
-
-
-
 from .auth_routes import validation_errors_to_error_messages
 
 waitlist_routes = Blueprint('waitlist', __name__)
 
+# GET WAITLIST
 @waitlist_routes.route('/selected-date', methods=['POST'])
 def selected_date_waitlist():
     data = request.json
+    establishment_id = current_user.establishment.id
     selected_date = parser.isoparse(data['selected_date'])
     end_datetime = selected_date + relativedelta(days=1)
-    waitlist = db.session.query(Waitlist).filter(Waitlist.created_at.between(selected_date, end_datetime)).all()
+    waitlist = db.session.query(Waitlist).filter(Waitlist.created_at.between(selected_date, end_datetime), Waitlist.establishment_id == establishment_id).all()
     if len(waitlist):
         return {"waitlist": [entry.to_dict() for entry in waitlist]}
     return {"waitlist": []}

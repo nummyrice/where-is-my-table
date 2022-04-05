@@ -136,9 +136,10 @@ def weeks_available_tables():
 @reservation_routes.route('/selected-date', methods=['POST'])
 def get_reservations():
     data = request.json
+    establishment_id = current_user.establishment.id
     client_datetime = parser.isoparse(data['selected_date'])
     end_offset = client_datetime + relativedelta(days=1)
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_offset)).all()
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_offset), Reservation.establishment_id == establishment_id).all()
     return {reservation.id: reservation.to_dict() for reservation in todays_res}
 
 # CREATE RESERVATION TIME AND SET PENDING

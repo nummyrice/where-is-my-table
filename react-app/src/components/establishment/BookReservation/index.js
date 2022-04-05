@@ -150,7 +150,7 @@ function BookReservation({bookRes, setBookRes}) {
     // NEW RESERVATION
     const handleNewResSubmit = async () => {
         // if guest is selected but none of the edits are present
-        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex].datetime, party_size: partySize, section_id: selectedSection, table_id: null, tags: newVisitTags}))
+        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex]?.datetime, party_size: partySize, section_id: selectedSection, table_id: null, tags: newVisitTags}))
             .then((data) => {
                 if (data.errors) {
                     setShowConfirmRes(false)
@@ -274,7 +274,7 @@ return(
                 </div>
             <div className={style.section}>
                 <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
-                {availableTimes[selectedTimeIndex].sections.map((sectionId => {
+                {availableTimes[selectedTimeIndex]?.sections.map((sectionId => {
                     const section = establishment.sections[sectionId]
                     let availableTables = Object.keys(section.tables).length
                     const resIds = Object.keys(reservations)
@@ -322,7 +322,7 @@ return(
                     setShowConfirmRes={setShowConfirmRes}
                     bookRes={bookRes}
                     selectedSection={selectedSection}
-                    resTime={availableTimes[selectedTimeIndex].datetime}
+                    resTime={availableTimes[selectedTimeIndex]?.datetime}
                     partySize={partySize}
                     selectedGuest={selectedGuest}
                 />

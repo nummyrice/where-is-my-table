@@ -35,34 +35,33 @@ const LoginForm = () => {
   }
 
   return (
-    <form id={style.login_block} onSubmit={onLogin}>
-      <div>
-        {errors.map((error, ind) => (
-          <div key={ind}>{error}</div>
-        ))}
+    <div id={style.login_background}>
+      <h2 id={style.est_form_title}>{"Login"}</h2>
+      <form id={style.login_block} onSubmit={onLogin}>
+        <div className={style.error}>
+          {errors.map((error, ind) => (
+            <div key={ind}>{error}</div>
+          ))}
+        </div>
+          <label htmlFor='email'>Email</label>
+          <input
+            name='email'
+            type='text'
+            placeholder='Email'
+            value={email}
+            onChange={updateEmail}
+          />
+          <label htmlFor='password'>Password</label>
+          <input
+            name='password'
+            type='password'
+            placeholder='Password'
+            value={password}
+            onChange={updatePassword}
+          />
+          <button type='submit'>Login</button>
+      </form>
       </div>
-      <div>
-        <label htmlFor='email'>Email</label>
-        <input
-          name='email'
-          type='text'
-          placeholder='Email'
-          value={email}
-          onChange={updateEmail}
-        />
-      </div>
-      <div>
-        <label htmlFor='password'>Password</label>
-        <input
-          name='password'
-          type='password'
-          placeholder='Password'
-          value={password}
-          onChange={updatePassword}
-        />
-      </div>
-        <button type='submit'>Login</button>
-    </form>
   );
 };
 

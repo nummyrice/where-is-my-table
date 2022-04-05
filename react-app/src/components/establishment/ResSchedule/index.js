@@ -61,7 +61,6 @@ const ResSchedule =() => {
 
     const getNowIndicatorPosition = (interval) => {
         const todaysMinutes = Math.ceil(DateTime.local().diff(DateTime.local().startOf('day'), 'minutes').toObject().minutes)
-        console.log("todays MInutes: ", todaysMinutes)
         if (interval === 15) return {left:  `${todaysMinutes * 7.28 - 42}px`};
         if (interval === 30) return {left: `${todaysMinutes * 3.71 - 42}px`};
         if (interval === 60) return {left: `${todaysMinutes * 1.83 - 42}px`};
@@ -89,18 +88,20 @@ const ResSchedule =() => {
     // console.log('MODEL ARRAY: ', resScheduleModel);
     return(
         <div className={style.res_schedule}>
-            <div className={style.schedule_scroll}>
+            <div id={"schedule_scroll"} className={style.schedule_scroll}>
                 {DateTime.local().toISODate() === selectedDate.toISODate() &&
                     <div
                         // style={{left: `${420 + 42.5}px`}}
                         style={getNowIndicatorPosition(scheduleScale.interval)}
-                        id={style.current_time_indicator}>{DateTime.local().toLocaleString({hour: '2-digit', minute: '2-digit'})}
+                        id={"current_time_indicator"}
+                        className={style.current_time_indicator}
+                    >{DateTime.local().toLocaleString({hour: '2-digit', minute: '2-digit'})}
                     </div>
                 }
             {resScheduleModel.map((column, index) => {
                 return(
                     <div key={`column ${index}`} className={style.column}>
-                        <div className={style.column_time}>
+                        <div style={{ "fontFamily": "sans-serif", "width": "100px","textAlign": "center"}} className={"column_time"}>
                             {column.columnTime.toLocaleString({hour: '2-digit', minute: '2-digit'})}
                         </div>
                         {column.reservations.map((reservation) => {
@@ -116,16 +117,16 @@ const ResSchedule =() => {
                                     <div className={style.guest}>
                                         {reservation.guest}
                                     </div>
-                                    {/* <div className={style.table_name}>
-                                        {reservation.table.table_name}
-                                    </div> */}
+                                    {reservation.section && <div className={style.table_name}>{reservation.section_info.name}</div>}
+                                    {!reservation.section && <div style={{"fontSize": "10px"}} className={style.table_name}>{"section not selected"}</div>}
                                 </div>
                                 <div  className={style.booked_hover_info_card}>
                                     <div className={style.hover_table_title}>{"Reservation Details"}</div>
                                     <div className={style.table_details}>
                                         <div className={style.hover_time}>{DateTime.fromISO(reservation.reservation_time).toLocaleString({hour: '2-digit', minute: '2-digit'})}</div>
                                         <div className={style.hover_date}>{DateTime.fromISO(reservation.reservation_time).toLocaleString()}</div>
-                                        {/* <div className={style.hover_min_max}>{`Min: ${reservation.table.min_seat}, Max: ${reservation.table.max_seat}`}</div> */}
+                                        {reservation.table && <div className={style.hover_min_max}>{`Min: ${reservation.table.min_seat}, Max: ${reservation.table.max_seat}`}</div>}
+                                        {!reservation.table && <div className={style.hover_min_max}>{"table not selected"}</div>}
                                         <div className={style.hover_tags}>{reservation.tags.reduce((prev, curr) => {
                                             return prev + ', ' + curr.name
                                         }, '')}</div>
