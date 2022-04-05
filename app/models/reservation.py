@@ -2,7 +2,7 @@ from app.models.utils import UTCDateTime
 from .db import db
 from sqlalchemy.sql import func
 from .tags_join import reservation_tags
-import pytz
+# import pytz
 
 class Reservation(db.Model):
     __tablename__ = 'reservations'
@@ -32,7 +32,7 @@ class Reservation(db.Model):
 
 
     def to_dict(self):
-        timezone = pytz.timezone(self.establishment.get_timezone())
+        # timezone = pytz.timezone(self.establishment.get_timezone())
         # print("RESERVATION TIME:_________________", self.created_at.tzinfo)
 
         return {
