@@ -1,18 +1,4 @@
-import { setErrors } from "../../store/errors"
-
-// NEW GUEST
-export const newGuestFetch = async (name, notes, phone, email) => {
-
-}
-
-
-// UPDATE GUEST
-export const updateGuestFetch = async (guestId, name, notes, phone, email) => {
-
-}
-
 // TAGS
-
 //add tags to reservation
  export const postTags = async (reservationId, tags) => {
         const newTags = {
@@ -24,7 +10,6 @@ export const updateGuestFetch = async (guestId, name, notes, phone, email) => {
             headers: {'Content-Type': "application/json"},
             body: JSON.stringify(newTags)
         })
-
         return response;
 }
 
@@ -40,6 +25,5 @@ export const postPartyTags = async (waitlistId, tags) => {
         headers: {'Content-Type': "application/json"},
         body: JSON.stringify(newTags)
     })
-    const data = await response.json()
-    return data;
+    return response;
 }

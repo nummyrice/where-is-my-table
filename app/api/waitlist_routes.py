@@ -1,23 +1,25 @@
 from flask import Blueprint, request
 from flask_login import current_user, login_required
+import sqlalchemy
 from app.models import db, Waitlist, Table
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from app.forms import WaitlistForm, UpdateWaitlistForm
 from .auth_routes import validation_errors_to_error_messages
-
-
-
+from sqlalchemy import exc
+from app.sockets import distribute_new_party, distribute_update_party, distribute_delete_party, distribute_party_status_change
 from .auth_routes import validation_errors_to_error_messages
 
 waitlist_routes = Blueprint('waitlist', __name__)
 
+# GET WAITLIST
 @waitlist_routes.route('/selected-date', methods=['POST'])
 def selected_date_waitlist():
     data = request.json
+    establishment_id = current_user.establishment.id
     selected_date = parser.isoparse(data['selected_date'])
     end_datetime = selected_date + relativedelta(days=1)
-    waitlist = db.session.query(Waitlist).filter(Waitlist.created_at.between(selected_date, end_datetime)).all()
+    waitlist = db.session.query(Waitlist).filter(Waitlist.created_at.between(selected_date, end_datetime), Waitlist.establishment_id == establishment_id).all()
     if len(waitlist):
         return {"waitlist": [entry.to_dict() for entry in waitlist]}
     return {"waitlist": []}
@@ -28,16 +30,20 @@ def new_party():
     form = WaitlistForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
-        newParty = Waitlist(
-            guest_id = form.data['guest_id'],
-            party_size = form.data['party_size'],
-            estimated_wait = form.data['estimated_wait'],
-            status_id = 5,
-        )
-        db.session.add(newParty)
-        db.session.commit()
-        return {'result': 'successfully added party', "party": newParty.to_dict()}
-    print('MADE IT', validation_errors_to_error_messages(form.errors))
+        try:
+            newParty = Waitlist(
+                guest_id = form.data['guest_id'],
+                party_size = form.data['party_size'],
+                estimated_wait = form.data['estimated_wait'],
+                status_id = 5,
+                establishment_id = current_user.establishment.id
+            )
+            db.session.add(newParty)
+            db.session.commit()
+            distribute_new_party(newParty.to_dict(), f'establishment_{newParty.establishment_id}')
+            return newParty.to_dict(), 201
+        except exc.SQLAlchemyError as e:
+            return {'errors': ['server error uploading to database']}, 400
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 # EDIT PARTY
@@ -46,12 +52,16 @@ def update_party():
     form = UpdateWaitlistForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
-        updated_party = db.session.query(Waitlist).get(form.data['id'])
-        updated_party.guest_id = form.data['guest_id']
-        updated_party.party_size = form.data['party_size']
-        updated_party.estimated_wait = form.data['estimated_wait']
-        db.session.commit()
-        return { "result": "successfully updated waitlist", "party": updated_party.to_dict()}
+        try:
+            updated_party = db.session.query(Waitlist).get(form.data['id'])
+            updated_party.guest_id = form.data['guest_id']
+            updated_party.party_size = form.data['party_size']
+            updated_party.estimated_wait = form.data['estimated_wait']
+            db.session.commit()
+            distribute_update_party(updated_party.to_dict(), f'establishment_{updated_party.establishment_id}')
+            return updated_party.to_dict(), 201
+        except:
+            return {'errors': ['server error uploading to database']}, 400
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 # UPDATE PARTY STATUS
@@ -62,16 +72,20 @@ def edit_status():
         party = db.session.query(Waitlist).get(data['party_id'])
         party.status_id = data['status_id']
         db.session.commit()
+        distribute_party_status_change(party.to_dict(), f'establishment_{party.establishment_id}')
         return {"result": "successfully updated party status", "party": party.to_dict()}
     except:
-        return {"errors": "there was a server error updating the party status"}, 400
+        return {"errors": ["there was a server error updating the party status"]}, 400
 
 # DELETE PARTY STATUS
 @waitlist_routes.route('/<int:partyId>remove', methods=['DELETE'])
 def delete_party(partyId):
     try:
         party = db.session.query(Waitlist).get(partyId)
+        establishment_id = party.establishment_id
         db.session.delete(party)
-        return {'result': 'successfully deleted party'}
+        db.session.commit()
+        distribute_delete_party(partyId, f'establishment_{establishment_id}')
+        return {'result': 'successfully deleted party'}, 200
     except:
-        return {'errors': "there was a server error deleting the party"}, 400
+        return {'errors': ["there was a server error deleting the party"]}, 400

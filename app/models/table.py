@@ -14,8 +14,8 @@ class Table(db.Model):
     section_id = db.Column(db.Integer, db.ForeignKey('sections.id'))
     customer_view_name = db.Column(db.String, default=customer_view_name_default)
     table_type = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime(), nullable=False, server_default=func.now())
-    updated_at = db.Column(db.DateTime(), onupdate=func.now(), default=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     #associations
     reservations = db.relationship("Reservation", back_populates='table')

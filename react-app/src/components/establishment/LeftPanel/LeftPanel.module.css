@@ -4,6 +4,8 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
+    position: relative;
+    font-family: sans-serif;
 }
 .search {
     position: sticky;
@@ -19,12 +21,14 @@
     top: 30px;
     background-color: #262626;
     z-index: 1;
+    align-items: center;
 
 }
 
 .filter_bar>div {
     font-family: sans-serif;
     margin: 5px;
+
 }
 .booked_bar {
     position: sticky;
@@ -47,10 +51,34 @@
     padding: 5px;
     background-color: #111111;
     align-items: center;
+    height: 50px;
 }
 
-.booked_bar .icon,
-.waitlist_bar .icon {
+.caret.icon {
+    height: 30px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: 150ms ease-in-out;
+}
+
+.caret_icon_sizer {
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.caret.icon:hover {
+    height: 40px;
+    cursor: pointer;
+    transition: 150ms ease-in-out;
+}
+
+.label {
+    margin-left: 2px;
+}
+.add_button .icon {
     height: 20px;
 }
 
@@ -65,6 +93,48 @@
     cursor: pointer;
 }
 
+#order {
+    display: flex;
+}
+
+#asc {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border: 2px solid #4c5868;
+    padding: 5px;
+}
+
+#desc {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border: 2px solid #4c5868;
+    padding: 5px;
+    border-left: 1px;
+}
+
+#asc:hover {
+    cursor: pointer;
+    background-color:rgba(240, 248, 255, 0.205);
+    transition: 150ms ease-in-out;
+}
+
+#desc:hover {
+    cursor: pointer;
+    background-color:rgba(240, 248, 255, 0.205);
+    transition: 150ms ease-in-out;
+}
+
+.order_select {
+    background-color: rgba(240, 248, 255, 0.205);
+}
+
+#sort_by {
+
+}
+
+/* #sort_select {
+    border-radius: 100px;
+} */
 
 /* RESERVATION ENTRIES*/
 
@@ -116,10 +186,10 @@
 
 .waitlist_entry {
     display: grid;
-    grid-template-columns: 50px 100px 100px 50px;
-    grid-template-rows: 70px;
+    grid-template-columns: 50px 200px 50px;
+    grid-template-rows: 100px;
     grid-template-areas:
-    "icon party-info time edit-delete";
+    "icon party-info edit-delete";
     /* overflow-y: scroll; */
     border-bottom: 1px solid grey;
 }
@@ -168,6 +238,7 @@
 /* STATUS */
 #status_icon {
     padding: 5px;
+    position: relative;
 }
 
 #status_icon:hover {
@@ -176,12 +247,13 @@
 
 #status_sizer {
     width: 400px;
-    z-index: 200;
+    z-index: 5;
     /* position: relative; */
     /* left: 50px; */
     left: 50px;
-    position: fixed;
+    position: absolute;
     color: black;
+    overflow:visible;
 
 }
 
@@ -213,4 +285,48 @@
 #no_res_message {
     font-family: sans-serif;
     text-align: center;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.negative {
+    color: #ee4266;
+}
+
+.positive {
+    color: #10bc35;
+}
+
+.party_size_icon{
+    height: 12px;
+    /* width: 5px; */
+    margin-right: 3px;
+    color: white;
+}
+
+.booked_icon {
+    height: 12px;
+    /* width: 5px; */
+    margin-right: 3px;
+    color: white;
+}
+.checkin_icon {
+    height: 15px;
+    color: white;
+    margin-right: 3px;
+}
+
+.status_background {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(8, 9, 9, 0.0);
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.status_background:hover {
+    cursor: pointer;
 }

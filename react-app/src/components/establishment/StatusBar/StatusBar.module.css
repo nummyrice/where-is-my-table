@@ -3,6 +3,8 @@
     display: flex;
     height: 80px;
     border: 2px solid grey;
+    position: absolute;
+    width: 440px;
 }
 .status_bar > div {
     width: 70px;

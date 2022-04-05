@@ -17,8 +17,8 @@ const ConfirmResModal = ({ bookRes, name, setShowConfirmRes, resTime, selectedSe
             <ul className={style.reservation_details}>
                 <li key={'title'}>Your reservation:</li>
                 <li key={'party'}>{`${partySize} ${partySize === 1 ? 'Guest' : 'Guests'}`}</li>
-                <li key={'time'}>{`at ${resTime.toLocaleString({hour: 'numeric', minute: '2-digit' })}`}</li>
-                <li key={'date'}>{`on ${resTime.toLocaleString({month: 'short', day: 'numeric'})}`}</li>
+                <li key={'time'}>{`at ${resTime?.toLocaleString({hour: 'numeric', minute: '2-digit' })}`}</li>
+                <li key={'date'}>{`on ${resTime?.toLocaleString({month: 'short', day: 'numeric'})}`}</li>
                 <li key={'name'}> {`for ${selectedGuest ? selectedGuest.name : name}`}</li>
             </ul>
                 <div className={style.button_area}>

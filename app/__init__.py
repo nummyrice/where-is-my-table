@@ -13,7 +13,8 @@ from .api.reservation_routes import reservation_routes
 from .api.guest_routes import guest_routes
 from .api.tag_routes import tag_routes
 from .api.waitlist_routes import waitlist_routes
-
+from .api.establishment_routes import establishment_routes
+from .sockets import socketio
 from .seeds import seed_commands
 
 from .config import Config
@@ -40,9 +41,11 @@ app.register_blueprint(reservation_routes, url_prefix='/api/reservations')
 app.register_blueprint(guest_routes, url_prefix='/api/guests')
 app.register_blueprint(tag_routes, url_prefix='/api/tags')
 app.register_blueprint(waitlist_routes, url_prefix='/api/waitlist')
-
+app.register_blueprint(establishment_routes, url_prefix='/api/establishments')
 db.init_app(app)
 Migrate(app, db)
+socketio.init_app(app)
+
 
 # Application Security
 CORS(app)
@@ -80,3 +83,6 @@ def react_root(path):
     if path == 'favicon.ico':
         return app.send_static_file('favicon.ico')
     return app.send_static_file('index.html')
+
+if __name__ == '__main__':
+    socketio.run(app)

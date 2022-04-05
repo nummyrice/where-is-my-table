@@ -1,11 +1,11 @@
 #book_background {
-    position: fixed;
+    /* position: fixed; */
     width: 100vw;
     height: 100vh;
     top: 0px;
     left: 0px;
     /* background-color: rgba(8, 9, 9, 0.8); */
-    /* z-index: 999; */
+    z-index: 5;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,6 +20,7 @@
     "date party time section guest";
     background-color: #dedede;
     border-radius: 3.5px;
+    z-index: 5;
 }
 
 

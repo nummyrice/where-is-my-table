@@ -7,7 +7,7 @@ const DisplayErrors = ({errors, setShowErrorsModal}) => {
             <ul>
                 {errors.map(error => {
                     return(
-                        <li>{error}</li>
+                        <li key={error}>{error}</li>
                     )
                 })}
             </ul>

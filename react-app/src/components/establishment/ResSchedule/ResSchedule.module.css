@@ -4,11 +4,12 @@
     grid-area: schedule;
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 1fr 30px;
+    grid-template-rows: 1fr 40px;
     grid-template-areas:
     "schedule"
     "bottom";
     overflow-y: scroll;
+    font-family: sans-serif;
 
 }
 
@@ -23,6 +24,34 @@
     flex-direction: row;
     overflow-x: scroll;
     height: 100%;
+    position: relative;
+}
+
+.current_time_indicator {
+    background-color: green;
+    height: 30px;
+    width: 85px;
+    position: absolute;
+    top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    z-index: 2;
+}
+
+.current_time_indicator:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 2.5px solid green;
+    border-right: 0px solid transparent;
+    border-top: 0px solid transparent;
+    border-bottom: calc(100vh - 100px) solid green;
+    /* right: -23px; */
+    left: 42.5px;
+    top: 30px;
 }
 
 .column {
@@ -30,11 +59,14 @@
     flex-direction: column;
     margin: 5px;
     height: 100%;
-    height: 1000px;
+    /* height: 1000px; */
     position: relative;
     /* flex-grow: 100; */
 
 
+}
+.column:hover {
+    background-color: #1c1c1c;
 }
 
 .column_time {
@@ -47,7 +79,7 @@
     background-color: #5394cd;
     /* padding: 5px; */
     width: 100px;
-    /* height: 500px !important; */
+    height: 85px;
     display: flex;
     flex-direction: column;
     font-family: sans-serif;
@@ -65,13 +97,6 @@
 }
 
 .table_name {
-
-}
-
-.footer_options {
-    grid-area: bottom;
-    text-align: center;
-
 }
 
 .booked_party {
@@ -131,6 +156,7 @@
     visibility: hidden;
     display: none;
 
+
 }
 
 .booked_reservation_card:hover + .booked_hover_info_card,
@@ -143,8 +169,14 @@
     background-color: #434343;
     position: absolute;
     left: 103px;
+    /* top: 100px; */
     z-index: 100;
     font-family: sans-serif;
+    box-shadow: 2px 2px 5px rgba(75, 75, 75, 0.5),
+            10px 10px 15px rgba(75, 75, 75, 0.5),
+            -1px -1px 30px rgba(49, 49, 49, 0.2);
+    border-radius: 6px;
+    border: 2px solid rgb(85, 85, 85);
 }
 
 .hover_table_title {
@@ -215,7 +247,64 @@
     margin-bottom: 27px;
 }
 
+
+/* Footer */
 .footer_options {
     background-color: #222222;
     font-family: sans-serif;
+    grid-area: bottom;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#interval_options {
+    display: flex;
+    height: 30px;
+}
+
+#interval_options > label {
+    margin-right: 20px;
+}
+
+#fifteen {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border: 2px solid #4c5868;
+}
+
+#thirty {
+    border-top: 2px solid #4c5868;
+    border-bottom: 2px solid #4c5868;
+}
+
+#sixty {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border: 2px solid #4c5868;
+}
+
+#interval_options > div {
+    /* padding: 3px; */
+    height: 30px;
+    padding-left: 4px;
+    padding-right: 5px;
+    text-align: center;
+}
+
+#interval_options > div:hover {
+    cursor: pointer;
+    background-color:rgba(240, 248, 255, 0.205);
+    transition: 150ms ease-in-out;
+}
+
+.interval_select {
+    background-color: rgba(240, 248, 255, 0.205);
+}
+
+/* Status Modal */
+.status_sizer {
+    width: 460px;
+    height: 80px;
+    position: relative;
 }

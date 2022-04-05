@@ -1,8 +1,9 @@
 
 .navbar_main {
     background-color: #ebf2fa;
+    width: 100vw;
     display: grid;
-    grid-template-columns: 8rem auto 8rem 8rem 8rem;
+    grid-template-columns: 1.5fr 4fr 1fr 1fr 1fr;
     grid-template-rows: 60px;
     grid-template-areas:
     "logo empty guest establishment dropdown";

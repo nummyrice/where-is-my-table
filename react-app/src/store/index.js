@@ -25,9 +25,9 @@ if (process.env.NODE_ENV === 'production') {
   const logger = require('redux-logger').default;
   const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-  enhancer = composeEnhancers(applyMiddleware(thunk, logger));
+  enhancer = composeEnhancers(applyMiddleware(thunk));
 }
-
+// TODO: add logger to applyMiddleware params to log redux iin development again
 const configureStore = (preloadedState) => {
   return createStore(rootReducer, preloadedState, enhancer);
 };

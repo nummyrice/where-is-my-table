@@ -10,6 +10,7 @@ from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
 import json
 import pytz
+from app.sockets import distribute_new_res, distribute_update_res, distribute_res_status_change
 
 reservation_routes = Blueprint('reservations', __name__)
 
@@ -103,7 +104,7 @@ def todays_available_tables():
     est = est_query.to_dict()
     data = request.json
     client_date = parser.isoparse(data['client_date'])
-    data = get_availability(client_date, est["sections"], est["timezone_offset"], est["daylight_savings"])
+    data = get_availability(client_date, est["sections"], est["timezone"]["luxon_string"], est["daylight_savings"])
     return data
 
 # GET SELECTED DATE AVAILABILITY
@@ -135,9 +136,10 @@ def weeks_available_tables():
 @reservation_routes.route('/selected-date', methods=['POST'])
 def get_reservations():
     data = request.json
+    establishment_id = current_user.establishment.id
     client_datetime = parser.isoparse(data['selected_date'])
     end_offset = client_datetime + relativedelta(days=1)
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_offset)).all()
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(client_datetime, end_offset), Reservation.establishment_id == establishment_id).all()
     return {reservation.id: reservation.to_dict() for reservation in todays_res}
 
 # CREATE RESERVATION TIME AND SET PENDING
@@ -176,37 +178,37 @@ def reservation_submit():
     if form.validate_on_submit():
         # reservation_time = parser.parse(form.data['reservation_time'])
         reservation_time = datetime.fromisoformat(form.data['reservation_time'])
-        print('RESERVATION TIME ?????????????????????????: ', reservation_time)
-        print('RESERVATION TIME ?????????????????????????: ', reservation_time.tzinfo)
-        reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
-        if  reservation_exists:
-            res_updated_at = reservation_exists.updated_at
-            pending_status: datetime = datetime.now() - res_updated_at
-            if reservation_exists.status_id == 2 and (pending_status.total_seconds() / 60) < 10 and reservation_exists.guest_id != form.data['guest_id']:
-                return {"errors": ["time unavailable, please choose a different time"]}, 400
-            elif (reservation_exists.status == 2 and (pending_status.total_seconds() / 60) > 10) or (reservation_exists.status == 2 and (pending_status.total_seconds() / 60) > 10 and reservation_exists.guest_id == form.data['guest_id']):
-                reservation_exists['guest_id'] = form.data['guest_id']
-                reservation_exists['status_id'] = 3
-                reservation_exists['party_size'] = form.data['party_size']
-                reservation_exists['section_id'] = form.data['section_id']
-                db.session.commit()
-                return reservation_exists.to_dict(), 200
-            else:
-                return {"errors": ["time unavailable, please choose a different time"]}, 400
-        else:
-            reservation = Reservation(
-                    guest_id = form.data['guest_id'],
-                    party_size = form.data['party_size'],
-                    status_id = 3,
-                    reservation_time = reservation_time.replace(tzinfo = None),
-                    # reservation_time = reservation_time,
-                    section_id = form.data['section_id'],
-                    establishment_id = current_user.establishment.id
-                )
-            db.session.add(reservation)
-            db.session.commit()
-            return reservation.to_dict(), 201
+        # reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
+        reservation = Reservation(
+                guest_id = form.data['guest_id'],
+                party_size = form.data['party_size'],
+                status_id = 3,
+                # reservation_time = reservation_time.replace(tzinfo = None),
+                reservation_time = reservation_time,
+                section_id = form.data['section_id'],
+                establishment_id = current_user.establishment.id
+            )
+        db.session.add(reservation)
+        db.session.commit()
+        establishment_id = f'establishment_{reservation.establishment_id}'
+        distribute_new_res(reservation.to_dict(),establishment_id)
+        return reservation.to_dict(), 201
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
+        # if  reservation_exists:
+        #     res_updated_at = reservation_exists.updated_at
+        #     pending_status: datetime = datetime.now() - res_updated_at.replace(tzinfo=None)
+        #     if reservation_exists.status_id == 2 and (pending_status.total_seconds() / 60) < 10 and reservation_exists.guest_id != form.data['guest_id']:
+        #         return {"errors": ["time unavailable, please choose a different time"]}, 400
+        #     elif (reservation_exists.status == 2 and (pending_status.total_seconds() / 60) > 10) or (reservation_exists.status == 2 and (pending_status.total_seconds() / 60) > 10 and reservation_exists.guest_id == form.data['guest_id']):
+        #         reservation_exists['guest_id'] = form.data['guest_id']
+        #         reservation_exists['status_id'] = 3
+        #         reservation_exists['party_size'] = form.data['party_size']
+        #         reservation_exists['section_id'] = form.data['section_id']
+        #         db.session.commit()
+        #         return reservation_exists.to_dict(), 200
+        #     else:
+        #         return {"errors": ["time unavailable, please choose a different time"]}, 400
+        # else:
 
 # UPDATE RESERVATION
 @reservation_routes.route('update', methods=['PUT'])
@@ -217,14 +219,15 @@ def edit_reservation():
         reservation_time = parser.isoparse(form.data['reservation_time'])
         target_reservation = db.session.query(Reservation).get(form.data['reservation_id'])
         res_updated_at = target_reservation.updated_at
-        pending_status = datetime.now() - res_updated_at
+        pending_status = datetime.now() - res_updated_at.replace(tzinfo=None)
         if not target_reservation.status_id == 2 or (target_reservation.status_id == 2 and (pending_status / 60) > 10):
             target_reservation.guest_id = form.data['guest_id']
             target_reservation.party_size = form.data['party_size']
-            target_reservation.reservation_time = reservation_time.replace(tzinfo = None)
+            target_reservation.reservation_time = reservation_time
             target_reservation.table_id = form.data['table_id']
             target_reservation.section_id = form.data['section_id']
             db.session.commit()
+            distribute_update_res(target_reservation.to_dict(), f'establishment_{target_reservation.establishment_id}')
             return target_reservation.to_dict(), 201
         return {'errors': ["reservation already exists for this time"]}, 400
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
@@ -262,9 +265,10 @@ def edit_status():
         reservation = db.session.query(Reservation).get(data['reservation_id'])
         reservation.status_id = data['status_id']
         db.session.commit()
-        return {"result": "successfully updated reservation status", "reservation": reservation.to_dict()}
+        distribute_res_status_change(reservation.to_dict(), f'establishment_{reservation.establishment_id}')
+        return {"result": "successfully updated reservation status", "reservation": reservation.to_dict()}, 200
     except:
-        return {"errors": "there was a server error updating the reservation status"}
+        return {"errors": "there was a server error updating the reservation status"}, 400
 
 
 # DELETE RESERVATION

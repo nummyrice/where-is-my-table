@@ -57,9 +57,9 @@ function BookReservation({bookRes, setBookRes}) {
         setIsLoading(true)
         dispatch(getReservations(selectedBookDate.toISO()))
         .then(async result => {
-            console.log("successfully acquired reservations")
+            console.log("successfully acquired reservations in <BookReservation>")
         }).catch(err => {
-            console.log("failed to acquire reservations")
+            console.log("failed to acquire reservations in <BookReservation>")
         }).finally(() => {
             setIsLoading(false);
         })
@@ -150,7 +150,7 @@ function BookReservation({bookRes, setBookRes}) {
     // NEW RESERVATION
     const handleNewResSubmit = async () => {
         // if guest is selected but none of the edits are present
-        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex].datetime, party_size: partySize, section_id: selectedSection, table_id: null, tags: newVisitTags}))
+        dispatch(newReservation({guest_id: selectedGuest.id, reservation_time: availableTimes[selectedTimeIndex]?.datetime, party_size: partySize, section_id: selectedSection, table_id: null, tags: newVisitTags}))
             .then((data) => {
                 if (data.errors) {
                     setShowConfirmRes(false)
@@ -159,7 +159,6 @@ function BookReservation({bookRes, setBookRes}) {
                     setShowConfirmRes(false)
                     setBookRes(null)
                     setSelectedDate(DateTime.fromISO(data.reservation_time).startOf('day'))
-                    return data;
                 }
             })
     }
@@ -176,7 +175,6 @@ function BookReservation({bookRes, setBookRes}) {
                     setShowConfirmRes(false)
                     setBookRes(null)
                     setSelectedDate(DateTime.fromISO(data.reservation_time).startOf('day'))
-                    return data;
                 }
             })
 
@@ -187,8 +185,16 @@ function BookReservation({bookRes, setBookRes}) {
             .then(data => {
                 if (data.errors) {
                     setShowErrorsModal(true)
+                    console.log("visit tag handler errors: ", data.data.errors)
                 } else {
+                    console.log("visit tag handler response: ", data)
+                    const tagToRemoveIndex = bookRes.tags.findIndex(tag => tag.id === data.tagId)
+                    const newState = {...bookRes}
+                    newState.tags.splice(tagToRemoveIndex, 1)
+                    const updatedRes = {...newState, tags: [...newState.tags]}
+                    setBookRes(updatedRes)
                     return data
+
                 }
             })
     }
@@ -268,7 +274,7 @@ return(
                 </div>
             <div className={style.section}>
                 <div className={`${style.top_scroll_space} ${isLoading ? style.is_loading : style.loaded} `}></div>
-                {availableTimes[selectedTimeIndex].sections.map((sectionId => {
+                {availableTimes[selectedTimeIndex]?.sections.map((sectionId => {
                     const section = establishment.sections[sectionId]
                     let availableTables = Object.keys(section.tables).length
                     const resIds = Object.keys(reservations)
@@ -313,12 +319,10 @@ return(
                 <ConfirmResModal
                     handleNewResSubmit={handleNewResSubmit}
                     handleResUpdate={handleResUpdate}
-                    errors={errors}
-                    errorClose={errorClose}
                     setShowConfirmRes={setShowConfirmRes}
                     bookRes={bookRes}
                     selectedSection={selectedSection}
-                    resTime={availableTimes[selectedTimeIndex].datetime}
+                    resTime={availableTimes[selectedTimeIndex]?.datetime}
                     partySize={partySize}
                     selectedGuest={selectedGuest}
                 />

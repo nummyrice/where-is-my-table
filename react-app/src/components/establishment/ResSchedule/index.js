@@ -1,21 +1,24 @@
 import React, { useState, useContext } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import { EstablishmentContext } from '..';
 import style from "./ResSchedule.module.css";
 import { ReactComponent as UserIcon }from './assets/user-solid.svg';
-import AddReservation from '../AddReservation';
+// import AddReservation from '../AddReservation';
 import StatusBar from '../StatusBar';
-import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
+// import { getSevenDayAvailability } from '../../../store/sevenDayAvailability';
+import { DateTime } from 'luxon';
+import { Modal } from '../../../context/Modal';
+import BookReservation from '../BookReservation';
 
 const ResSchedule =() => {
     const {selectedDate} = useContext(EstablishmentContext);
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     // const [availableTables, setavailableTables] = useState();
-    const [showMakeRes, setShowMakeRes] = useState(null);
+    // const [showMakeRes, setShowMakeRes] = useState(null);
     // const [reservations, setReservations] = useState();
-    const [editReservation, setEditReservation] = useState(null)
-    const availableTables = useSelector(state => state.selectedDateAvailability.availability)
-    const reservations = useSelector(state => state.selectedDateAvailability.reservations)
+    const [bookRes, setBookRes] = useState(null);    // const availableTables = useSelector(state => state.selectedDateAvailability.availability)
+    const [scheduleScale, setScheduleScale] = useState({slots: 96, interval: 15})
+    const reservations = useSelector(state => state.reservations)
 
     // FETCH RESERVATIONS AND AVAILABLE TIMES
     // useEffect(() => {
@@ -32,52 +35,76 @@ const ResSchedule =() => {
     //     })
     // },[selectedDate])
 
+    //scheduleScale
+        // 15 minutes
+            // slots: 96
+        // 30 minutes
+            // slots: 48
+        // 60 minutes
+            // slots 24
+
     // SET 24 TEMPLATE COLUMNS
-    let date = new Date(selectedDate)
-    date.setUTCHours(5, 0, 0, 0)
-    const hourColumns = Array(96).fill(0).map((_, minutesMultiplier) => {
-        const timeIncrement = new Date(date)
-        timeIncrement.setMinutes(15 * minutesMultiplier)
-        return timeIncrement;
+    const resScheduleModel = Array(scheduleScale.slots).fill(0).map((_, minutesMultiplier) => {
+        const columnTime = selectedDate.plus({minute:scheduleScale.interval * minutesMultiplier});
+        const nextColumnTime = columnTime.plus({minute:scheduleScale.interval})
+        const resKeys = Object.keys(reservations)
+        const columnRes = resKeys.filter((id) => {
+            const res = reservations[id]
+            const reservationTime = DateTime.fromISO(res.reservation_time)
+            if (columnTime.toMillis() <= reservationTime.toMillis() && nextColumnTime.toMillis() > reservationTime.toMillis()) {
+                return true;
+            }
+            return false;
+        }).map((id)=>reservations[id])
+        return {columnTime, reservations:columnRes}
     })
+
+    const getNowIndicatorPosition = (interval) => {
+        const todaysMinutes = Math.ceil(DateTime.local().diff(DateTime.local().startOf('day'), 'minutes').toObject().minutes)
+        if (interval === 15) return {left:  `${todaysMinutes * 7.28 - 42}px`};
+        if (interval === 30) return {left: `${todaysMinutes * 3.71 - 42}px`};
+        if (interval === 60) return {left: `${todaysMinutes * 1.83 - 42}px`};
+    }
     // SET 24 SCHEDULE MODEL
-    const resScheduleModel = hourColumns.map((datetime, hourIndex) => {
-        const scheduleColumn = {
-            timeMarker: datetime,
-            reservations: reservations?.filter((reservation) => {
-                const reservationDate = new Date(reservation.reservation_time)
-                if (reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]) {
-                    // console.log('|----------------------------------------------------------|')
-                    // console.log(` DEBUGGER: ReservationISO  "${reservation.reservation_time} becomes ${typeof reservationDate} AND ISOSTRING ${reservationDate.toISOString()}`)
-                    // console.log('GUEST: ', reservation.guest_info.name)
-                    // console.log('LEFT COLUMN: ', datetime.toISOString())
-                    // console.log('RIGHT COLUMN (NOT ISO): ', hourColumns[hourIndex + 1] ? hourColumns[hourIndex + 1].toISOString() : 'undefined')
-                    // console.log('RESERVATION IS BETWEEN LEFT AND RIGHT COLUMNS: ', reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1])
-                    // console.log('|----------------------------------------------------------|')
-                }
-                return reservationDate >= datetime && reservationDate < hourColumns[hourIndex + 1]
-            }),
-            availableTables: availableTables?.filter((tableTimeSlot) => {
-                const availableDatetime = new Date(tableTimeSlot.datetime)
-                return availableDatetime >= datetime && availableDatetime < hourColumns[hourIndex + 1]
-            })
-        }
-        return(
-            scheduleColumn
-        )
-    })
+    // const resScheduleModel = timeColumns.map((datetime, hourIndex) => {
+    //     const scheduleColumn = {
+    //         timeMarker: datetime,
+    //         reservations: reservations?.filter((reservation) => {
+    //             const reservationDate = new Date(reservation.reservation_time)
+    //             if (reservationDate >= datetime && reservationDate < timeColumns[hourIndex + 1]) {
+    //             }
+    //             return reservationDate >= datetime && reservationDate < timeColumns[hourIndex + 1]
+    //         }),
+    //         availableTables: availableTables?.filter((tableTimeSlot) => {
+    //             const availableDatetime = new Date(tableTimeSlot.datetime)
+    //             return availableDatetime >= datetime && availableDatetime < timeColumns[hourIndex + 1]
+    //         })
+    //     }
+    //     return(
+    //         scheduleColumn
+    //     )
+    // })
 
     // console.log('MODEL ARRAY: ', resScheduleModel);
     return(
         <div className={style.res_schedule}>
-            <div className={style.schedule_scroll}>
-            {resScheduleModel && resScheduleModel.map((column, index) => {
+            <div id={"schedule_scroll"} className={style.schedule_scroll}>
+                {DateTime.local().toISODate() === selectedDate.toISODate() &&
+                    <div
+                        // style={{left: `${420 + 42.5}px`}}
+                        style={getNowIndicatorPosition(scheduleScale.interval)}
+                        id={"current_time_indicator"}
+                        className={style.current_time_indicator}
+                    >{DateTime.local().toLocaleString({hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                }
+            {resScheduleModel.map((column, index) => {
                 return(
                     <div key={`column ${index}`} className={style.column}>
-                        <div className={style.column_time}>
-                            {column.timeMarker.toLocaleTimeString([], { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}
+                        <div style={{ "fontFamily": "sans-serif", "width": "100px","textAlign": "center"}} className={"column_time"}>
+                            {column.columnTime.toLocaleString({hour: '2-digit', minute: '2-digit'})}
                         </div>
-                        {column.reservations && column.reservations.length > 0 && column.reservations.map((reservation) => {
+                        {column.reservations.map((reservation) => {
                            return(
                                <React.Fragment key={reservation.id}>
                                 <div  className={style.booked_reservation_card}>
@@ -90,20 +117,22 @@ const ResSchedule =() => {
                                     <div className={style.guest}>
                                         {reservation.guest}
                                     </div>
-                                    <div className={style.table_name}>
-                                        {reservation.table.table_name}
-                                    </div>
+                                    {reservation.section && <div className={style.table_name}>{reservation.section_info.name}</div>}
+                                    {!reservation.section && <div style={{"fontSize": "10px"}} className={style.table_name}>{"section not selected"}</div>}
                                 </div>
                                 <div  className={style.booked_hover_info_card}>
-                                    <div className={style.hover_table_title}>{reservation.table.table_name}</div>
+                                    <div className={style.hover_table_title}>{"Reservation Details"}</div>
                                     <div className={style.table_details}>
-                                        <div className={style.hover_time}>{new Date(reservation.reservation_time).toLocaleTimeString([], {timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit'})}</div>
-                                        <div className={style.hover_date}>{new Date(reservation.reservation_time).toLocaleDateString([], {timeZone: 'America/New_York'})}</div>
-                                        <div className={style.hover_min_max}>{`Min: ${reservation.table.min_seat}, Max: ${reservation.table.max_seat}`}</div>
+                                        <div className={style.hover_time}>{DateTime.fromISO(reservation.reservation_time).toLocaleString({hour: '2-digit', minute: '2-digit'})}</div>
+                                        <div className={style.hover_date}>{DateTime.fromISO(reservation.reservation_time).toLocaleString()}</div>
+                                        {reservation.table && <div className={style.hover_min_max}>{`Min: ${reservation.table.min_seat}, Max: ${reservation.table.max_seat}`}</div>}
+                                        {!reservation.table && <div className={style.hover_min_max}>{"table not selected"}</div>}
                                         <div className={style.hover_tags}>{reservation.tags.reduce((prev, curr) => {
                                             return prev + ', ' + curr.name
                                         }, '')}</div>
-                                        <StatusBar reservationId={reservation.id} statusId={reservation.status_id}/>
+                                        <div className={style.status_sizer}>
+                                            <StatusBar reservationId={reservation.id} statusId={reservation.status_id}/>
+                                        </div>
                                     </div>
                                     <div className={style.hover_guest_title}>Guest Info</div>
                                     <div className={style.guest_details}>
@@ -113,17 +142,12 @@ const ResSchedule =() => {
                                         <div className={style.hover_number}>{reservation.guest_info.phone_number}</div>
                                         <div className={style.hover_email}>{reservation.guest_info.email}</div>
                                     </div>
-                                    <div onClick={()=>{
-                                        dispatch(getSevenDayAvailability(selectedDate)).then(() =>
-                                            {setEditReservation(reservation)}
-                                        )
-                                        }} className={style.edit_reservation_button}>Edit</div>
+                                    <div onClick={()=>setBookRes(reservation)} className={style.edit_reservation_button}>Edit</div>
                                 </div>
-                                {editReservation?.id === reservation.id && <AddReservation key={`addRes${reservation.id}`} setEditReservation={setEditReservation} editReservation={editReservation}/>}
                             </React.Fragment>
                            )
                         })}
-                        {column.availableTables?.length > 0 && column.availableTables.map((availableTable, timeIndex) => {
+                        {/* {column.availableTables?.length > 0 && column.availableTables.map((availableTable, timeIndex) => {
                             const tableTime  = new Date(availableTable.datetime);
                             if (tableTime > new Date()) {
                                 return(
@@ -137,7 +161,7 @@ const ResSchedule =() => {
                                         </div>
                                         <div className={style.spacer}></div>
                                         <div className={style.table_name}>
-                                            {availableTable.table.table_name}
+                                            {availableTable.section_id}
                                         </div>
                                     </div>
                                     {showMakeRes?.tableId === availableTable.table.id && new Date(showMakeRes.datetime).getTime() === new Date(availableTable.datetime).getTime() && <AddReservation key={`avail${timeIndex}`} setShowMakeRes={setShowMakeRes} availableTable={availableTable}/>}
@@ -147,13 +171,24 @@ const ResSchedule =() => {
                                 return(null)
                             }
                             })
-                        }
+                        } */}
                     </div>
                 )
             })}
+                        {bookRes &&
+                <Modal onClose={() => setBookRes(false)}>
+                    <BookReservation setBookRes={setBookRes} bookRes={bookRes}/>
+                </Modal>}
             </div>
 
-            <div className={style.footer_options}>More schedule options coming...</div>
+            <div className={style.footer_options}>
+                <div id={style.interval_options}>
+                    <label>Adjust Interval</label>
+                    <div id={style.fifteen} className={`${scheduleScale.interval === 15 ? style.interval_select : null}`} onClick={() => setScheduleScale({slots: 96, interval: 15})}>{"15m"}</div>
+                    <div id={style.thirty} className={`${scheduleScale.interval === 30 ? style.interval_select : null}`} onClick={() => setScheduleScale({slots: 48, interval: 30})}>{"30m"}</div>
+                    <div id={style.sixty} className={`${scheduleScale.interval === 60 ? style.interval_select : null}`} onClick={() => setScheduleScale({slots: 24, interval: 60})}>{"1hr"}</div>
+                </div>
+            </div>
         </div>
     )
 }

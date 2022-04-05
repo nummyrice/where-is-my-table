@@ -1,5 +1,6 @@
 from .db import db
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.sql import func
 
 default_schedule = {'monday':{
     1:{
@@ -94,6 +95,8 @@ class Section(db.Model):
     establishment_id = db.Column(db.Integer, db.ForeignKey('establishments.id'))
     schedule = db.Column(JSONB, nullable=False, default=default_schedule)
     name = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
     #associations
     tables = db.relationship("Table", back_populates='section')

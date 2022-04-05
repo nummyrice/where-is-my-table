@@ -13,20 +13,22 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 
 
-const TopBar = () => {
+const TopBar = ({periodIndex, handlePeriodChange}) => {
     const establishment = useSelector(state => state.session.user.establishment)
     const [showPanel, setShowPanel] = useState(false);
     const {setSelectedDate, selectedDate} = useContext(EstablishmentContext);
-
+    const scrollToPeriods = ["change period", "now", "breakfast", "lunch", "dinner"]
     const handleDateChange = (date) => {
         setSelectedDate(date)
     }
+
+
     return(
         <div className={style.top_bar}>
             <div className={style.restaurant_title}>{establishment.name}</div>
             <div className={style.center_options}>
                 <LeftArrow onClick={() => setSelectedDate(selectedDate.minus({days: 1}))} className={style.back_date}/>
-                <div className={style.todays_date}>{selectedDate.toLocaleString({ weekday: 'short', month: 'long', day: '2-digit' })}</div>
+                <div className={style.todays_date}>{selectedDate.toLocaleString({ weekday: 'long' })}</div>
                 <LocalizationProvider dateAdapter={DateAdapter}>
                 <DesktopDatePicker
                     label="Date desktop"
@@ -38,15 +40,22 @@ const TopBar = () => {
                         '.MuiOutlinedInput-input': {
                             'backgroundColor': '#444',
                             'color': '#fff',
-                            'height': '10px'
+                            'height': '5px',
+                            'margin': '3px',
+                            "border": "2px solid #4c5868",
+                            "border-radius": "6px"
                         },
                         '.MuiButtonBase-root': {
                             'color': '#fff'
+                        },
+                        '.MuiButtonBase-root:hover': {
+                            'color': '#808080',
+                            'cursor': 'pointer'
                         }
                     }} />}
                 />
                 </LocalizationProvider>
-                <div className={style.dining_period}>{'Dinner'}</div>
+                <div onClick={()=>handlePeriodChange(periodIndex)} className={style.dining_period}>{scrollToPeriods[periodIndex]}</div>
                 <RightArrow onClick={() => setSelectedDate(selectedDate.plus({days: 1}))} className={style.forward_date}/>
             </div>
             <SettingsIcon onClick={()=>setShowPanel(!showPanel)} className={style.establishment_settings}/>

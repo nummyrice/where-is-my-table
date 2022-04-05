@@ -5,3 +5,4 @@ from .guest_form import NewGuestForm, UpdateGuestForm
 from .edit_user_form import EditUserForm
 from .tags_form import NewTagsForm, NewPartyTagsForm
 from .waitlist_form import WaitlistForm, UpdateWaitlistForm
+from .establishment_form import NewEstablishmentForm, EditEstablishmentForm

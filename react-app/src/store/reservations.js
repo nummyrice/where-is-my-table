@@ -6,22 +6,22 @@ const SET_RES = 'selectedDateAvailability/SET_RES';
 const UPDATE_RES = 'selectedDateAvailability/UPDATE_RES';
 const REMOVE_TAG = 'selectedDateAvailability/REMOVE_TAG';
 
-const setReservations = (reservations) => ({
+export const setReservations = (reservations) => ({
     type: SET_RESERVATIONS,
     payload: reservations
 })
 
-const setRes = (reservation) => ({
+export const setRes = (reservation) => ({
     type: SET_RES,
     payload: reservation
 })
 
-const setUpdatedRes = (reservation) => ({
+export const setUpdatedRes = (reservation) => ({
     type: UPDATE_RES,
     payload: reservation
 })
 
-const setRemoveTag = (resId, tagId) => ({
+export const setRemoveTag = (resId, tagId) => ({
     type: REMOVE_TAG,
     payload: {resId, tagId}
 })
@@ -44,17 +44,17 @@ export const getReservations = (selectedDate) => async (dispatch) => {
 
 // NEW RESERVATION
 export const newReservation = (reservationDetails) => async (dispatch) => {
-    reservationDetails.reservation_time = reservationDetails.reservation_time.toISO()
-    console.log('NEW RES ISO FROM THUNK: ', reservationDetails.reservation_time)
+    reservationDetails.reservation_time = reservationDetails.reservation_time?.toISO()
+    // console.log('NEW RES ISO FROM THUNK: ', reservationDetails.reservation_time)
 
     if (!reservationDetails.section_id) {
         delete reservationDetails.section_id
     }
-    console.log('RESERVATION DETAILS: ', !reservationDetails.section_id)
+    // console.log('RESERVATION DETAILS: ', !reservationDetails.section_id)
     if (!reservationDetails.table_id) {
         delete reservationDetails.table_id
     }
-    console.log('RESERVATION DETAILS: ', reservationDetails)
+    // console.log('RESERVATION DETAILS: ', reservationDetails)
     const response = await fetch('/api/reservations/new', {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
@@ -72,7 +72,6 @@ export const newReservation = (reservationDetails) => async (dispatch) => {
             if (!tagResponse.ok) {
                 setErrors(tagData.errors)
                 return tagData
-
             }
             dispatch(setUpdatedRes(tagData));
             return tagData;
@@ -136,14 +135,14 @@ export const updateReservation = (reservationDetails) => async (dispatch) => {
     //REMOVE TAG
 export const removeTag = (reservationId, tagId) => async (dispatch) => {
     // console.log('MADE IT INTO TAG STORE: ', reservationId, tagId)
-    const response = await fetch(`/api/tags/${reservationId}/${tagId}/remove`, {method:"DELETE"})
+    const response = await fetch(`/api/tags/${reservationId}/${tagId}/remove-res-tag`, {method:"DELETE"})
     const data = await response.json()
     if (!response.ok) {
         dispatch(setErrors(data.errors))
         return data
     }
     dispatch(setRemoveTag(reservationId, tagId))
-    return data;
+    return {data, reservationId, tagId};
 }
 
 const initialState = {};
@@ -159,10 +158,11 @@ export default function reducer(state = initialState, action) {
             newState[action.payload.id] = action.payload
             return newState
         case REMOVE_TAG:
-            const tagToRemoveIndex = newState.action.payload.resId.tags.findIndex((tag) => tag.id === action.payload.tagId)
-            newState.resId.tags.splice(tagToRemoveIndex, 1)
-            const updatedRes = {...newState.resId, tags: [...newState.resId.tags]}
-            newState.resId = updatedRes
+            const resId = action.payload.resId
+            const tagToRemoveIndex = newState[resId].tags.findIndex((tag) => tag.id === action.payload.tagId)
+            newState[resId].tags.splice(tagToRemoveIndex, 1)
+            const updatedRes = {...newState[resId], tags: [...newState[resId].tags]}
+            newState[resId] = updatedRes
             return newState
         default:
             return state;
