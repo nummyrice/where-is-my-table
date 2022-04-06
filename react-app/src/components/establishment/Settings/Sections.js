@@ -96,7 +96,7 @@ const Sections = () => {
 
     return(
         <div id={style.sections_page}>
-            <form id={style.new_section_form}>
+            {newSectionForm && <form id={style.new_section_form}>
                 <label htmlFor={"section_name"}>{"Section Name"}</label>
                 <input onChange={e => setSectionName(e.target.value)} type={"text"} name={"section_name"} placeholder={"less than 40 characters"} value={sectionName}></input>
                 <h2>{"Section Schedule"}</h2>
@@ -109,7 +109,7 @@ const Sections = () => {
                                 return (
                                     <React.Fragment key={`${day}_${sequence}`}>
                                         <label htmlFor={`${day}_${sequence}_start`}>{"Start"}</label>
-                                        <input type={"time"} name={`${day}_${sequence}_start`} value={newSchedule[day][sequence].start}></input>
+                                        <input className={style.start_time_input} type={"time"} name={`${day}_${sequence}_start`} value={newSchedule[day][sequence].start}></input>
                                         <label htmlFor={`${day}_${sequence}_end`}>{"End"}</label>
                                         <input type={"time"} name={`${day}_${sequence}_end`} value={newSchedule[day][sequence].end}></input>
                                     </React.Fragment>
@@ -119,8 +119,8 @@ const Sections = () => {
                     )
                 })}
                 {newSectionForm && <button id={style.new_section_button}>{"Submit Section"}</button>}
-            </form>
-            {!newSectionForm && <button id={style.new_section_button}>{"New Section"}</button>}
+            </form>}
+            {!newSectionForm && <button onClick={() => setNewSectionForm(true)} id={style.new_section_button}>{"New Section"}</button>}
         </div>
     )
 }

@@ -20,22 +20,32 @@
 /* NAV BAR */
 #settings_nav {
     width: 100vw;
-    position: fixed;
-    height: 100px;
+    position: relative;
+    height: 50px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 4fr;
     grid-template-rows: 1fr;
     grid-template-areas:
     "back name"
     ;
+    background-color: #111111;
+    font-family: sans-serif;
 }
 
 #return_button {
     grid-area: back;
+    border-top: 4px solid #afafaf;
+    border-left: 4px solid #afafaf;
+    height: 25px;
+    width: 25px;
+    margin: 15px;
+    border-top-left-radius: 6px;
+    offset-rotate: auto 90deg;
 }
 
 #settings_nav h1 {
     grid-area: name;
+    font-size: 1rem;
 }
 
 /* SECTIONS */
@@ -43,6 +53,8 @@
     background-color: #262626;
     /* color: black; */
     font-family: sans-serif;
+    height: 100%;
+    overflow-y: scroll;
 }
 
 #new_section_form {
@@ -54,8 +66,22 @@
 
 .schedule_daily_block {
     margin-bottom: 50px;
+    width: 390px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
+.schedule_daily_block label {
+    margin-right: 20px;
+}
+
+.start_time_input {
+    margin-right: 40px;
+}
+
+.schedule_daily_block h3 {
+    text-transform: capitalize;
+}
 
 @media (min-width: 600px) {
     #new_section_form {
