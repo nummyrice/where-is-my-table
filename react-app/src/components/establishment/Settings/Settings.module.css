@@ -1,3 +1,4 @@
+/* SETTINGS PANEL */
 #settings_panel {
     /* height: 80vh; */
     /* width: 400px; */
@@ -13,4 +14,52 @@
 #settings_panel > div {
     font-size: 20px;
     margin-bottom: 20px;
+}
+
+
+/* NAV BAR */
+#settings_nav {
+    width: 100vw;
+    position: fixed;
+    height: 100px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas:
+    "back name"
+    ;
+}
+
+#return_button {
+    grid-area: back;
+}
+
+#settings_nav h1 {
+    grid-area: name;
+}
+
+/* SECTIONS */
+#sections_page {
+    background-color: #262626;
+    /* color: black; */
+    font-family: sans-serif;
+}
+
+#new_section_form {
+    margin-left: auto;
+    margin-right: auto;
+    /* padding: 50px; */
+    /* width: calc(100vw - 20rem) */
+}
+
+.schedule_daily_block {
+    margin-bottom: 50px;
+}
+
+
+@media (min-width: 600px) {
+    #new_section_form {
+        width: calc(100vw / 2);
+        padding: 50px;
+    }
 }

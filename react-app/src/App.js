@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import LoginForm from './components/auth/LoginForm';
 import SignUpForm from './components/auth/SignUpForm';
 import NavBar from './components/NavBar';
@@ -12,6 +12,8 @@ import Establishment from './components/establishment';
 import Landing from './components/Landing';
 import EstablishmentSetup from './components/auth/EstablishmentSetup';
 import { authenticate } from './store/session';
+import SettingsNav from './components/establishment/Settings/SettingsNav';
+import Sections from './components/establishment/Settings/Sections';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -24,7 +26,7 @@ function App() {
     })();
   }, [dispatch]);
 
-  const user = useSelector(state => state.session?.user)
+  // const user = useSelector(state => state.session?.user)
   // console.log('USER', user)
   if (!loaded) {
     return null;
@@ -35,6 +37,10 @@ function App() {
       <Switch>
         <ProtectedEstablishmentRoute path='/establishment' exact={true}>
           <Establishment/>
+        </ProtectedEstablishmentRoute>
+        <ProtectedEstablishmentRoute path='/establishment/sections' exact={true}>
+          <SettingsNav/>
+          <Sections/>
         </ProtectedEstablishmentRoute>
         <Route path='/login' exact={true}>
           <NavBar/>
