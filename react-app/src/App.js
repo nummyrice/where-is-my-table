@@ -12,6 +12,9 @@ import Establishment from './components/establishment';
 import Landing from './components/Landing';
 import EstablishmentSetup from './components/auth/EstablishmentSetup';
 import { authenticate } from './store/session';
+import SettingsNav from './components/establishment/Settings/SettingsNav';
+import Sections from './components/establishment/Settings/Sections';
+import { getEstablishment } from './store/establishment';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -19,12 +22,17 @@ function App() {
 
   useEffect(() => {
     (async() => {
-      await dispatch(authenticate());
+      const data = await dispatch(authenticate());
+      if (data.establishment_id) {
+        console.log('getting establishment details: ', data)
+        await dispatch(getEstablishment(data.establishment_id))
+      }
       setLoaded(true);
     })();
   }, [dispatch]);
 
-  const user = useSelector(state => state.session?.user)
+  // if (data.establishment_id) getEstablishment(data.establishment_id)
+  // const user = useSelector(state => state.session?.user)
   // console.log('USER', user)
   if (!loaded) {
     return null;
@@ -35,6 +43,10 @@ function App() {
       <Switch>
         <ProtectedEstablishmentRoute path='/establishment' exact={true}>
           <Establishment/>
+        </ProtectedEstablishmentRoute>
+        <ProtectedEstablishmentRoute path='/establishment/sections' exact={true}>
+          <SettingsNav/>
+          <Sections/>
         </ProtectedEstablishmentRoute>
         <Route path='/login' exact={true}>
           <NavBar/>

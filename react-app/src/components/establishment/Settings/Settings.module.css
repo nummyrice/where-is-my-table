@@ -1,3 +1,4 @@
+/* SETTINGS PANEL */
 #settings_panel {
     /* height: 80vh; */
     /* width: 400px; */
@@ -13,4 +14,192 @@
 #settings_panel > div {
     font-size: 20px;
     margin-bottom: 20px;
+}
+
+
+/* NAV BAR */
+#settings_nav {
+    width: 100vw;
+    position: relative;
+    height: 50px;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    grid-template-rows: 1fr;
+    grid-template-areas:
+    "back name"
+    ;
+    background-color: #111111;
+    font-family: sans-serif;
+}
+
+#return_button {
+    grid-area: back;
+    border-top: 4px solid #afafaf;
+    border-left: 4px solid #afafaf;
+    height: 25px;
+    width: 25px;
+    margin: 15px;
+    border-top-left-radius: 6px;
+    /* offset-rotate: auto 90deg; */
+}
+
+#settings_nav h1 {
+    grid-area: name;
+    font-size: 1rem;
+}
+
+/* SECTIONS */
+#sections_page {
+    background-color: #262626;
+    /* color: black; */
+    font-family: sans-serif;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+#new_section_button {
+    width: 200px;
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+#new_section_form h3 {
+    margin-top: 50px;
+}
+
+#new_section_form {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 100px;
+    width: 370px;
+    /* padding: 50px; */
+    /* width: calc(100vw - 20rem) */
+}
+
+
+#new_section_details_block {
+    margin-left: auto;
+    margin-right: auto;
+    width: 370px;
+}
+
+#new_section_details_block input {
+    width: 245px;
+}
+
+.schedule_daily_block {
+    margin-bottom: 50px;
+    width: 370px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.schedule_daily_block label, #new_section_name_label {
+    margin-right: 15px;
+}
+
+.start_time_input {
+    margin-right: 30px;
+}
+
+.time_block_error {
+    border-color: red;
+}
+
+.schedule_daily_block h4 {
+    text-transform: capitalize;
+}
+
+.add_time_block {
+    width: 30px;
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+}
+
+
+#new_section_button_block {
+    margin-left: auto;
+    margin-right: auto;
+    width: 370px;
+    margin-bottom: 100px;
+    /* display: flex;
+    justify-content: center; */
+}
+
+#new_section_form:after {
+    content: '';
+    width: 370px;
+    border-bottom: 1px solid white;
+}
+
+#new_section_cancel_button {
+    margin-right: 40px;
+}
+
+@media (min-width: 600px) {
+    #new_section_form {
+        width: calc(100vw / 2);
+        padding: 50px;
+    }
+
+    .display_section_name {
+        width: 400px !important;
+    }
+    .edit_section_button {
+        margin: none !important;
+    }
+    /* .display_section {
+        width: calc(100vw / 2) !important;
+    } */
+}
+
+/* DISPLAY SECTION */
+.display_section_name {
+    width: 370px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.display_section {
+    margin-left: auto;
+    margin-right: auto;
+    width: 370px;
+    margin-bottom: 100px;
+    /* border-bottom: 1px solid white; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.display_section h3 {
+    margin-bottom: 30px;
+}
+
+.display_section:after {
+    content: '';
+    /* width: 500px; */
+    border-bottom: 1px solid white;
+}
+.display_time {
+    /* margin-left: 50px; */
+    width: 12rem;
+}
+
+.display_daily_block {
+    margin-bottom: 50px;
+}
+
+.display_daily_block h4 {
+    text-transform: capitalize;
+}
+
+.edit_section_button {
+    margin-bottom: 100px;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
 }

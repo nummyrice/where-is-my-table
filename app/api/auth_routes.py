@@ -24,8 +24,8 @@ def authenticate():
     Authenticates a user.
     """
     if current_user.is_authenticated:
-        return current_user.to_dict()
-    return {'errors': ['Unauthorized']}
+        return current_user.to_dict(), 200
+    return {'errors': ['Unauthorized']}, 400
 
 
 @auth_routes.route('/login', methods=['POST'])
@@ -41,7 +41,7 @@ def login():
         # Add the user to the session, we are logged in!
         user = User.query.filter(User.email == form.data['email']).first()
         login_user(user)
-        return user.to_dict()
+        return user.to_dict(), 200
     return {'errors': validation_errors_to_error_messages(form.errors)}, 401
 
 
@@ -51,7 +51,7 @@ def logout():
     Logs a user out
     """
     logout_user()
-    return {'message': 'User logged out'}
+    return {'message': 'User logged out'}, 200
 
 
 @auth_routes.route('/signup', methods=['POST'])
@@ -71,7 +71,7 @@ def sign_up():
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        return user.to_dict()
+        return user.to_dict(), 200
     return {'errors': validation_errors_to_error_messages(form.errors)}, 401
 
 
