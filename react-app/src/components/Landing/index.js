@@ -33,20 +33,20 @@ const Landing = () => {
         return result;
     }
 
-    useEffect(() => {
-        setDateArray(getSevenDays(selectedDate));
-        fetch('/api/reservations/today', {
-            method: 'POST',
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({"client_date": selectedDate.toISOString()})
-        }).then(async (response) => {
-            const data = await response.json()
-            setavailableTables(data.availability)
-            // console.log('AVAILABLE TABLES', data)
-        }).catch((e) => {
-            console.error(e)
-        })
-    },[selectedDate])
+    // useEffect(() => {
+    //     setDateArray(getSevenDays(selectedDate));
+    //     fetch('/api/reservations/today', {
+    //         method: 'POST',
+    //         headers: {"Content-Type": "application/json"},
+    //         body: JSON.stringify({"client_date": selectedDate.toISOString()})
+    //     }).then(async (response) => {
+    //         const data = await response.json()
+    //         setavailableTables(data.availability)
+    //         // console.log('AVAILABLE TABLES', data)
+    //     }).catch((e) => {
+    //         console.error(e)
+    //     })
+    // },[selectedDate])
 
     return(
         <div className={style.landing_main}>

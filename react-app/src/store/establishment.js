@@ -1,3 +1,4 @@
+import { setErrors } from "./errors"
 const SET_ESTABLISHMENT = 'establishment/SET_ESTABLISHMENT'
 const SET_SECTION = 'establishment/SET_SECTION'
 const UPDATE_SECTION = 'establishment/UPDATE_SECTION'
@@ -9,23 +10,54 @@ const setEstablishment = (establishment) => ({
     payload: establishment
 })
 
-const update_section = (section) => ({
+const updateSection = (section) => ({
     type: UPDATE_SECTION,
     payload: section
 })
 
-const delete_section = (sectionId) => ({
+const deleteSection = (sectionId) => ({
     type: DELETE_SECTION,
     payload: sectionId
 }
 )
-const unsetEstablishment = () => ({
+export const unsetEstablishment = () => ({
     type: UNSET_ESTABLISHMENT
 })
 
-const initialState = {};
+export const getEstablishment = (establishmentId) => async (dispatch) => {
+    const response = await fetch(`api/establishments/${establishmentId}`)
+    const data = await response.json();
+    if (!response.ok) {
+        // setErrors(data.errors)
+        return data;
+    }
+    dispatch(setEstablishment(data))
+}
+
+export const newEstablishement = (userId, name, timezoneId, daylightSavings) => async (dispatch) => {
+    const newEstablishment = {
+        user_id: userId,
+        name: name,
+        timezone_id: timezoneId,
+        daylight_savings: daylightSavings
+    }
+    const response = await fetch("api/establishments/new", {
+                                method: "POST",
+                                headers: {'Content-Type': "application/json"},
+                                body: JSON.stringify(newEstablishment)
+                            })
+    const data = await response.json()
+    if (!response.ok) {
+        dispatch(setErrors(data.errors))
+    }
+    dispatch(setEstablishment(data))
+    return data;
+
+}
+
+const initialState = null;
 export default function reducer(state = initialState, action) {
-    const newState = {...state};
+    const newState = !state ? {} : {...state}
     switch(action.type) {
         case SET_ESTABLISHMENT:
             return action.payload

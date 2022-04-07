@@ -16,7 +16,7 @@ export const EstablishmentContext = createContext();
 let socket;
 // const CONNECTION = 'localhost:3000'
 const Establishment = () => {
-    const establishment = useSelector(state => state.session.user.establishment)
+    const establishment = useSelector(state => state.establishment)
     const dispatch = useDispatch();
     Settings.defaultZone = establishment.timezone.luxon_string
     // const user = useSelector(state => state.session.user)

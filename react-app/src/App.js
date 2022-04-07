@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from './components/auth/LoginForm';
 import SignUpForm from './components/auth/SignUpForm';
 import NavBar from './components/NavBar';
@@ -14,6 +14,7 @@ import EstablishmentSetup from './components/auth/EstablishmentSetup';
 import { authenticate } from './store/session';
 import SettingsNav from './components/establishment/Settings/SettingsNav';
 import Sections from './components/establishment/Settings/Sections';
+import { getEstablishment } from './store/establishment';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -21,11 +22,16 @@ function App() {
 
   useEffect(() => {
     (async() => {
-      await dispatch(authenticate());
+      const data = await dispatch(authenticate());
+      if (data.establishment_id) {
+        console.log('getting establishment details: ', data)
+        await dispatch(getEstablishment(data.establishment_id))
+      }
       setLoaded(true);
     })();
   }, [dispatch]);
 
+  // if (data.establishment_id) getEstablishment(data.establishment_id)
   // const user = useSelector(state => state.session?.user)
   // console.log('USER', user)
   if (!loaded) {

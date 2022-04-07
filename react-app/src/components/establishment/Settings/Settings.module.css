@@ -106,7 +106,7 @@
 }
 
 .time_block_error {
-    border: 2px solid red !important;
+    border-color: red;
 }
 
 .schedule_daily_block h4 {

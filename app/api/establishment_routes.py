@@ -7,6 +7,16 @@ from .auth_routes import validation_errors_to_error_messages
 establishment_routes = Blueprint('establishments', __name__)
 
 # ADD NEW ESTABLISHMENT
+@establishment_routes.route('<int:establishment_id>', methods=['GET'])
+def get_establishment(establishment_id):
+    user_id = current_user.id
+    establishment = db.session.query(Establishment).get(establishment_id)
+    if not establishment:
+        return {"errors": ["establishment with this id does not exist"]}, 400
+    if user_id != establishment.user_id:
+        return {"errors": ["current user is not establishment owner"]}, 400
+    return establishment.to_dict(), 200
+
 
 @establishment_routes.route('new', methods=['POST'])
 def create_new_establishment():

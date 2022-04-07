@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { Redirect, useHistory } from 'react-router-dom';
 import style from "./auth.module.css";
+import { newEstablishement } from '../../store/establishment';
 
 const EstablishmentSetup = () => {
+    const history = useHistory()
+    const dispatch = useDispatch()
     const user = useSelector(state => state.session.user)
+    const establishment = useSelector(state => state.establishment)
     const [timezones, setTimezones] = useState([])
     const [selectedTZ, setSelectedTZ] = useState(1)
     const [establishmentName, setEstablishmentName] = useState('')
@@ -11,34 +16,22 @@ const EstablishmentSetup = () => {
     const [errors, setErrors] = useState([])
     useEffect(() => {
         fetch("/api/establishments/timezones")
-            .then( async res => {
-                const data = await res.json()
-                if (res.ok)  setTimezones(data.timezones)
-
-                // if (res.ok)  data.timezones.forEach(tz => timezones.current.push(tz))
-            })
-}, [])
+        .then( async res => {
+            const data = await res.json()
+            if (res.ok)  setTimezones(data.timezones)
+            // if (res.ok)  data.timezones.forEach(tz => timezones.current.push(tz))
+        })
+    }, [])
+    if (establishment) return(<Redirect to={'/establishment'}/>)
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        const newEstablishment = {
-            user_id: user.id,
-            name: establishmentName,
-            timezone_id: selectedTZ,
-            daylight_savings: daylightSavings
-        }
-        console.log('submit test', newEstablishment)
-        fetch("api/establishments/new", {
-            method: "POST",
-            headers: {'Content-Type': "application/json"},
-            body: JSON.stringify(newEstablishment)
-        }).then(async res => {
-            const data = await res.json()
-            if (res.ok) return;
-            return setErrors(data.errors)
+        dispatch(newEstablishement(user.id, establishmentName, selectedTZ, daylightSavings))
+            .then(async data => {
+            if (data.errors) return setErrors(data.errors);
+            history.push('/establishment/sections')
         })
     }
-
     return(
         <div id={style.est_setup_background}>
             <h2 id={style.est_form_title}>{"Register Your Restaurant"}</h2>

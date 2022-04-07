@@ -1,3 +1,4 @@
+import { unsetEstablishment } from './establishment'
 // constants
 const SET_USER = 'session/SET_USER';
 const REMOVE_USER = 'session/REMOVE_USER';
@@ -19,14 +20,12 @@ export const authenticate = () => async (dispatch) => {
       'Content-Type': 'application/json'
     }
   });
-  if (response.ok) {
-    const data = await response.json();
-    if (data.errors) {
-      return;
-    }
-
-    dispatch(setUser(data));
+  const data = await response.json();
+  if (!response.ok) {
+      return data;
   }
+  dispatch(setUser(data));
+  return data
 }
 
 // LOGIN
@@ -41,14 +40,11 @@ export const login = (email, password) => async (dispatch) => {
       password
     })
   });
-
-
+  const data = await response.json();
   if (response.ok) {
-    const data = await response.json();
     dispatch(setUser(data))
     return null;
   } else if (response.status < 500) {
-    const data = await response.json();
     if (data.errors) {
       return data.errors;
     }
@@ -68,6 +64,7 @@ export const logout = () => async (dispatch) => {
 
   if (response.ok) {
     dispatch(removeUser());
+    dispatch(unsetEstablishment())
   }
 };
 

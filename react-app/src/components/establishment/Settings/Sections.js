@@ -15,7 +15,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         },
         tuesday: {
@@ -27,7 +28,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         },
         wednesday: {
@@ -39,7 +41,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         },
         thursday: {
@@ -51,7 +54,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         },
         friday: {
@@ -63,7 +67,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         },
         saturday: {
@@ -75,7 +80,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         },
         sunday: {
@@ -87,7 +93,8 @@ const Sections = () => {
                 end: {
                     hour: 0,
                     minute: 0
-                }
+                },
+                valid: true
             }
         }
     }
@@ -122,42 +129,34 @@ const Sections = () => {
         event.preventDefault()
         const scheduleCopy = {...currSchedule, [day]: {...currSchedule[day]}}
         delete scheduleCopy[day][sequence]
-        setNewSchedule(scheduleCopy)
+        let index = parseInt(sequence, 10);
+        while (index <= 5) {
+            if (!scheduleCopy[day][index + 1]) {
+                delete scheduleCopy[day][index]
+                break
+            }
+            scheduleCopy[day][index] = scheduleCopy[day][index + 1]
+            index++
+        }
+        return setNewSchedule(scheduleCopy)
     }
-    const validateTime = (target, day, sequence, bound) => {
-        const hour = newSchedule[day][sequence][bound].hour
-        const minute = newSchedule[day][sequence][bound].minute
-        const pairedHour = bound === 'start' ? newSchedule[day][sequence].end.hour : newSchedule[day][sequence].start.hour
-        const pairedMinute = bound === 'start' ? newSchedule[day][sequence].end.minute : newSchedule[day][sequence].start.minute
+    const validateTime = (day, sequence) => {
+        const validScheduleCopy = {...newSchedule, [day]: {...newSchedule[day], [sequence]: {...newSchedule[day][sequence], valid: true} }}
+        const invalidScheduleCopy = {...newSchedule, [day]: {...newSchedule[day], [sequence]: {...newSchedule[day][sequence], valid: false} }}
+        const startHour = newSchedule[day][sequence].start.hour
+        const startMinute = newSchedule[day][sequence].start.minute
+        const endHour = newSchedule[day][sequence].end.hour
+        const endMinute = newSchedule[day][sequence].end.minute
+        if (startHour === endHour && startMinute >= endMinute) {
+            return setNewSchedule(invalidScheduleCopy)
+        }
+        if (startHour > endHour) return setNewSchedule(invalidScheduleCopy)
+        if (parseInt(sequence, 10) === 1) return setNewSchedule(validScheduleCopy);
         const prevHour = newSchedule[day][parseInt(sequence, 10) - 1].end.hour
         const prevMinute = newSchedule[day][parseInt(sequence, 10) - 1].end.minute
-        console.log("validate time log: ", hour, minute)
-        console.log("validate prev log: ", prevHour, prevMinute)
-        // if start
-            // if end is less than start
-                // return error
-        // if end
-            // if start is greater than end
-                // return error
-
-        if (bound === "start") {
-            if (hour === pairedHour && minute >= pairedMinute) {
-
-            }
-        }
-
-        if (parseInt(sequence, 10) === 1) return;
-        if (hour === prevHour && minute <= prevMinute) {
-            target.style.borderColor = "red"
-            alert("1 Time blocks must be in sequence and must not overlap.")
-            return
-        }
-        if (hour < prevHour) {
-            target.style.borderColor = "red"
-            alert("2 Time blocks must be in sequence and must not overlap.")
-            return
-        }
-       target.style.borderColor = "green"
+        if (startHour === prevHour && startMinute <= prevMinute) return setNewSchedule(invalidScheduleCopy)
+        if (startHour < prevHour) return setNewSchedule(invalidScheduleCopy)
+        return setNewSchedule(validScheduleCopy)
     }
     // check that no start time comes before any other end time for the day
     // const validateSchedule = (schedule) => {
@@ -188,9 +187,9 @@ const Sections = () => {
                                 return (
                                     <React.Fragment key={`${day}_${sequence}`}>
                                         <label htmlFor={`${day}_${sequence}_start`}>{"Start"}</label>
-                                        <input onBlur={(event) => validateTime(event.target, day, sequence, "start")} onChange={event => timeChangeHandler(event, day, sequence, "start")} step={900} className={style.start_time_input} type={"time"} name={`${day}_${sequence}_start`} value={timeValueSetter(newSchedule[day][sequence].start.hour, newSchedule[day][sequence].start.minute)}></input>
+                                        <input onBlur={() => validateTime(day, sequence)} onChange={event => timeChangeHandler(event, day, sequence, "start")} step={900} className={`${style.start_time_input} ${dailySchedule[sequence].valid ? null : style.time_block_error}`} type={"time"} name={`${day}_${sequence}_start`} value={timeValueSetter(newSchedule[day][sequence].start.hour, newSchedule[day][sequence].start.minute)}></input>
                                         <label htmlFor={`${day}_${sequence}_end`}>{"End"}</label>
-                                        <input onBlur={(event) => validateTime(event.target, day, sequence, "end")} onChange={event => timeChangeHandler(event, day, sequence, "end")} step={900} type={"time"} name={`${day}_${sequence}_end`} value={timeValueSetter(newSchedule[day][sequence].end.hour, newSchedule[day][sequence].end.minute)}></input>
+                                        <input onBlur={() => validateTime(day, sequence)} onChange={event => timeChangeHandler(event, day, sequence, "end")} step={900} className={`${style.end_time_input} ${dailySchedule[sequence].valid ? null : style.time_block_error}`} type={"time"} name={`${day}_${sequence}_end`} value={timeValueSetter(newSchedule[day][sequence].end.hour, newSchedule[day][sequence].end.minute)}></input>
                                         <button className={style.remove_time_block} onClick={(event) => removeTimeBlock(event, newSchedule, day, sequence)}>{"-"}</button>
                                     </React.Fragment>
                                 )})

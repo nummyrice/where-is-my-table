@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { NavLink, Redirect } from 'react-router-dom';
+import { NavLink, Redirect, useHistory } from 'react-router-dom';
 import LogoutButton from '../auth/LogoutButton';
 import style from './NavBar.module.css';
 import logo from './assets/Artboard1.png';
@@ -11,8 +11,10 @@ import { ReactComponent as DropDownIcon } from './assets/bars-solid.svg';
 import { login, deleteUser } from '../../store/session';
 
 const NavBar = () => {
+  const history = useHistory()
   const dispatch = useDispatch()
   const user = useSelector(state => state.session?.user)
+  const establishment = useSelector(state => state.establishment)
   const demoGuestLogin = () => {
     dispatch(login('guest_demo@aa.io', 'password4'))
   };
@@ -62,11 +64,16 @@ const NavBar = () => {
             Users
           </NavLink>
         </li>}
-        {user && <li>
-          <LogoutButton/>
+        {establishment && <li>
+          <NavLink style={{textDecoration: "none"}} to='/establishment' exact={true} activeClassName='active'>
+            Restaurant Dashboard
+          </NavLink>
         </li>}
         {user && (user.id !== 1 && user.id !== 4) && <li id={style.delete_user} onClick={()=> {dispatch(deleteUser(user.id))}}>
           Delete My Account
+        </li>}
+        {user && <li>
+          <LogoutButton/>
         </li>}
       </ul>
     </nav>

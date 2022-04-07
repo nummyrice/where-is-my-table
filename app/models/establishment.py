@@ -35,3 +35,6 @@ class Establishment(db.Model):
             'daylight_savings': self.daylight_savings,
             'sections': { section.id : section.to_dict() for section in self.sections }
         }
+
+    def get_establishment_id(self):
+        return self.id

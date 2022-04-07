@@ -44,6 +44,7 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'establishment': self.establishment.to_dict() if self.establishment else None,
+            'establishment_id': self.establishment.get_establishment_id() if self.establishment else None,
             'hashed_password': self.hashed_password,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
@@ -57,6 +58,7 @@ class User(db.Model, UserMixin):
             'phone_number': self.phone_number,
             'notes': self.notes,
             'establishment': self.establishment.to_dict() if self.establishment else None,
+            'establishment_id': self.establishment.get_establishment_id() if self.establishment else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
