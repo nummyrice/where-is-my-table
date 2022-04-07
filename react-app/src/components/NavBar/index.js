@@ -9,6 +9,7 @@ import { ReactComponent as Dragon} from './assets/dragon-solid.svg';
 import { ReactComponent as Bird} from './assets/crow-solid.svg';
 import { ReactComponent as DropDownIcon } from './assets/bars-solid.svg';
 import { login, deleteUser } from '../../store/session';
+import { getEstablishment } from '../../store/establishment';
 
 const NavBar = () => {
   const history = useHistory()
@@ -17,12 +18,16 @@ const NavBar = () => {
   const establishment = useSelector(state => state.establishment)
   const demoGuestLogin = () => {
     dispatch(login('guest_demo@aa.io', 'password4'))
+
   };
 
   const demoEstablishmentLogin = () => {
     dispatch(login('establishment_demo@aa.io', 'password1'))
+    .then(data => {
+      if (data.establishment_id) dispatch(getEstablishment(data.establishment_id)).then(() => history.push('/establishment'))
+    })
   };
-  if (user?.id === 1) return <Redirect to='/establishment'/>
+  // if (user?.id === 1) return <Redirect to='/establishment'/>
   return (
     <nav className={style.navbar_main}>
       <div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Redirect } from 'react-router-dom';
+import { getEstablishment } from '../../store/establishment';
 import { login } from '../../store/session';
 import style from './auth.module.css';
 
@@ -9,14 +10,17 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const user = useSelector(state => state.session.user);
+  const establishment = useSelector(state => state.establishment)
   const dispatch = useDispatch();
 
   const onLogin = async (e) => {
     e.preventDefault();
     const data = await dispatch(login(email, password));
-    if (data) {
-      setErrors(data);
+    if (data.errors) {
+      return setErrors(data);
     }
+    if (data.establishment_id) await dispatch(getEstablishment(data.establishment_id))
+    return
   };
 
   const updateEmail = (e) => {
@@ -27,9 +31,6 @@ const LoginForm = () => {
     setPassword(e.target.value);
   };
 
-  if (user?.id === 1) {
-    return <Redirect to='/establishment'/>;
-  }
   if (user) {
     return <Redirect to='/' />;
   }
