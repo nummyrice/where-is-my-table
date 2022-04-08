@@ -13,12 +13,13 @@ import Landing from './components/Landing';
 import EstablishmentSetup from './components/auth/EstablishmentSetup';
 import { authenticate } from './store/session';
 import SettingsNav from './components/establishment/Settings/SettingsNav';
-import Sections from './components/establishment/Settings/Sections';
+import Settings from './components/establishment/Settings';
 import { getEstablishment } from './store/establishment';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
   const dispatch = useDispatch();
+  const [settingTab, setSettingTab] = useState("sections")
 
   useEffect(() => {
     (async() => {
@@ -44,9 +45,9 @@ function App() {
         <ProtectedEstablishmentRoute path='/establishment' exact={true}>
           <Establishment/>
         </ProtectedEstablishmentRoute>
-        <ProtectedEstablishmentRoute path='/establishment/sections' exact={true}>
-          <SettingsNav/>
-          <Sections/>
+        <ProtectedEstablishmentRoute path='/establishment/settings' exact={true}>
+          <SettingsNav settingTab={settingTab} setSettingTab={setSettingTab}/>
+          <Settings settingTab={settingTab}/>
         </ProtectedEstablishmentRoute>
         <Route path='/login' exact={true}>
           <NavBar/>

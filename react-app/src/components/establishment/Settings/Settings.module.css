@@ -198,6 +198,12 @@
 }
 
 .edit_section_button {
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.delete_section_button {
     margin-bottom: 100px;
     width: 200px;
     margin-left: auto;

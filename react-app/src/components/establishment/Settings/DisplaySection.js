@@ -1,9 +1,10 @@
 import React from 'react';
-// import { useSelector } from 'react-redux';
+import { deleteSection } from '../../../store/establishment';
+import { useDispatch } from 'react-redux';
 import style from './Settings.module.css'
 
 const DisplaySection = ({section, setEditSections, editSections}) => {
-
+    const dispatch = useDispatch()
 
     return(
         <React.Fragment key={section.id}>
@@ -25,6 +26,7 @@ const DisplaySection = ({section, setEditSections, editSections}) => {
                     )
                 })}
             <button onClick={()=>setEditSections([...editSections, section.id])} className={style.edit_section_button}>{"Edit Section"}</button>
+            <button onClick={()=>dispatch(deleteSection(section.id))} className={style.delete_section_button}>{"Delete"}</button>
             </div>
         </React.Fragment>
     )

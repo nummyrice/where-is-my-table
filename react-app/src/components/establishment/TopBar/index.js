@@ -1,7 +1,7 @@
 import React, { useState, useContext} from 'react';
 import { useSelector } from 'react-redux';
 import { EstablishmentContext } from '..';
-import Settings from '../Settings';
+import SettingsSelector from '../Settings/SettingsSelector';
 import style from './TopBar.module.css';
 import { ReactComponent as SettingsIcon } from './assets/cogs-solid.svg';
 import { ReactComponent as RightArrow } from './assets/arrow-right-solid.svg';
@@ -60,7 +60,7 @@ const TopBar = ({periodIndex, handlePeriodChange}) => {
             </div>
             <SettingsIcon onClick={()=>setShowPanel(!showPanel)} className={style.establishment_settings}/>
             {showPanel &&
-            <Settings/>}
+            <SettingsSelector/>}
         </div>
     )
 }
