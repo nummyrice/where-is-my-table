@@ -21,4 +21,6 @@ class NewEstablishmentForm(FlaskForm):
     daylight_savings = BooleanField('daylight_savings', validators=[DataRequired()])
 
 class EditEstablishmentForm(FlaskForm):
+    id = IntegerField('id', validators=[DataRequired()])
     name = StringField('name', validators=[Length(min=1, max=40)])
+    daylight_savings = BooleanField('daylight_savings', validators=[DataRequired()])

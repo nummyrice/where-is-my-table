@@ -9,6 +9,8 @@ import { clearErrors, setErrors } from '../../../store/errors';
 import { newSection } from '../../../store/establishment';
 import NewSection from './NewSection'
 import EditEstablishment from './EditEstablishment';
+import SubmitTable from './SubmitTable'
+import DisplayTables from './DisplayTables';
 
 const Settings = ({settingTab, setSettingTab}) => {
 
@@ -19,6 +21,8 @@ const Settings = ({settingTab, setSettingTab}) => {
     const [newSectionForm, setNewSectionForm] = useState(false)
     const [editSections, setEditSections] = useState([])
     const [showErrorsModal, setShowErrorsModal] = useState(false)
+    const [newTable, setNewTable] = useState(null)
+    const [editTables, setEditTables] = useState([])
 
 
     const errorClose = () => {
@@ -27,7 +31,29 @@ const Settings = ({settingTab, setSettingTab}) => {
     }
     if (settingTab === 'tables') {
         return(
-            <div id={style.sections_page}></div>
+            <div id={style.sections_page}>
+                {newTable && <SubmitTable sections={establishment.sections} newTable={newTable} setNewTable={setNewTable} editTable={null} setEditTable={null}/>}
+                {!newTable && <>
+                    <button onClick={() => setNewTable(true)} id={style.new_section_button}>{"New Table"}</button>
+                    <div id={style.divider}></div>
+                </>}
+                {Object.keys(establishment.sections).map(sectionId => {
+                    const section = establishment.sections[sectionId]
+                    return(
+                        <>
+                            {section.tables && Object.keys(section.tables).map(tableId => {
+                                const table = section.tables[tableId]
+                                return(
+                                    <>
+                                        {!editTables.find(editTable => editTable.id === table.id) && <DisplayTables table={table} setEditTables={setEditTables} editTables={editTables}/>}
+                                        {editTables.find(editTable => editTable.id === table.id) && <SubmitTable id={table.id} sections={establishment.sections} editTables={editTables} newTable={null} setEditTables={setEditTables} setNewTable={null}/>}
+                                    </>
+                                )
+                            })}
+                        </>
+                    )
+                })}
+            </div>
         )
     }
     if (settingTab === "establishment") {
@@ -48,8 +74,18 @@ const Settings = ({settingTab, setSettingTab}) => {
     if (settingTab === "sections") {
         return(
             <div id={style.sections_page}>
-                {newSectionForm && <NewSection setNewSectionForm={setNewSectionForm} setShowErrorsModal={setShowErrorsModal}/>}
-                {!newSectionForm && <button onClick={() => setNewSectionForm(true)} id={style.new_section_button}>{"New Section"}</button>}
+                {newSectionForm &&
+                    <>
+                        <NewSection setNewSectionForm={setNewSectionForm} setShowErrorsModal={setShowErrorsModal}/>
+                        <div id={style.divider}></div>
+                    </>
+                    }
+                {!newSectionForm &&
+                    <>
+                        <button onClick={() => setNewSectionForm(true)} id={style.new_section_button}>{"New Section"}</button>
+                        <div id={style.divider}></div>
+                    </>
+                }
                 {establishment.sections && Object.keys(establishment.sections).map(sectionId => {
                     const section = establishment.sections[sectionId]
                     return(

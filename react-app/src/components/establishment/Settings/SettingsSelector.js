@@ -7,9 +7,8 @@ const SettingsSelector = () => {
 
     return (
         <div id={style.settings_panel}>
-            <div>{"Settings"}</div>
+            <NavLink is style={{fontSize: "20px", marginBottom: "20px", color: "grey", textDecoration: "none", fontWeight: "20px"}} to={"/establishment/settings"}>{"Settings"}</NavLink>
             <LogoutButton/>
-            <NavLink to={"/establishment/settings"}>{"Sections"}</NavLink>
         </div>
     )
 }

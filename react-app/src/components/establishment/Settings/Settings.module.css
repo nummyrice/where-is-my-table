@@ -8,12 +8,9 @@
     background-color:#262626;
     z-index: 1;
     padding: 40px;
+    display: flex;
+    flex-direction: column;
 
-}
-
-#settings_panel > div {
-    font-size: 20px;
-    margin-bottom: 20px;
 }
 
 
@@ -21,32 +18,70 @@
 #settings_nav {
     width: 100vw;
     position: relative;
-    height: 50px;
+    height: 100px;
     display: grid;
-    grid-template-columns: 1fr 4fr;
-    grid-template-rows: 1fr;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: 1fr 1fr;
     grid-template-areas:
-    "back name"
-    ;
+    "back name name name . ."
+    "back est sec tab . .";
     background-color: #111111;
     font-family: sans-serif;
+    justify-content: center;
+    align-content: center;
 }
 
 #return_button {
     grid-area: back;
-    border-top: 4px solid #afafaf;
-    border-left: 4px solid #afafaf;
-    height: 25px;
-    width: 25px;
-    margin: 15px;
-    border-top-left-radius: 6px;
+    transform: rotate(360deg) scaleX(-1);
+    color: white;
+    width: 40px;
+    margin: auto;
+
     /* offset-rotate: auto 90deg; */
+}
+
+#return_button:hover {
+    cursor: pointer;
+}
+
+.setting_tab {
+    width: 100px;
+    margin-right: auto;
+    margin-left: auto;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.setting_tab:hover {
+    cursor: pointer;
+}
+
+#establishment_selector {
+    grid-area: est;
+}
+
+#sections_selector {
+    grid-area: sec;
+}
+
+#tables_selector {
+    grid-area: tab;
+}
+
+.selected_tab {
+    border-bottom: 2px solid white;
 }
 
 #settings_nav h1 {
     grid-area: name;
-    font-size: 1rem;
+    font-size: 1.5rem;
+    margin-right: auto;
+    margin-left: auto;
 }
+/* SETTINGS MAIN */
 
 /* SECTIONS */
 #sections_page {
@@ -66,6 +101,14 @@
     margin-bottom: 50px;
 }
 
+#divider {
+    border-bottom: 1px solid white;
+    width: 370px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 50px;
+}
+
 #new_section_form h3 {
     margin-top: 50px;
 }
@@ -73,7 +116,7 @@
 #new_section_form {
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 100px;
+    margin-bottom: 50px;
     width: 370px;
     /* padding: 50px; */
     /* width: calc(100vw - 20rem) */
@@ -125,12 +168,12 @@
     margin-left: auto;
     margin-right: auto;
     width: 370px;
-    margin-bottom: 100px;
+    /* margin-bottom: px; */
     /* display: flex;
     justify-content: center; */
 }
 
-#new_section_form:after {
+#new_section_form::after {
     content: '';
     width: 370px;
     border-bottom: 1px solid white;
@@ -155,6 +198,10 @@
     /* .display_section {
         width: calc(100vw / 2) !important;
     } */
+    #edit_est_form {
+        width: calc(100vw / 2);
+        padding: 50px;
+    }
 }
 
 /* DISPLAY SECTION */
@@ -179,7 +226,7 @@
     margin-bottom: 30px;
 }
 
-.display_section:after {
+.display_section::after {
     content: '';
     /* width: 500px; */
     border-bottom: 1px solid white;
@@ -208,4 +255,23 @@
     width: 200px;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* ESTABLISHMENT SETTINGS */
+
+#edit_est_form {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 50px;
+    width: 370px;
+    display: flex;
+    flex-direction: column;
+}
+
+#edit_est_form label {
+    margin-top: 50px;
+}
+
+#edit_est_form button {
+    margin-top: 50px;
 }

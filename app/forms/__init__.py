@@ -7,3 +7,4 @@ from .tags_form import NewTagsForm, NewPartyTagsForm
 from .waitlist_form import WaitlistForm, UpdateWaitlistForm
 from .establishment_form import NewEstablishmentForm, EditEstablishmentForm
 from .section_form import NewSectionForm, EditSectionForm
+from .table_form import NewTableForm, EditTableForm

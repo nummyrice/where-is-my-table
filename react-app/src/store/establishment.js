@@ -5,6 +5,9 @@ const UPDATE_SECTION = 'establishment/UPDATE_SECTION'
 const DELETE_SECTION = 'establishment/DELETE_SECTION'
 const UNSET_ESTABLISHMENT = 'establishment/UNSET_ESTABLISHMENT'
 const UPDATE_ESTABLSHMENT = 'establishment/UPDATE_ESTABLISHMENT'
+const NEW_TABLE = 'establishment/NEW_TABLE'
+const UPDATE_TABLE = 'establishment/UPDATE_TABLE'
+const DELETE_TABLE = 'establishment/DELETE_TABLE'
 
 const setEstablishment = (establishment) => ({
     type: SET_ESTABLISHMENT,
@@ -33,6 +36,21 @@ export const unsetEstablishment = () => ({
 const updateEstablishment = (establishment) => ({
     type: UPDATE_ESTABLSHMENT,
     payload: establishment
+})
+
+const setTable = (table) => ({
+    type: NEW_TABLE,
+    payload: table
+})
+
+const updateTable = (table) => ({
+    type: UPDATE_TABLE,
+    payload: table
+})
+
+const unsetTable = (tableId) => ({
+    type: DELETE_TABLE,
+    payload: tableId
 })
 
 export const getEstablishment = (establishmentId) => async (dispatch) => {
@@ -72,6 +90,7 @@ export const editEstablishment = (id, name, daylightSavings) => async (dispatch)
         name: name,
         daylight_savings: daylightSavings
     }
+    console.log("update estab: ", updatedEstablishment)
     const response = await fetch("/api/establishments/edit", {
                                 method: "PUT",
                                 headers: {'Content-Type': "application/json"},
@@ -80,7 +99,7 @@ export const editEstablishment = (id, name, daylightSavings) => async (dispatch)
     const data = await response.json()
     if (!response.ok) {
         dispatch(setErrors(data.errors))
-        return
+        return data
     }
     dispatch(updateEstablishment(data))
     return data;
@@ -135,6 +154,48 @@ export const deleteSection = (sectionId) => async (dispatch) => {
     }
 }
 
+export const createTable = (newTableDetails) => async (dispatch) => {
+    const response = await fetch(`/api/establishments/tables/new`, {
+        method: "POST",
+        headers: {'Content-Type': "application/json"},
+        body: JSON.stringify(newTableDetails)})
+    const data = await response.json()
+    if (!response.ok) {
+        if (data.errors) dispatch(setErrors)
+        return data;
+    }
+    dispatch(setTable(data))
+    return data;
+}
+
+export const modifyTable = () => async (dispatch) => {
+    const updatedTable = {
+
+    }
+    const response = await fetch(`/api/establishments/tables/edit`, {
+        method: "PUT",
+        headers: {'Content-Type': "application/json"},
+        body: JSON.stringify(updatedTable) })
+    const data = await response.json()
+    if (!response.ok) {
+        if (data.errors) dispatch(setErrors)
+        return data;
+    }
+    dispatch(updateTable(data))
+    return data;
+}
+
+export const deleteTable = (tableId) => async (dispatch) => {
+    const response = await fetch(`/api/establishments/tables/${tableId}`, {method: "DELETE"})
+    const data = await response.json()
+    if (!response.ok) {
+        if (data.errors) dispatch(setErrors)
+        return data;
+    }
+    dispatch(deleteTable(tableId))
+    return data;
+}
+
 const initialState = null;
 export default function reducer(state = initialState, action) {
     const newState = !state ? {} : {...state}
@@ -158,6 +219,26 @@ export default function reducer(state = initialState, action) {
             delete newSectionState[action.payload]
             newState.sections = newSectionState
             return newState
+        case NEW_TABLE:
+            const tableSection = newState.sections[action.payload.section_id]
+            const tables = {...tableSection.tables, [action.payload.id]: action.payload}
+            return {...newState, sections: {...newState.sections, [action.payload.section_id]: {...tableSection, tables: tables}}}
+        case UPDATE_TABLE:
+            const tableSectionToUpdate = newState.sections[action.payload.section_id]
+            const tablesToUpdate = {...tableSection.tables, [action.payload.id]: action.payload}
+            for (let sectionId in newState.sections) {
+                if (sectionId !== action.payload.section_id) {
+                    if (newState.sections[sectionId].tables[action.payload.id]) {
+                        delete newState.sections[sectionId].tables[action.payload.id]
+                    }
+                }
+            }
+            return {...newState, sections: {...newState.sections, [action.payload.section_id]: {...tableSectionToUpdate, tables: tablesToUpdate}}}
+        case DELETE_TABLE:
+            const deleteFromSection = newState.sections[action.payload.section_id]
+            const deleteFromTables = {...tableSection.tables, [action.payload.id]: action.payload}
+            delete deleteFromTables[action.payload]
+            return {...newState, sections: {...newState.sections, [action.payload.section_id]: {...deleteFromSection, tables: deleteFromTables}}}
         default:
             return state;
     }
