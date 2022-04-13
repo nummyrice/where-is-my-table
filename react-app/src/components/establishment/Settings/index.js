@@ -40,17 +40,17 @@ const Settings = ({settingTab, setSettingTab}) => {
                 {Object.keys(establishment.sections).map(sectionId => {
                     const section = establishment.sections[sectionId]
                     return(
-                        <>
+                        <React.Fragment key={`section_${section.id}`}>
                             {section.tables && Object.keys(section.tables).map(tableId => {
                                 const table = section.tables[tableId]
                                 return(
-                                    <>
+                                    <React.Fragment key={`display_or_edit_${table.id}`}>
                                         {!editTables.find(editTable => editTable.id === table.id) && <DisplayTables table={table} setEditTables={setEditTables} editTables={editTables}/>}
                                         {editTables.find(editTable => editTable.id === table.id) && <SubmitTable id={table.id} sections={establishment.sections} editTables={editTables} newTable={null} setEditTables={setEditTables} setNewTable={null}/>}
-                                    </>
+                                    </React.Fragment>
                                 )
                             })}
-                        </>
+                        </React.Fragment>
                     )
                 })}
             </div>

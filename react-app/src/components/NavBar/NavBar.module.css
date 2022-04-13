@@ -12,16 +12,50 @@
 
 .home_navlink {
     grid-area: logo;
-    align-self: center;
-    justify-self: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
 }
+
+#tableGater_icon circle {
+    /* transition-property: transform; */
+    /* transition-duration: 4s;
+    transition-delay: 2s; */
+    animation-name: blink;
+    animation-duration: 6s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+/* .home_navlink:hover, .home_navlink {
+} */
+
+@keyframes blink {
+    0% {
+      transform: scaleY(0.5) translateY(110px);
+    }
+    4% {
+        transform: none;
+    }
+    8%{
+        transform: scaleY(0.5) translateY(110px);
+    }
+    12% {
+        transform: none;
+    }
+    100% {
+        transform: none;
+    }
+  }
 
 #welcome {
     grid-area: empty;
     color: black;
     align-self: center;
-    font-family: sans-serif;
-    font-size: 15px;
+    font-family: 'Bungee', cursive;
+    font-size: 1.5rem;
 
 }
 

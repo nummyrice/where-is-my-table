@@ -14,10 +14,10 @@ from app.sockets import distribute_new_res, distribute_update_res, distribute_re
 
 reservation_routes = Blueprint('reservations', __name__)
 
-def get_availability(client_datetime, sections, timezone_offset, daylight_savings):
+def get_availability(client_datetime, sections, timezone_offset, daylight_savings, establishment_id):
     esta_offset = client_datetime + relativedelta(hours=timezone_offset)
     end_offset = esta_offset + relativedelta(days=1)
-    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset)).all()
+    todays_res = db.session.query(Reservation).filter(Reservation.reservation_time.between(esta_offset, end_offset), Reservation.establishment_id == establishment_id).all()
     for res in todays_res:
         res.reservation_time = res.reservation_time.replace(tzinfo=pytz.utc)
     weekday = client_datetime.strftime('%A').lower()

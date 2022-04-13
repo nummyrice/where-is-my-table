@@ -13,7 +13,7 @@ const SubmitTable = ({id, sections, editTables, newTable, setEditTables, setNewT
         isEdit = editTables.find(table => table.id === id)
     }
     const [tableName, setTableName] = useState(isEdit ? isEdit.table_name : '')
-    const [sectionId, setSectionId] = useState(isEdit ? isEdit.section_id : '')
+    const [sectionId, setSectionId] = useState(isEdit ? isEdit.section.id : '')
     const [minSeat, setMinSeat] = useState(isEdit ? isEdit.min_seat : 1)
     const [maxSeat, setMaxSeat] = useState(isEdit ? isEdit.max_seat : 1)
     const [customerViewName, setCustomerViewName] = useState(isEdit ? isEdit.customer_view_name : '')
@@ -24,16 +24,21 @@ const SubmitTable = ({id, sections, editTables, newTable, setEditTables, setNewT
             .then(data =>{
                 if (data.errors) {
                     console.log(data.errors)
+                    return
                 }
+                setNewTable(null)
             })
     }
 
     const handleEditTable = (event) => {
         event.preventDefault()
-        dispatch(modifyTable({id: editTables.id, name: tableName, section_id: sectionId, min_seat: minSeat, max_seat: maxSeat, customer_view_name: customerViewName}))
+        dispatch(modifyTable({id: id, table_name: tableName, section_id: sectionId, min_seat: minSeat, max_seat: maxSeat, customer_view_name: customerViewName}))
             .then(data =>{
                 if (data.errors) {
+                    console.log(data.errors)
+                    return
                 }
+                setEditTables([...editTables.filter(table => table.id !== id)])
             })
     }
 

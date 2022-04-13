@@ -120,7 +120,7 @@ def create_new_table():
             db.session.commit()
             return new_table.to_dict(), 201
         except:
-            return {'errors': ["table/new: database connection error"]}
+            return {'errors': ["table/new: database connection error"]}, 400
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 @establishment_routes.route('tables/edit', methods=['PUT'])

@@ -189,7 +189,7 @@
         padding: 50px;
     }
 
-    .display_section_name {
+    .display_table_name, .display_section_name {
         width: 400px !important;
     }
     .edit_section_button {
@@ -205,13 +205,13 @@
 }
 
 /* DISPLAY SECTION */
-.display_section_name {
+.display_table_name, .display_section_name {
     width: 370px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.display_section {
+.display_table, .display_section {
     margin-left: auto;
     margin-right: auto;
     width: 370px;
@@ -226,7 +226,7 @@
     margin-bottom: 30px;
 }
 
-.display_section::after {
+.display_table::after, .display_section::after {
     content: '';
     /* width: 500px; */
     border-bottom: 1px solid white;
@@ -244,13 +244,13 @@
     text-transform: capitalize;
 }
 
-.edit_section_button {
+.edit_table_button, .edit_section_button {
     width: 200px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.delete_section_button {
+.delete_table_button, .delete_section_button {
     margin-bottom: 100px;
     width: 200px;
     margin-left: auto;
@@ -275,3 +275,6 @@
 #edit_est_form button {
     margin-top: 50px;
 }
+
+
+/* Display Tables */

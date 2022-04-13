@@ -48,9 +48,9 @@ const updateTable = (table) => ({
     payload: table
 })
 
-const unsetTable = (tableId) => ({
+const unsetTable = (tableId, sectionId) => ({
     type: DELETE_TABLE,
-    payload: tableId
+    payload: {sectionId, tableId}
 })
 
 export const getEstablishment = (establishmentId) => async (dispatch) => {
@@ -168,14 +168,11 @@ export const createTable = (newTableDetails) => async (dispatch) => {
     return data;
 }
 
-export const modifyTable = () => async (dispatch) => {
-    const updatedTable = {
-
-    }
+export const modifyTable = (updatedTableDetails) => async (dispatch) => {
     const response = await fetch(`/api/establishments/tables/edit`, {
         method: "PUT",
         headers: {'Content-Type': "application/json"},
-        body: JSON.stringify(updatedTable) })
+        body: JSON.stringify(updatedTableDetails) })
     const data = await response.json()
     if (!response.ok) {
         if (data.errors) dispatch(setErrors)
@@ -185,14 +182,14 @@ export const modifyTable = () => async (dispatch) => {
     return data;
 }
 
-export const deleteTable = (tableId) => async (dispatch) => {
+export const deleteTable = (tableId, sectionId) => async (dispatch) => {
     const response = await fetch(`/api/establishments/tables/${tableId}`, {method: "DELETE"})
     const data = await response.json()
     if (!response.ok) {
         if (data.errors) dispatch(setErrors)
         return data;
     }
-    dispatch(deleteTable(tableId))
+    dispatch(unsetTable(tableId, sectionId))
     return data;
 }
 
@@ -220,25 +217,25 @@ export default function reducer(state = initialState, action) {
             newState.sections = newSectionState
             return newState
         case NEW_TABLE:
-            const tableSection = newState.sections[action.payload.section_id]
+            const tableSection = newState.sections[action.payload.section.id]
             const tables = {...tableSection.tables, [action.payload.id]: action.payload}
-            return {...newState, sections: {...newState.sections, [action.payload.section_id]: {...tableSection, tables: tables}}}
+            return {...newState, sections: {...newState.sections, [action.payload.section.id]: {...tableSection, tables: tables}}}
         case UPDATE_TABLE:
-            const tableSectionToUpdate = newState.sections[action.payload.section_id]
-            const tablesToUpdate = {...tableSection.tables, [action.payload.id]: action.payload}
+            const tableSectionToUpdate = newState.sections[action.payload.section.id]
+            const tablesToUpdate = {...tableSectionToUpdate.tables, [action.payload.id]: action.payload}
             for (let sectionId in newState.sections) {
-                if (sectionId !== action.payload.section_id) {
+                if (sectionId !== action.payload.section.id) {
                     if (newState.sections[sectionId].tables[action.payload.id]) {
                         delete newState.sections[sectionId].tables[action.payload.id]
                     }
                 }
             }
-            return {...newState, sections: {...newState.sections, [action.payload.section_id]: {...tableSectionToUpdate, tables: tablesToUpdate}}}
+            return {...newState, sections: {...newState.sections, [action.payload.sectionId]: {...tableSectionToUpdate, tables: tablesToUpdate}}}
         case DELETE_TABLE:
-            const deleteFromSection = newState.sections[action.payload.section_id]
-            const deleteFromTables = {...tableSection.tables, [action.payload.id]: action.payload}
-            delete deleteFromTables[action.payload]
-            return {...newState, sections: {...newState.sections, [action.payload.section_id]: {...deleteFromSection, tables: deleteFromTables}}}
+            const deleteFromSection = newState.sections[action.payload.sectionId]
+            const deleteFromTables = {...deleteFromSection.tables, [action.payload.tableId]: action.payload}
+            delete deleteFromTables[action.payload.tableId]
+            return {...newState, sections: {...newState.sections, [action.payload.sectionId]: {...deleteFromSection, tables: deleteFromTables}}}
         default:
             return state;
     }

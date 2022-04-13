@@ -10,6 +10,8 @@ import { ReactComponent as Bird} from './assets/crow-solid.svg';
 import { ReactComponent as DropDownIcon } from './assets/bars-solid.svg';
 import { login, deleteUser } from '../../store/session';
 import { getEstablishment } from '../../store/establishment';
+import { ReactComponent as AlligatorHead } from './assets/alligator-head.svg';
+import { ReactComponent as OpenMouth } from './assets/open-mouth.svg'
 
 const NavBar = () => {
   const history = useHistory()
@@ -32,7 +34,7 @@ const NavBar = () => {
     <nav className={style.navbar_main}>
       <div>
         <NavLink className={style.home_navlink} to='/' exact={true} activeClassName='active'>
-          <img alt='Logo' src={logo}></img>
+          <AlligatorHead id={style.tableGater_icon}/>
         </NavLink>
       </div>
       {user && <div id={style.welcome}>{`Welcome ${user.name.toUpperCase()}`}</div>}
