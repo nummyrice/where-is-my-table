@@ -15,6 +15,7 @@ import { authenticate } from './store/session';
 import SettingsNav from './components/establishment/Settings/SettingsNav';
 import Settings from './components/establishment/Settings';
 import { getEstablishment } from './store/establishment';
+import GuestResAccess from './components/establishment/GuestResAccess';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -49,6 +50,9 @@ function App() {
           <SettingsNav settingTab={settingTab} setSettingTab={setSettingTab}/>
           <Settings settingTab={settingTab}/>
         </ProtectedEstablishmentRoute>
+        <Route path={'/reser-a-table/:establishmentName/:id'}>
+          <GuestResAccess/>
+        </Route>
         <Route path='/login' exact={true}>
           <NavBar/>
           <LoginForm />
@@ -69,7 +73,7 @@ function App() {
           <NavBar/>
           <EstablishmentSetup/>
         </ProtectedRoute>
-        <Route path='/' exact={true} >
+        <Route path='/' exact={true}>
           <NavBar/>
           <Landing/>
         </Route>

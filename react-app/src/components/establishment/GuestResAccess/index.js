@@ -1,9 +1,16 @@
-import React from 'react'
+import React, {useEffect} from 'react'
+import { useParams } from 'react-router-dom'
 
 const GuestResAccess = () => {
+    const { establishmentName, id} = useParams()
+    useEffect(() => {
 
+    }, [])
     return(
-        <div></div>
+        <div>
+            <h1>{establishmentName}</h1>
+
+        </div>
     )
 }
 

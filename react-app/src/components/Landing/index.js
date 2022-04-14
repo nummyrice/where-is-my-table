@@ -8,45 +8,41 @@ import { ReactComponent as Food1} from './assets/food1.svg';
 import { ReactComponent as Food2 } from './assets/food2.svg';
 import guest_pic from './assets/guest_pic.png';
 import establishment_pic from './assets/establishment_pic.png';
-// import { SingleDatePicker } from 'react-dates';
-// import 'react-dates/lib/css/_datepicker.css';
 import githubLogo from './assets/github.png';
 import linkedinLogo from './assets/linkedin.png';
+import { DateTime, Settings } from 'luxon';
 
 const Landing = () => {
-    const today = new Date()
-    today.setUTCHours(0,0,0,0)
-    const [selectedDate, setSelectedDate] = useState(today);
+    Settings.defaultZone = "America/New_York"
+    const local = DateTime.local().startOf('day')
+    const [selectedDate, setSelectedDate] = useState(local);
     const [availableTables, setavailableTables] = useState([]);
-    const [showDatePicker, setShowDatePicker] = useState(false)
+    // const [showDatePicker, setShowDatePicker] = useState(false)
     const [dateArray, setDateArray] = useState([])
     const [showGuestReserveModal, setShowGuestReserveModal] = useState(false);
 
+    // establishment
     const getSevenDays = (date) => {
-        const result = [date];
-        for (let index = 0; index < 7; index++) {
-            // why is prevDate displaying as seconds in this loop if accessing above array
-            const prevDate = new Date(result[result.length - 1]);
-            const newDate = new Date(prevDate).setDate(prevDate.getDate() + 1)
-            result.push(newDate);
-        }
+        const result = Array(7).fill(0).map((_, i) => {
+            return date.plus({days: i})
+        })
         return result;
     }
 
-    // useEffect(() => {
-    //     setDateArray(getSevenDays(selectedDate));
-    //     fetch('/api/reservations/today', {
-    //         method: 'POST',
-    //         headers: {"Content-Type": "application/json"},
-    //         body: JSON.stringify({"client_date": selectedDate.toISOString()})
-    //     }).then(async (response) => {
-    //         const data = await response.json()
-    //         setavailableTables(data.availability)
-    //         // console.log('AVAILABLE TABLES', data)
-    //     }).catch((e) => {
-    //         console.error(e)
-    //     })
-    // },[selectedDate])
+    useEffect(() => {
+        setDateArray(getSevenDays(selectedDate));
+        fetch('/api/reservations/Village_Baker-1/availability', {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({"client_date": selectedDate.toISO()})
+        }).then(async (response) => {
+            const data = await response.json()
+            setavailableTables(data.available_tables)
+            return
+        }).catch((e) => {
+            console.error(e)
+        })
+    },[selectedDate, setavailableTables])
 
     return(
         <div className={style.landing_main}>
@@ -93,20 +89,21 @@ const Landing = () => {
                             <div
                             key={date}
                             id={index}
-                            className={selectedDate.getTime() === new Date(date).getTime() ? style.date_selection_active : style.date_selection}
-                            onClick={()=>setSelectedDate(new Date(date))}
-                            >{new Date(date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>)})}
+                            className={selectedDate.toMillis() === DateTime.local().startOf('day').toMillis() ? style.date_selection_active : style.date_selection}
+                            onClick={()=>setSelectedDate(date)}
+                            >{date.toLocaleString({month: 'short', day: 'numeric'})}</div>)})}
                     </div>
                     {!availableTables.length && <div> No tables available. Please select a new date.</div>}
                     {availableTables.length && <div id={style.availability_grid}>
-                        {availableTables.map((table, reservationId)=>{
+
+                        {availableTables.map((table, i)=>{
                             return(
-                            <React.Fragment key={reservationId}>
-                            <div onClick={() => setShowGuestReserveModal(reservationId)} id={reservationId} className={style.avail_table_cell}>
-                                <div>{new Date(table.datetime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
-                                <div>{table.table.table_name}</div>
+                            <React.Fragment key={`${table.res_time}_${table.table_details.id}`}>
+                            <div onClick={() => setShowGuestReserveModal(i)} className={style.avail_table_cell}>
+                                <div>{DateTime.fromISO(table.res_time).toLocaleString({hour: '2-digit', minute: '2-digit'})}</div>
+                                <div>{table.table_details.table_name}</div>
                             </div>
-                            {showGuestReserveModal === reservationId &&
+                            {showGuestReserveModal === i &&
                             <GuestReserveModal
                                 availableTableTime={table}
                                 setShowGuestReserveModal={setShowGuestReserveModal}
