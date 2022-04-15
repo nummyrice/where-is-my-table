@@ -1,10 +1,11 @@
 .landing_main {
-    display: flex;
-    flex-direction: column;
-    background-color: #05668d;
-    width: 100vw;
-    height: 100vh;
-    overflow-y: scroll;
+    /* display: flex; */
+    /* flex-direction: column; */
+
+    width: 100%;
+    height: auto;
+    /* overflow-y: scroll;
+    overflow-x: hidden; */
     font-family: 'Roboto', sans-serif;
     /* justify-content: space-between; */
 }
@@ -15,11 +16,11 @@
 }
 
 #intro {
-    background-color: #427aa1;
+    /* background-color: #427aa1; */
     width: 50%;
     padding: 25px;
     border-radius: 18px;
-    margin: 200px auto 100px auto;
+    margin: 60px auto 0px auto;
     font-family: 'Roboto', sans-serif;
 }
 
@@ -58,14 +59,17 @@
 
 #intro_section {
     position: relative;
+    background-color: #05668d;
+    padding: 100px;
 }
 
 /* FEATURES */
 #feature_section {
     background-color: #a5be00;
-    width: 100vw;
+    width: 100%;
     height: auto;
     flex-shrink: 0;
+    padding: 100px;
 }
 
 #features_description {
@@ -73,7 +77,7 @@
     width: 50%;
     padding: 25px;
     border-radius: 18px;
-    margin: 60px auto 2% auto;
+    margin: 0px auto 2% auto;
 }
 
 #example_image_1 {
@@ -130,19 +134,65 @@
 
 #availability_grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(80px, 1fr));
+    /* grid-template-columns: repeat(5, minmax(80px, 1fr)); */
+    grid-template-columns: repeat(3,minmax(80px,1fr));
     grid-column-gap: 10px;
     grid-row-gap: 10px;
-    width: 60%;
+    width: 80%;
     margin: 20px auto 20px auto;
 }
 
-#date_selection_bar {
+@media (min-width: 600px) {
+    #availability_grid {
+        grid-template-columns: repeat(5, minmax(80px,1fr));
+    }
+}
+
+#res_params_selector {
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 8%);
+    background-color: #eaf2fa;
+    border: 1px solid #eaeaea;
+    border-radius: 28px;
     display: flex;
-    margin: 2px auto 2px auto;
+    width: fit-content;
+    margin: 1.5em auto 1.5em auto;
+}
+
+#res_params_selector label {
+    color: black;
+}
+#res_date_param_container,
+#res_guest_param_container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin: 10px;
+
+}
+
+#guest_num_selector {
+    background-color: #444;
+    color: #fff;
+    height: 38px;
+    /* font-size: 12px; */
+    margin: 3px;
+    border: none;
+    border-radius: 6px;
+    /* box-sizing: border-box; */
+    width: 100%;
+    padding: 4px 4px;
+    writing-mode: horizontal-tb !important;
+    word-spacing: normal;
+}
+
+#date_selection_bar {
+    margin: 0px auto 0px auto;
     width: 80%;
-    justify-content: space-evenly;
-    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 90px;
+    overflow-x: scroll;
+    white-space: nowrap;
 }
 
 .date_selection {
@@ -152,12 +202,14 @@
     font-family: sans-serif;
     font-size: large;
     font-weight:bolder;
-    height: 5rem;
-    width: 5rem;
+    height: 80px;
+    width: 80px;
     line-height: 5rem;
     text-align: center;
-    margin: 3px;
+    margin: 0px 3px 0px 5px;
     text-transform: uppercase;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 .date_selection:hover {
@@ -165,20 +217,10 @@
     cursor: pointer;
 }
 .date_selection_active {
-    /* -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black; */
-    border-radius: 50%;
     background-color: #679436;
     color: #a5be00;
-    font-family: sans-serif;
-    font-size: large;
-    font-weight:bolder;
-    height: 5rem;
-    width: 5rem;
-    line-height: 5rem;
-    text-align: center;
-    margin: 3px;
-    text-transform: uppercase;
+
+
 
 }
 
@@ -189,10 +231,10 @@
     background-color: #eaf2fa;
     color: #a5be00;
     font-family: sans-serif;
-    font-size: large;
     font-weight:bolder;
     text-transform: uppercase;
     align-items: center;
+    border-radius: 4px;
 
 }
 
@@ -201,6 +243,13 @@
     cursor: pointer;
 }
 
+.avail_table_cell_name {
+    font-size: small;
+}
+
+.avail_table_cell_date {
+    font-size: large;
+}
 #links_section {
     display: flex;
     background-color: #427aa1;
@@ -218,4 +267,9 @@
 
 #github {
 
+}
+
+#spacer {
+    height: 800px;
+    width: 100%;
 }

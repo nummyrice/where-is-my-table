@@ -34,7 +34,7 @@ html:focus-within {
 
 /* Set core body defaults */
 body {
-  height: 100vh;
+  height: auto;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
 }
@@ -64,8 +64,9 @@ ul {
   padding: 0;
 }
 div#root {
-  height: 100%;
-  overflow: hidden;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
   background-color: white;

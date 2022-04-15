@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
-from app.forms import ReservationForm, UpdateReservationForm
+from app.forms import ReservationForm, UpdateReservationForm, GuestReservationForm
 from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
 import json
@@ -47,11 +47,11 @@ def get_availability(client_iso, sections, daylight_savings):
                     select_table_key = 0
                     # print("compare times", block_start_time, block_end_time)
                     while target_time < block_end_time:
-                        print('keys: ', select_table_key)
+                        # print('keys: ', select_table_key)
                         select_table = tables[table_keys[select_table_key]]
                         table_free = True
                         for res in block_res_list:
-                            if res.table_id == select_table.id:
+                            if res['table_id'] == select_table['id']:
                                 time_delta = res.reservation_time - target_time
                                 if abs(time_delta.total_seconds()) / 3600 < 2:
                                     table_free = False
@@ -136,6 +136,30 @@ def reservation_lock():
         db.session.commit()
         return {"result": "set pending"}, 201
 
+# GUEST RESERVATION SUBMIT
+@reservation_routes.route('/new/<establishment_name>', methods=['POST'])
+def guest_reservation_submit(establishment_name):
+    form = GuestReservationForm()
+    form['csrf_token'].data = request.cookies['csrf_token']
+    if form.validate_on_submit():
+        # reservation_time = parser.parse(form.data['reservation_time'])
+        reservation_time = datetime.fromisoformat(form.data['reservation_time'])
+        # reservation_exists = db.session.query(Reservation).filter(Reservation.reservation_time == reservation_time, Reservation.table_id == form.data['table_id']).one_or_none()
+        reservation = Reservation(
+                guest_id = form.data['guest_id'],
+                party_size = form.data['party_size'],
+                status_id = 3,
+                # reservation_time = reservation_time.replace(tzinfo = None),
+                reservation_time = reservation_time,
+                section_id = form.data['section_id'],
+                establishment_id = form.data['establishment_id']
+            )
+        db.session.add(reservation)
+        db.session.commit()
+        establishment_id = f'establishment_{reservation.establishment_id}'
+        distribute_new_res(reservation.to_dict(),establishment_id)
+        return reservation.to_dict(), 201
+    return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 # SUBMIT RESERVATION
 @reservation_routes.route('/new', methods=['POST'])

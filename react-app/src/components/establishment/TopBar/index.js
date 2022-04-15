@@ -43,7 +43,7 @@ const TopBar = ({periodIndex, handlePeriodChange}) => {
                             'height': '5px',
                             'margin': '3px',
                             "border": "2px solid #4c5868",
-                            "border-radius": "6px"
+                            "borderRadius": "6px"
                         },
                         '.MuiButtonBase-root': {
                             'color': '#fff'
