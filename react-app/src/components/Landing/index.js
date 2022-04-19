@@ -15,6 +15,7 @@ import DateAdapter from '@mui/lab/AdapterLuxon';
 import TextField from '@mui/material/TextField';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import { Modal } from '../../context/Modal';
 
 const Landing = () => {
     Settings.defaultZone = "America/New_York"
@@ -100,7 +101,6 @@ const Landing = () => {
                             <label htmlFor={'date'}>{"Date"}</label>
                             <LocalizationProvider dateAdapter={DateAdapter}>
                                 <DesktopDatePicker
-                                    open={showDatePicker}
                                     label="Date desktop"
                                     inputFormat="MM/dd/yyyy"
                                     value={selectedDate}
@@ -173,12 +173,15 @@ const Landing = () => {
                                 <div className={style.avail_table_cell_name}>{table.table_details.table_name}</div>
                             </div>
                             {showGuestReserveModal === i &&
-                            <GuestReserveModal
-                                availableTableTime={table}
-                                setShowGuestReserveModal={setShowGuestReserveModal}
-                                selectedDate={selectedDate}
-                                setSelectedDate={setSelectedDate}
-                                />}
+                                <Modal onClose={() => setShowGuestReserveModal(false)}>
+                                    <GuestReserveModal
+                                        availableTableTime={table}
+                                        setShowGuestReserveModal={setShowGuestReserveModal}
+                                        selectedDate={selectedDate}
+                                        setSelectedDate={setSelectedDate}
+                                    />
+                                </Modal>
+                            }
                             </React.Fragment>)
                         })}</div>}
                 </div>

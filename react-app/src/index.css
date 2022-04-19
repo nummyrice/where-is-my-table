@@ -64,9 +64,9 @@ ul {
   padding: 0;
 }
 div#root {
-  height: auto;
+  /* height: auto;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: scroll; */
   text-rendering: optimizeSpeed;
   line-height: 1.5;
   background-color: white;

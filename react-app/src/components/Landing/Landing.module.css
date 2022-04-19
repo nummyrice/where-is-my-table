@@ -1,9 +1,30 @@
+/* :export {
+    brandColor: $blue;
+    baseFontSize: $base-font-size;
+ } */
+
+ /* .panelDefault{
+    composes: panel from './panel.css";
+    max-width: 640px;
+    margin-bottom: 24px;
+ } */
+
+
+ /* :global .active{
+    color: #fff;
+    border-bottom: 1px solid teal;
+ }
+ :global .wrapper{
+    background-color: teal;
+ } */
+
+
 .landing_main {
     /* display: flex; */
     /* flex-direction: column; */
 
     width: 100%;
-    height: auto;
+    /* height: auto; */
     /* overflow-y: scroll;
     overflow-x: hidden; */
     font-family: 'Roboto', sans-serif;
@@ -59,17 +80,20 @@
 
 #intro_section {
     position: relative;
-    background-color: #05668d;
-    padding: 100px;
+    background-color: #fff;
+    padding-top: 100px;
+    padding-bottom: 100px;
 }
 
 /* FEATURES */
 #feature_section {
     background-color: #a5be00;
     width: 100%;
-    height: auto;
+    /* height: auto; */
     flex-shrink: 0;
-    padding: 100px;
+    padding-top: 100px;
+    padding-bottom: 100px;
+    /* overflow-x: hidden; */
 }
 
 #features_description {
@@ -96,8 +120,7 @@
     border-radius: 18px;
     /* margin: 100px auto 100px auto; */
     position: relative;
-    left: 400px;
-    bottom: 50px;
+    float: left;
 }
 
 
@@ -115,9 +138,8 @@
     padding: 25px;
     border-radius: 18px;
     /* margin: 100px auto 100px auto; */
-    position: relative;
-    bottom: 50px;
-    left: 200px;
+    /* position: relative; */
+    float: left;
 
 }
 
@@ -156,6 +178,8 @@
     display: flex;
     width: fit-content;
     margin: 1.5em auto 1.5em auto;
+    top: 80px;
+    position: sticky;
 }
 
 #res_params_selector label {
@@ -190,9 +214,8 @@
     width: 80%;
     display: flex;
     justify-content: center;
-    height: 90px;
     overflow-x: scroll;
-    white-space: nowrap;
+    flex-wrap: nowrap;
 }
 
 .date_selection {

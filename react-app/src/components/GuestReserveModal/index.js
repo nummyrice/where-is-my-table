@@ -53,7 +53,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
     // TODO: allow user to add notes or tags
     if (!user) return <Redirect to='/login'/>;
     return(
-        <div className={style.background}>
+
             <form onSubmit={handleSubmit} id={style.guest_res_modal}>
                 <span id={style.guest_res_header}>
                     <UtensilsIcon/>
@@ -90,7 +90,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
                     <button type='submit'>Confirm</button>
                 </span>
             </form>
-        </div>
+
     )
 }
 
