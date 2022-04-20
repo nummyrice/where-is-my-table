@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_login import current_user, login_required
 import sqlalchemy
-from app.models import db, Waitlist, Table
+from app.models import db, Waitlist, Table, Establishment
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from app.forms import WaitlistForm, UpdateWaitlistForm
@@ -9,8 +9,39 @@ from .auth_routes import validation_errors_to_error_messages
 from sqlalchemy import exc
 from app.sockets import distribute_new_party, distribute_update_party, distribute_delete_party, distribute_party_status_change
 from .auth_routes import validation_errors_to_error_messages
+import pytz
+import datetime
 
 waitlist_routes = Blueprint('waitlist', __name__)
+# GET WAITLIST NUMBER
+@waitlist_routes.route('/<establishment_name>/<int:establishment_id>/waitlist-details', methods=['GET'])
+def waitlist_details(establishment_name, establishment_id):
+    try:
+        establishment = db.session.query(Establishment).get(establishment_id)
+        timezone = pytz.timezone(establishment.get_timezone())
+        establishment_now = datetime.datetime.now(timezone).replace(hour=0, minute=0)
+        end_time = establishment_now + relativedelta(days=1)
+        todays_waitlist = db.session.query(Waitlist).filter(Waitlist.created_at.between(establishment_now, end_time),Waitlist.status_id == 5,  Waitlist.establishment_id == establishment_id).all()
+        current_place = None
+        max_wait = 0
+        for i, party_query in enumerate(todays_waitlist):
+            party = party_query.to_dict()
+            if max_wait < party.estimated_wait:
+                max_wait = party.estimated_wait
+            if current_user:
+                if party.guest_id == current_user.id:
+                    current_place = i + 1
+        data = {
+            "waitlist_count": len(todays_waitlist),
+            "estimated_wait": max_wait,
+            "place": current_place
+        }
+
+
+        return data, 200
+    except:
+        return {"errors": ["there was an error getting waitlist data"]}, 400
+#
 
 # GET WAITLIST
 @waitlist_routes.route('/selected-date', methods=['POST'])

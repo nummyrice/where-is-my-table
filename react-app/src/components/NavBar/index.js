@@ -140,16 +140,18 @@ window.addEventListener('resize', function(){
 
 // // --------------add active class-on another-page move----------
 
-
-
-
-
-// onClick={function(){
-// 	$(".navbar-collapse").slideToggle(300);
-// 	setTimeout(function(){ test(); });
-// }} className={`${style.navbar_toggler}`}
-
-
+function collapseExpand(event) {
+  var collapseNavbar = document.getElementsByClassName(`${style.navbar_collapse}`)[0]
+  if (collapseNavbar) {
+    if (collapseNavbar.style.display === 'block') {
+      // collapseNavbar.style.height = '0'
+      collapseNavbar.style.display = 'none'
+    } else {
+      // collapseNavbar.height = collapseNavbar.style.scrollHeight
+      collapseNavbar.style.display = 'block'
+    }
+  }
+}
 
 
   // if (user?.id === 1) return <Redirect to='/establishment'/>
@@ -159,7 +161,7 @@ window.addEventListener('resize', function(){
           <AlligatorHead id={style.tableGater_icon}/>
         </Link>
       <div></div>
-      <button className={style.navbar_toggler}
+      <button onClick={collapseExpand} className={style.navbar_toggler}
       type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <DropDownIcon/>
         </button>
@@ -169,21 +171,24 @@ window.addEventListener('resize', function(){
                 <li className={style.nav_item}>
                     <Link className={style.nav_link} to="/" ><i className="far fa-chart-bar"></i>Home</Link>
                 </li>
-                {!user && <li className={style.nav_item}>
-                    <Link className={style.nav_link} to="/login"><i className="fas fa-tachometer-alt"></i>Login</Link>
-                </li>}
                 {!user && <li className={`${style.nav_item} ${style.active}`}>
-                    <Link className={style.nav_link} ><i className="far fa-address-book"></i>Demo Guest</Link>
+                    <Link className={style.nav_link} to={'/reserve-a-table/village_baker/1'}><i className="far fa-address-book"></i>Demo Reservations</Link>
                 </li>}
                 <li className={style.nav_item}>
-                    <Link className={style.nav_link} to={"/establishment"} ><i className="far fa-clone"></i>Demo Dashboard</Link>
+                    <Link className={style.nav_link} to={"/join-waitlist/village_baker/1"} ><i className="far fa-clone"></i>Demo Waitlist</Link>
+                </li>
+                <li className={style.nav_item}>
+                    <Link className={style.nav_link} to={"/demo-dashboard-access"} ><i className="far fa-clone"></i>Demo Dashboard</Link>
                 </li>
                 <li className={style.nav_item}>
                     <Link className={style.nav_link} to="sign-up"><i className="far fa-calendar-alt"></i>Sign Up</Link>
                 </li>
-                <li className={style.nav_item}>
+                {!user && <li className={style.nav_item}>
+                    <Link className={style.nav_link} to="/login"><i className="fas fa-tachometer-alt"></i>Login</Link>
+                </li>}
+                {user && <li className={style.nav_item}>
                     <Link className={style.nav_link} to='/establishment-setup'><i className="far fa-copy"></i>Set Up a Restaurant</Link>
-                </li>
+                </li>}
             </ul>
         </div>
       {/* {user && <div id={style.welcome}>{`Welcome ${user.name.toUpperCase()}`}</div>}
