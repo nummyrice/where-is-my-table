@@ -45,6 +45,13 @@ class Waitlist(db.Model):
     tags = db.relationship("Tag", secondary=waitlist_tags, back_populates="waitlist")
     establishment = db.relationship("Establishment", back_populates="waitlist")
 
+    def to_safe_dict(self):
+        return{
+            "estimated_wait": self.estimated_wait,
+            "guest": self.guest.name,
+            "guest_id": self.guest_id,
+            'created_at': self.created_at.isoformat(),
+        }
 
     def to_dict(self):
         # timezone = pytz.timezone(self.establishment.get_timezone())
