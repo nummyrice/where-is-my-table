@@ -20,6 +20,7 @@ import GuestWaitlist from './components/establishment/GuestWaitlist'
 import GuestDashboardAccess from './components/GuestDashboardAccess';
 import { TransitionGroup, CSSTransition } from "react-transition-group"
 import "./App.css"
+import LogoutPage from './components/auth/LogoutPage';
 
 function App() {
   const location = useLocation()
@@ -64,6 +65,17 @@ function App() {
     //guestaccessWaitlist
     //guestAccessReservtation
   return (
+    <Switch>
+    <ProtectedEstablishmentRoute path='/establishment'>
+          <Route path='/establishment' exact={true}>
+            <Establishment/>
+          </Route>
+          <Route path='/establishment/settings' exact={true}>
+            <SettingsNav settingTab={settingTab} setSettingTab={setSettingTab}/>
+            <Settings settingTab={settingTab}/>
+          </Route>
+    </ProtectedEstablishmentRoute>
+    <Route path='/'>
     <TransitionGroup component="div" className="App">
       <NavBar/>
       <CSSTransition  key={currentKey}
@@ -79,53 +91,50 @@ function App() {
               }
             >
         <Switch location={location}>
-          <ProtectedEstablishmentRoute path='/establishment' exact={true}>
-            <Establishment/>
-          </ProtectedEstablishmentRoute>
-          <ProtectedEstablishmentRoute path='/establishment/settings' exact={true}>
-            <SettingsNav settingTab={settingTab} setSettingTab={setSettingTab}/>
-            <Settings settingTab={settingTab}/>
-          </ProtectedEstablishmentRoute>
           <Route path={'/reserve-a-table/:establishmentName/:id'}>
-            {/* <NavBar/> */}
+
             <GuestResAccess/>
           </Route>
           <Route path="/join-waitlist/:establishmentName/:id" exact={true}>
-            {/* <NavBar/> */}
+
             <GuestWaitlist/>
           </Route>
           <Route path='/login' exact={true}>
-            {/* <NavBar/> */}
+
             <LoginForm />
           </Route>
           <Route path="/demo-dashboard-access" exact={true}>
-            {/* <NavBar/> */}
+
             <GuestDashboardAccess/>
           </Route>
           <Route path='/sign-up' exact={true}>
-            {/* <NavBar/> */}
+
             <SignUpForm />
           </Route>
           <ProtectedRoute path='/users' exact={true}>
-            {/* <NavBar/> */}
+
             <UsersList/>
           </ProtectedRoute>
           <ProtectedRoute path='/users/:userId' exact={true} >
-            {/* <NavBar/> */}
+
             <User />
           </ProtectedRoute>
           <ProtectedRoute path='/establishment-setup' exact={true}>
-            {/* <NavBar/> */}
+
             <EstablishmentSetup/>
           </ProtectedRoute>
+          <Route path='/logout-page' exact={true}>
+              <LogoutPage/>
+          </Route>
           <Route path='/' exact={true}>
-            {/* <NavBar/> */}
             <Landing/>
           </Route>
         </Switch>
       </div>
       </CSSTransition>
     </TransitionGroup>
+    </Route>
+    </Switch>
   );
 }
 

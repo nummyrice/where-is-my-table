@@ -70,7 +70,7 @@ div#root {
   text-rendering: optimizeSpeed;
   line-height: 1.5;
   /* background-color: white; */
-  color: rgb(254, 254, 254);
+  /* color: rgb(254, 254, 254); */
 }
 ::-webkit-scrollbar {
   display: none;

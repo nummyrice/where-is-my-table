@@ -52,9 +52,9 @@ const GuestResAccess = () => {
 
     return(
         <div>
-            <h1>{establishmentName}</h1>
             <div id={style.availability_section}>
                     <div id={style.avail_sec_title}>Reserve a Table...</div>
+                 <div id={style.sticky_wrapper}>
                     <div id={style.res_params_selector}>
                         <div id={style.res_guest_param_container}>
                             <label htmlFor={'guestNum'}>{"Guests"}</label>
@@ -66,52 +66,53 @@ const GuestResAccess = () => {
                                 })}
                             </select>
                         </div>
-                        <div id={style.res_date_param_container}>
-                            <label htmlFor={'date'}>{"Date"}</label>
-                            <LocalizationProvider dateAdapter={DateAdapter}>
-                                <DesktopDatePicker
-                                    label="Date desktop"
-                                    inputFormat="MM/dd/yyyy"
-                                    value={selectedDate}
-                                    onChange={(date) => setSelectedDate(date)}
-                                    renderInput={(params) => <TextField {...params}
-                                    sx={{
-                                        '.MuiOutlinedInput-input': {
-                                            'display': 'hidden',
-                                            'backgroundColor': '#444',
-                                            'color': '#fff',
-                                            'height': '5px',
-                                            'margin': '3px',
-                                            "border": "none",
-                                            "borderRadius": "6px"
-                                        },
-                                        '.MuiInputLabel-root': {
-                                            'display': 'none'
-                                        },
-                                        // '.MuiInputAdornment-root': {
-                                        //     'border': 'none'
-                                        // },
-                                        '.MuiButtonBase-root': {
-                                            'color': 'black'
-                                        },
-                                        '.MuiButtonBase-root:hover': {
-                                            'color': '#808080',
-                                            'cursor': 'pointer'
-                                        },
-                                        '.MuiButtonBase-root svg': {
-                                            'height': '1.5em',
-                                            'width': '1.5em'
-                                        },
-                                        // '.MuiFormControl-root': {
-                                        //     'border': 'none'
-                                        // },
-                                        '.MuiOutlinedInput-notchedOutline': {
-                                            'border': 'none'
-                                        }
-                                    }} />}
-                                />
-                            </LocalizationProvider>
-                        </div>
+                            <div id={style.res_date_param_container}>
+                                <label htmlFor={'date'}>{"Date"}</label>
+                                <LocalizationProvider dateAdapter={DateAdapter}>
+                                    <DesktopDatePicker
+                                        label="Date desktop"
+                                        inputFormat="MM/dd/yyyy"
+                                        value={selectedDate}
+                                        onChange={(date) => setSelectedDate(date)}
+                                        renderInput={(params) => <TextField {...params}
+                                        sx={{
+                                            '.MuiOutlinedInput-input': {
+                                                'display': 'hidden',
+                                                'backgroundColor': '#444',
+                                                'color': '#fff',
+                                                'height': '5px',
+                                                'margin': '3px',
+                                                "border": "none",
+                                                "borderRadius": "6px"
+                                            },
+                                            '.MuiInputLabel-root': {
+                                                'display': 'none'
+                                            },
+                                            // '.MuiInputAdornment-root': {
+                                            //     'border': 'none'
+                                            // },
+                                            '.MuiButtonBase-root': {
+                                                'color': 'black'
+                                            },
+                                            '.MuiButtonBase-root:hover': {
+                                                'color': '#808080',
+                                                'cursor': 'pointer'
+                                            },
+                                            '.MuiButtonBase-root svg': {
+                                                'height': '1.5em',
+                                                'width': '1.5em'
+                                            },
+                                            // '.MuiFormControl-root': {
+                                            //     'border': 'none'
+                                            // },
+                                            '.MuiOutlinedInput-notchedOutline': {
+                                                'border': 'none'
+                                            }
+                                        }} />}
+                                    />
+                                </LocalizationProvider>
+                            </div>
+                    </div>
                 </div>
                     <div id={style.date_selection_bar}>
                         {dateArray.map((date, index)=>{

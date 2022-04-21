@@ -1,12 +1,16 @@
 /* AVAILABILITY SECTION */
-
+#availability_section {
+    font-family: "Roboto", sans-serif;
+}
 #avail_sec_title {
-    color: #eaf2fa;
-    font-family: sans-serif;
+    color: transparent;
+    font-family: bungee, sans-serif;
     font-size: 50px;
     position: relative;
     font-weight: bolder;
     left: 10%;
+    background-image: linear-gradient(60deg, #108758, #0D6E47,#5073b8, #19D489, #7BDCED, #129460, #07b39b, #6fba82);
+    background-clip: text;
 }
 
 #availability_grid {
@@ -24,17 +28,52 @@
         grid-template-columns: repeat(5, minmax(80px,1fr));
     }
 }
+#sticky_wrapper {
+    position: sticky;
+    top: 80px;
+    margin: 0 auto;
+}
 
 #res_params_selector {
     box-shadow: 0 2px 5px 0 rgb(0 0 0 / 8%);
     background-color: #eaf2fa;
-    border: 1px solid #eaeaea;
-    border-radius: 28px;
+    /* border: 1px solid #eaeaea; */
+    border-radius: 25px;
     display: flex;
     width: fit-content;
     margin: 1.5em auto 1.5em auto;
-    top: 80px;
-    position: sticky;
+
+    position: relative;
+    /* z-index: 1; */
+}
+
+#res_params_selector::after {
+    content: '';
+    position: absolute;
+    top: calc(-1*5px);
+    left: calc(-1*5px);
+    height: calc(100% + 5px * 2);
+    width: calc(100% + 5px * 2);
+    background: linear-gradient(60deg, #108758, #09472E, #0D6E47,#5073b8, #19D489, #7BDCED, #129460, #07b39b, #6fba82);
+
+    border-radius: calc(5*5px);
+    z-index: -1;
+    animation:animate 5s ease alternate infinite;
+    background-size: 300% 300%;
+    box-shadow: 0 30px 60px 0 rgb(90 116 148 / 40%);
+
+}
+
+@keyframes animate{
+    0%{
+        background-position: 0% 50%;
+    }
+    50%{
+        background-position: 100% 50%;
+    }
+    100%{
+        background-position: 0% 50%;
+    }
 }
 
 #res_params_selector label {
@@ -71,13 +110,14 @@
     justify-content: center;
     overflow-x: scroll;
     flex-wrap: nowrap;
+    height: 100px;
 }
 
 .date_selection {
     border-radius: 50%;
     background-color: #eaf2fa;
-    color: #a5be00;
-    font-family: sans-serif;
+    color: #3f729b;
+    /* font-family: sans-serif; */
     font-size: large;
     font-weight:bolder;
     height: 80px;
@@ -88,15 +128,17 @@
     text-transform: uppercase;
     display: inline-block;
     flex-shrink: 0;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 8%);
 }
 
 .date_selection:hover {
     background-color: #679436;
     cursor: pointer;
+    color: #eaf2fa;
 }
 .date_selection_active {
     background-color: #679436;
-    color: #a5be00;
+    color: #eaf2fa;
 
 
 
@@ -107,18 +149,20 @@
     display: flex;
     flex-direction: column;
     background-color: #eaf2fa;
-    color: #a5be00;
-    font-family: sans-serif;
+    color: #3f729b;
+    /* font-family: sans-serif; */
     font-weight:bolder;
     text-transform: uppercase;
     align-items: center;
     border-radius: 4px;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 8%);
 
 }
 
 .avail_table_cell:hover {
     background-color: #679436;
     cursor: pointer;
+    color: #eaf2fa;
 }
 
 .avail_table_cell_name {

@@ -46,6 +46,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
             return data
         }
         setShowGuestReserveModal(false);
+        alert("Successfully placed reservation")
         return data
 
     }

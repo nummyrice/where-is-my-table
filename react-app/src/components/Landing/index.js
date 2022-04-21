@@ -11,11 +11,141 @@ import githubLogo from './assets/github.png';
 import linkedinLogo from './assets/linkedin.png';
 
 
+
 const Landing = () => {
+
+  document.addEventListener("click", e => {
+    let handle
+    if (e.target.matches(".handle")) {
+      handle = e.target
+    } else {
+      handle = e.target.closest(".handle")
+    }
+    if (handle != null) onHandleClick(handle)
+  })
+
+  const throttleProgressBar = throttle(() => {
+    document.querySelectorAll(".progress-bar").forEach(calculateProgressBar)
+  }, 250)
+  window.addEventListener("resize", throttleProgressBar)
+
+  document.querySelectorAll(".progress-bar").forEach(calculateProgressBar)
+
+  function calculateProgressBar(progressBar) {
+    progressBar.innerHTML = ""
+    const slider = progressBar.closest(".row").querySelector(".slider")
+    const itemCount = slider.children.length
+    const itemsPerScreen = parseInt(
+      getComputedStyle(slider).getPropertyValue("--items-per-screen")
+    )
+    let sliderIndex = parseInt(
+      getComputedStyle(slider).getPropertyValue("--slider-index")
+    )
+    const progressBarItemCount = Math.ceil(itemCount / itemsPerScreen)
+
+    if (sliderIndex >= progressBarItemCount) {
+      slider.style.setProperty("--slider-index", progressBarItemCount - 1)
+      sliderIndex = progressBarItemCount - 1
+    }
+
+    for (let i = 0; i < progressBarItemCount; i++) {
+      const barItem = document.createElement("div")
+      barItem.classList.add("progress-item")
+      if (i === sliderIndex) {
+        barItem.classList.add("active")
+      }
+      progressBar.append(barItem)
+    }
+  }
+
+  function onHandleClick(handle) {
+    const progressBar = handle.closest(".row").querySelector(".progress-bar")
+    const slider = handle.closest(".container").querySelector(".slider")
+    const sliderIndex = parseInt(
+      getComputedStyle(slider).getPropertyValue("--slider-index")
+    )
+    const progressBarItemCount = progressBar.children.length
+    if (handle.classList.contains("left-handle")) {
+      if (sliderIndex - 1 < 0) {
+        slider.style.setProperty("--slider-index", progressBarItemCount - 1)
+        progressBar.children[sliderIndex].classList.remove("active")
+        progressBar.children[progressBarItemCount - 1].classList.add("active")
+      } else {
+        slider.style.setProperty("--slider-index", sliderIndex - 1)
+        progressBar.children[sliderIndex].classList.remove("active")
+        progressBar.children[sliderIndex - 1].classList.add("active")
+      }
+    }
+
+    if (handle.classList.contains("right-handle")) {
+      if (sliderIndex + 1 >= progressBarItemCount) {
+        slider.style.setProperty("--slider-index", 0)
+        progressBar.children[sliderIndex].classList.remove("active")
+        progressBar.children[0].classList.add("active")
+      } else {
+        slider.style.setProperty("--slider-index", sliderIndex + 1)
+        progressBar.children[sliderIndex].classList.remove("active")
+        progressBar.children[sliderIndex + 1].classList.add("active")
+      }
+    }
+  }
+
+  function throttle(cb, delay = 1000) {
+    let shouldWait = false
+    let waitingArgs
+    const timeoutFunc = () => {
+      if (waitingArgs == null) {
+        shouldWait = false
+      } else {
+        cb(...waitingArgs)
+        waitingArgs = null
+        setTimeout(timeoutFunc, delay)
+      }
+    }
+
+    return (...args) => {
+      if (shouldWait) {
+        waitingArgs = args
+        return
+      }
+
+      cb(...args)
+      shouldWait = true
+      setTimeout(timeoutFunc, delay)
+    }
+  }
 
     return(
         <div className={style.landing_main}>
-            <div id={style.intro_section}>
+            <div className={style.row}>
+    <div className={style.header}>
+      <h3 className={style.title}>Title</h3>
+      <div className={style.progress_bar}></div>
+    </div>
+    <div className={style.container}>
+      <button className={`${style.handle} ${style.left_handle}`}>
+        <div className={style.text}>&#8249;</div>
+      </button>
+      <div className={style.slider}>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/210/00FF00?text=1"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/220/00FF00?text=2"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/230/00FF00?text=3"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/240/00FF00?text=4"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/250/00FF00?text=5"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/260/00FF00?text=6"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/270/00FF00?text=7"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/280/00FF00?text=8"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/250/00FF00?text=9"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/260/00FF00?text=10"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/270/00FF00?text=11"/>
+        <img alt={style.video_placeholder} src="https://via.placeholder.com/280/00FF00?text=12"/>
+      </div>
+      <button className={`${style.handle} ${style.right_handle}`}>
+        <div className={style.text}>&#8250;</div>
+      </button>
+    </div>
+  </div>
+            {/* <div id={style.intro_section}>
                 <img alt='bread' src={bread}id={style.bread_icon} className={style.icon}></img>
                 <img alt='chili' src={chili}id={style.chili_icon} className={style.icon}></img>
                 <img alt='pie' src={pie}id={style.pie_icon} className={style.icon}></img>
@@ -32,14 +162,8 @@ const Landing = () => {
                         <div>Nicholas Rice</div>
                     </a>
                 </div>
-            </div>
-            <div id={style.feature_section}>
-                <p className={style.txt} id={style.features_description}>With this demo app you can either explore availablity as a guest looking to reserve a table or gain establishment access and use tableGater's robust reservation system as a restaurant employee.</p>
-                <img src={guest_pic} alt='guest' id={style.example_image_1}></img>
-                <p className={style.txt} id={style.guest_example}>Create an account, login or use our demo guest. Then you can browse our table availability</p>
-                <img src={establishment_pic} alt='establishment' id={style.example_image_2}></img>
-                <p className={style.txt} id={style.esatablishment_example}>...or login as our demo establishment as an employee and manage/view reservations.</p>
-            </div>
+            </div> */}
+
         </div>
     )
 }

@@ -78,7 +78,7 @@ export const newEstablishement = (userId, name, timezoneId, daylightSavings) => 
     const data = await response.json()
     if (!response.ok) {
         dispatch(setErrors(data.errors))
-        return
+        return data;
     }
     dispatch(setEstablishment(data))
     return data;

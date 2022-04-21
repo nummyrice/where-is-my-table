@@ -38,7 +38,7 @@ const NavBar = () => {
   function test(){
   // var tabsNewAnim = document.getElementById(`${style.navbarSupportedContent}`)
   var activeItemNewAnim = document.getElementsByClassName(`${style.active}`);
-
+    if (activeItemNewAnim.length) {
   var computed = getComputedStyle(activeItemNewAnim[0]),
     paddingHeight = parseInt(computed.paddingTop, 10) + parseInt(computed.paddingBottom, 10),
     paddingWidth = parseInt(computed.paddingRight, 10) + parseInt(computed.paddingLeft, 10),
@@ -75,7 +75,7 @@ const NavBar = () => {
     horiSelector.style.left = itemPosNewAnimLeft+ "px"
     horiSelector.style.height = activeWidthNewAnimHeight + "px"
     horiSelector.style.width = activeWidthNewAnimWidth + "px"
-  }})
+  }})}
 
 	// var tabsNewAnim = $('#navbarSupportedContent');
 	// var selectorNewAnim = $('#navbarSupportedContent').find('li').length;
@@ -157,7 +157,7 @@ function collapseExpand(event) {
   // if (user?.id === 1) return <Redirect to='/establishment'/>
   return (
     <nav className={`${style.navbar} ${style.navbar_expand_custom} ${style.navbar_mainbg}`}>
-        <Link className={style.home_navlink} to='/' exact={true}>
+        <Link className={style.home_navlink} to='/' exact="true">
           <AlligatorHead id={style.tableGater_icon}/>
         </Link>
       <div></div>
@@ -171,23 +171,26 @@ function collapseExpand(event) {
                 <li className={style.nav_item}>
                     <Link className={style.nav_link} to="/" ><i className="far fa-chart-bar"></i>Home</Link>
                 </li>
-                {!user && <li className={`${style.nav_item} ${style.active}`}>
+                <li className={`${style.nav_item} ${style.active}`}>
                     <Link className={style.nav_link} to={'/reserve-a-table/village_baker/1'}><i className="far fa-address-book"></i>Demo Reservations</Link>
-                </li>}
+                </li>
                 <li className={style.nav_item}>
                     <Link className={style.nav_link} to={"/join-waitlist/village_baker/1"} ><i className="far fa-clone"></i>Demo Waitlist</Link>
                 </li>
                 <li className={style.nav_item}>
                     <Link className={style.nav_link} to={"/demo-dashboard-access"} ><i className="far fa-clone"></i>Demo Dashboard</Link>
                 </li>
-                <li className={style.nav_item}>
+                {!user && <li className={style.nav_item}>
                     <Link className={style.nav_link} to="sign-up"><i className="far fa-calendar-alt"></i>Sign Up</Link>
-                </li>
+                </li>}
                 {!user && <li className={style.nav_item}>
                     <Link className={style.nav_link} to="/login"><i className="fas fa-tachometer-alt"></i>Login</Link>
                 </li>}
-                {user && <li className={style.nav_item}>
+                {user && !establishment && <li className={style.nav_item}>
                     <Link className={style.nav_link} to='/establishment-setup'><i className="far fa-copy"></i>Set Up a Restaurant</Link>
+                </li>}
+                {user && <li className={style.nav_item}>
+                    <Link className={style.nav_link} to='/logout-page'><i className="far fa-copy"></i>Logout</Link>
                 </li>}
             </ul>
         </div>

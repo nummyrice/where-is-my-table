@@ -17,7 +17,7 @@ const GuestDashboardAccess = () => {
       };
 
     return(
-        <div className={style.frame}>
+        <div className={`${style.frame} ${style.gradient_border}`}>
             <p>After creating your account and setting up your restaurant details you will have access to your very own dashboard to manage your restaurants and waitlist.</p>
             <button onClick={demoEstablishmentLogin} className={`${style.custom_btn} ${style.btn_9}`}>Check it out</button>
         </div>

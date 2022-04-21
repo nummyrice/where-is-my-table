@@ -1,12 +1,9 @@
 /* LOGIN */
 #login_background {
-    overflow: scroll;
-    height: 100%;
-    background-color: #427aa1
+    font-family: "Roboto", sans-serif;
 }
 
 #login_block {
-    background-color:#a5be00;
     width: calc(100vw - 20px);
     height: auto;
     margin-left: auto;
@@ -16,9 +13,11 @@
     padding: 10px 30px 30px 30px;
     font-family: sans-serif;
     border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.597);
+    background-color: #eaf2fa;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     color: black;
+    position: relative;
+    border-radius: 25px;
 }
 
 #login_block label {
@@ -26,7 +25,7 @@
 }
 
 #signup_block button, #login_block button {
-    color: #333;
+    color: black;
     border: 1px solid #55b68a;
     border-bottom: 5px solid #55b68a;
     background-color: #fff;
@@ -57,13 +56,19 @@
 
 /* SIGNUP */
 #signup_background {
-    overflow: scroll;
-    height: 100%;
-    background-color: #427aa1
+    font-family: "Roboto", sans-serif;
 }
 
+#est_setup_form select, #est_setup_form input, #login_block input, #signup_block input {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    background-color: #eaf2fa;
+}
+
+
 #signup_block {
-    background-color: rgba(255, 255, 255, 0.597);
+    background-color: #eaf2fa;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     width: calc(100vw - 20px);
     height: auto;
@@ -73,8 +78,38 @@
     flex-direction: column;
     padding: 10px 30px 30px 30px;
     font-family: sans-serif;
-    border-radius: 6px;
+    border-radius: 25px;
     color: black;
+    position: relative;
+}
+
+.gradient_border::after {
+    content: '';
+    position: absolute;
+    top: calc(-1*5px);
+    left: calc(-1*5px);
+    height: calc(100% + 5px * 2);
+    width: calc(100% + 5px * 2);
+    background: linear-gradient(60deg, #108758, #09472E, #0D6E47,#5073b8, #19D489, #7BDCED, #129460, #07b39b, #6fba82);
+
+    border-radius: calc(5*5px);
+    z-index: -1;
+    animation:animate 5s ease alternate infinite;
+    background-size: 300% 300%;
+    box-shadow: 0 30px 60px 0 rgb(90 116 148 / 40%);
+
+}
+
+@keyframes animate{
+    0%{
+        background-position: 0% 50%;
+    }
+    50%{
+        background-position: 100% 50%;
+    }
+    100%{
+        background-position: 0% 50%;
+    }
 }
 
 #signup_block label {
@@ -87,18 +122,18 @@
 
 /* Establishment Setup */
 #est_setup_background {
-    overflow: scroll;
-    height: 100%;
-    background-color: #427aa1
+    font-family: "Roboto", sans-serif;
 }
 
 #est_form_title {
-    font-family: sans-serif;
-    color: white;
+    font-family: bungee, sans-serif;
+    color: transparent;
     width: calc(100vw - 20px);
     margin-left: auto;
     margin-right: auto;
     margin-top: 50px;
+    background-image: linear-gradient(60deg, #108758, #0D6E47,#5073b8, #19D489, #7BDCED, #129460, #07b39b, #6fba82);
+    background-clip: text;
 }
 
 #est_setup_background label {
@@ -140,8 +175,10 @@
     flex-direction: column;
     flex-wrap: wrap;
     margin-bottom: 50px;
-    background-color: rgba(255, 255, 255, 0.597);
+    background-color: #eaf2fa;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    position: relative;
+    border-radius: 25px;
 }
 
 @media (min-width: 600px) {
@@ -164,3 +201,70 @@
         width: calc(100vw / 2);
     }
 }
+
+#btn_section {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 200px;
+    margin: 1rem auto;
+}
+
+/* 9 */
+.custom_btn {
+    width: auto;
+    height: 40px;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+     box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
+     7px 7px 20px 0px rgba(0,0,0,.1),
+     4px 4px 5px 0px rgba(0,0,0,.1);
+    outline: none;
+    z-index: 2;
+    margin: 0 auto;
+
+  }
+
+.btn_9 {
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .btn_9:after {
+    position: absolute;
+    content: " ";
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1fd1f9;
+    background-image: linear-gradient(315deg, #2FD492 0%, #5073b8 74%);
+    transition: all 0.3s ease;
+  }
+
+  .btn_9:hover {
+    background: transparent;
+    box-shadow:  4px 4px 6px 0 rgba(255,255,255,.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, .2),
+      inset -4px -4px 6px 0 rgba(255,255,255,.5),
+      inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+    color: white;
+  }
+  .btn_9:hover:after {
+    -webkit-transform: scale(2) rotate(180deg);
+    transform: scale(2) rotate(180deg);
+    box-shadow:  4px 4px 6px 0 rgba(255,255,255,.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, .2),
+      inset -4px -4px 6px 0 rgba(255,255,255,.5),
+      inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+  }
