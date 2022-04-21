@@ -11,7 +11,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }},
     'tuesday': {
         1:{
@@ -22,7 +23,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }
     },
     'wednesday': {
@@ -34,7 +36,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }
     },
     'thursday': {
@@ -46,7 +49,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }
     },
     'friday': {
@@ -58,7 +62,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }
     },
     'saturday': {
@@ -70,7 +75,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }
     },
     'sunday': {
@@ -82,7 +88,8 @@ default_schedule = {'monday':{
         "end": {
             "hour": 20,
             "minute": 0
-        }
+        },
+        "valid": True
     }
     }}
     # TODO: need to add table for holidays and schedule overrides

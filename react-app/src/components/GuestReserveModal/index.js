@@ -3,17 +3,17 @@ import { Redirect } from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import style from './GuestReserveModal.module.css';
 import { ReactComponent as UtensilsIcon} from './assets/utensils-solid.svg';
+import {DateTime} from 'luxon'
 
 const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, setShowGuestReserveModal}) => {
     const user = useSelector(state=>state.session?.user);
-    const [partySize, setPartySize] = useState(availableTableTime.table.min_seat)
+    const [partySize, setPartySize] = useState(availableTableTime.table_details.min_seat)
     const [notes, setNotes] = useState('')
     const [errors, setErrors] = useState([]);
-
     // party size selector array
     const partySizeOptions = (function getPartySize(){
         const result = [];
-        for (let party = availableTableTime.table.min_seat; party <= availableTableTime.table.max_seat; party++) {
+        for (let party = availableTableTime.table_details.min_seat; party <= availableTableTime.table_details.max_seat; party++) {
             result.push(party);
         }
         return result;
@@ -25,26 +25,28 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
 
         const newReservation = {
             guest_id: user.id,
-            reservation_time: availableTableTime.datetime,
+            reservation_time: availableTableTime.res_time,
             party_size: partySize,
             notes: notes,
-            table_id: availableTableTime.table.id
+            table_id: availableTableTime.table_details.id,
+            establishment_id: 1
         }
         //then post reservation
-        const response = await fetch('/api/reservations/new', {
+        const response = await fetch(`/api/reservations/new/village_baker`, {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newReservation)
         })
         const data = await response.json()
-        if (data.result) {
-            setShowGuestReserveModal(false);
-            setSelectedDate(new Date(selectedDate));
-            return data.reservation
-
+        if (!response.ok) {
+            if (data.errors) {
+                setErrors(data.errors);
+                console.log(data.errors)
+            }
+            return data
         }
-        setErrors(data.errors);
-        console.log(data.errors)
+        setShowGuestReserveModal(false);
+        alert("Successfully placed reservation")
         return data
 
     }
@@ -52,11 +54,11 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
     // TODO: allow user to add notes or tags
     if (!user) return <Redirect to='/login'/>;
     return(
-        <div className={style.background}>
+
             <form onSubmit={handleSubmit} id={style.guest_res_modal}>
                 <span id={style.guest_res_header}>
                     <UtensilsIcon/>
-                    <span>{`Reserve ${availableTableTime.table.table_name}`}</span>
+                    <span>{`Reserve ${availableTableTime.table_details.table_name}`}</span>
                 </span>
                 {errors.length > 0 && errors.map((error)=>{
                     return(
@@ -64,7 +66,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
                     )
                 })}
                 <div>
-                    <span>{`${new Date(availableTableTime.datetime).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} ${new Date(availableTableTime.datetime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}`}</span>
+                    <span>{`${DateTime.fromISO(availableTableTime.res_time).toLocaleString({month: 'short', day: 'numeric'})} ${DateTime.fromISO(availableTableTime.res_time).toLocaleString({hour: '2-digit', minute: '2-digit'})}`}</span>
                 </div>
                 <div>
                     <label id={style.name_label}>Party Name:</label>
@@ -75,7 +77,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
                     <select onChange={(e)=> setPartySize(e.target.value)}>
                         {partySizeOptions.map((num) => {
                             return(
-                                <option id={num} value={num}>{num}</option>
+                                <option key={`guest_${num}`} value={num}>{num}</option>
                             )
                         })}
                     </select>
@@ -89,7 +91,7 @@ const GuestReserveModal = ({selectedDate, setSelectedDate, availableTableTime, s
                     <button type='submit'>Confirm</button>
                 </span>
             </form>
-        </div>
+
     )
 }
 

@@ -15,6 +15,7 @@ export default function reducer(state = initialState, action) {
     const newState = [...state];
     switch(action.type) {
         case SET_ERRORS:
+            console.log('here are errors: ', action.payload)
             return [...newState, ...action.payload];
         case CLEAR_ERRORS:
             return [];

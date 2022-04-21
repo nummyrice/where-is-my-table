@@ -1,108 +1,107 @@
 import React, { useState, useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import style from './Settings.module.css'
-import DisplaySection from './DisplaySection';
-import EditSection from './EditSection';
-
-const Sections = () => {
-    const scheduleTemplate = {
-        monday: {
-            1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
-        },
-        tuesday: {
-             1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
-        },
-        wednesday: {
-             1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
-        },
-        thursday: {
-             1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
-        },
-        friday: {
-             1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
-        },
-        saturday: {
-             1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
-        },
-        sunday: {
-             1: {
-                start: {
-                    hour: 0,
-                    minute: 0,
-                },
-                end: {
-                    hour: 0,
-                    minute: 0
-                },
-                valid: true
-            }
+import { clearErrors, setErrors } from '../../../store/errors';
+import { newSection } from '../../../store/establishment';
+const scheduleTemplate = {
+    monday: {
+        1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
+        }
+    },
+    tuesday: {
+         1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
+        }
+    },
+    wednesday: {
+         1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
+        }
+    },
+    thursday: {
+         1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
+        }
+    },
+    friday: {
+         1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
+        }
+    },
+    saturday: {
+         1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
+        }
+    },
+    sunday: {
+         1: {
+            start: {
+                hour: 8,
+                minute: 0,
+            },
+            end: {
+                hour: 20,
+                minute: 0
+            },
+            valid: true
         }
     }
+}
+
+const NewSection = ({setNewSectionForm, setShowErrorsModal}) => {
+    const dispatch = useDispatch()
     const user = useSelector(state => state.session.user)
-    const [newSectionForm, setNewSectionForm] = useState(false)
     const [sectionName, setSectionName] = useState('')
     const [newSchedule, setNewSchedule] = useState(scheduleTemplate)
-    const [editSections, setEditSections] = useState([])
 
     const timeChangeHandler = (event, day, sequence, bound) => {
         const newTime = event.target.value
@@ -158,20 +157,35 @@ const Sections = () => {
         if (startHour < prevHour) return setNewSchedule(invalidScheduleCopy)
         return setNewSchedule(validScheduleCopy)
     }
-    // check that no start time comes before any other end time for the day
-    // const validateSchedule = (schedule) => {
-    //     const errors = []
-    //     const days = Object.keys(newSchedule)
-    //     const forEach
-    // }
-    // get current establishment sections
-        // create display/edit section form/component
-    // map through each section
-        // pass section schedule and details to section display/edit component
-        //
+
+    const handleNewScheduleSubmit = (event) => {
+        event.preventDefault()
+        Object.keys(newSchedule).forEach(day => Object.keys(newSchedule[day]).forEach(sequence => {
+            if (!newSchedule[day][sequence].valid) {
+                setErrors(["time-block: one or more of the time blocks specified are overlapping, or not in sequential order"])
+                setShowErrorsModal(true)
+                return
+            }
+        }))
+        if (sectionName.length > 40) {
+            setErrors(["sectionName: must not exceed 40 characters"])
+            setShowErrorsModal(true)
+            return
+        }
+        dispatch(newSection(sectionName, newSchedule, user.establishment_id))
+            .then(data => {
+                if (data.errors) {
+                    setShowErrorsModal(true)
+                } else {
+                    setNewSchedule(scheduleTemplate)
+                    setSectionName('')
+                    setNewSectionForm(false)
+                }
+
+            })
+    }
     return(
-        <div id={style.sections_page}>
-            {newSectionForm && <form id={style.new_section_form}>
+        <form id={style.new_section_form}>
                 <h3>{"Section Details"}</h3>
                 <div id={style.new_section_details_block}>
                     <label id={style.new_section_name_label} htmlFor={"section_name"}>{"Section Name"}</label>
@@ -200,20 +214,9 @@ const Sections = () => {
                 })}
                 <div id={style.new_section_button_block}>
                     <button onClick={()=>{setNewSectionForm(false);setNewSchedule(scheduleTemplate)}}id={style.new_section_cancel_button}>{"Cancel"}</button>
-                    <button id={style.new_section_submit_button}>{"Submit Section"}</button>
+                    <button onClick={(event) => handleNewScheduleSubmit(event)} id={style.new_section_submit_button}>{"Submit Section"}</button>
                  </div>
-            </form>}
-            {!newSectionForm && <button onClick={() => setNewSectionForm(true)} id={style.new_section_button}>{"New Section"}</button>}
-            {user.establishment?.sections && Object.keys(user.establishment.sections).map(sectionId => {
-                const section = user.establishment.sections[sectionId]
-                return(
-                    <React.Fragment key={sectionId}>
-                        {!editSections.find(id => id === section.id) && <DisplaySection section={section} editSections={editSections} setEditSections={setEditSections}/>}
-                        {editSections.find(id => id === section.id) && <EditSection section={section} editSections={editSections} setEditSections={setEditSections}/>}
-                    </React.Fragment>
-                )
-            })}
-        </div>
+            </form>
     )
 }
 
@@ -223,4 +226,4 @@ function timeValueSetter(hourInt, minuteInt) {
     return `${hour}:${minute}`
 }
 
-export default Sections;
+export default NewSection

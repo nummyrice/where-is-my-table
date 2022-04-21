@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Redirect } from 'react-router-dom';
+import { getEstablishment } from '../../store/establishment';
 import { login } from '../../store/session';
 import style from './auth.module.css';
 
@@ -9,15 +10,28 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const user = useSelector(state => state.session.user);
+  const establishment = useSelector(state => state.establishment)
   const dispatch = useDispatch();
 
   const onLogin = async (e) => {
     e.preventDefault();
     const data = await dispatch(login(email, password));
-    if (data) {
-      setErrors(data);
+    if (data.errors) {
+      return setErrors(data);
     }
+    if (data.establishment_id) await dispatch(getEstablishment(data.establishment_id))
+    return
   };
+
+  const demoLogin = async (e) => {
+    e.preventDefault();
+    const data = await dispatch(login("establishment_demo@aa.io", 'password1'));
+    if (data.errors) {
+      return setErrors(data);
+    }
+    if (data.establishment_id) await dispatch(getEstablishment(data.establishment_id))
+    return
+  }
 
   const updateEmail = (e) => {
     setEmail(e.target.value);
@@ -27,9 +41,6 @@ const LoginForm = () => {
     setPassword(e.target.value);
   };
 
-  if (user?.id === 1) {
-    return <Redirect to='/establishment'/>;
-  }
   if (user) {
     return <Redirect to='/' />;
   }
@@ -37,7 +48,7 @@ const LoginForm = () => {
   return (
     <div id={style.login_background}>
       <h2 id={style.est_form_title}>{"Login"}</h2>
-      <form id={style.login_block} onSubmit={onLogin}>
+      <form id={style.login_block} className={style.gradient_border} onSubmit={onLogin}>
         <div className={style.error}>
           {errors.map((error, ind) => (
             <div key={ind}>{error}</div>
@@ -59,7 +70,10 @@ const LoginForm = () => {
             value={password}
             onChange={updatePassword}
           />
-          <button type='submit'>Login</button>
+          <div id={style.btn_section}>
+            <button onClick={event => onLogin(event)} className={`${style.custom_btn} ${style.btn_9}`}>Login</button>
+            <button onClick={event => demoLogin(event)} className={`${style.custom_btn} ${style.btn_9}`}>Demo Login</button>
+          </div>
       </form>
       </div>
   );

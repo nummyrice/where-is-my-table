@@ -1,0 +1,204 @@
+#paper_list {
+background: white;
+    width: 300px;
+    padding:20px;
+    position: relative;
+    margin: 0 auto;
+    box-shadow: 10px 10px 50px 10px rgba(0,0,0,.2);
+    top: -100px;
+}
+#scroll_box {
+    overflow-y: scroll;
+    height: 100px;
+}
+
+#current_waitlist {
+    color: #108758;
+    font-weight: bolder;
+}
+
+.party_entry {
+    height: 40px;
+    width:220px;
+    margin:10px auto;
+    border-radius: 20px;
+    border: 1px solid grey;
+    display: flex;
+    align-items: center;
+
+}
+
+.user_icon_wrapper {
+    width: 20px;
+    color: grey;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#paper_list::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    height: 20px;
+    width: 100%;
+    left: 0;
+    background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/23618/rip.svg) bottom;
+    background-size: 200%;
+}
+
+#box {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 600px;
+    min-width: 300px;
+    width: 80%;
+    margin-top: calc(100vh /8);
+    color: black;
+    font-family: "Roboto", sans-serif;
+    padding: 1rem 0;
+}
+.current_waitlist_details {
+    margin: 2rem auto;
+    width: max-content
+}
+
+.current_waitlist_details::before {
+    display: inline-block;
+    content: '';
+    -webkit-border-radius: 0.375rem;
+    border-radius: 0.375rem;
+    height: 0.75rem;
+    width: 0.75rem;
+    margin-right: 0.5rem;
+    background-color: #108758;
+}
+
+h1 {
+    font-family: bungee, sans-serif;
+    text-align: center;
+    margin: 0 auto;
+    width: min-content;
+}
+
+#new_party_form {
+    margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+    width:max-content;
+    border: 1px solid green;
+    border-radius: 5px;
+    padding: 2rem;
+}
+
+#party_size_label {
+    margin-top: 2rem;
+}
+
+.gradient_border {
+    border-width: 4px;
+    /* background: #1d1f20; */
+    background: #fff;
+    position: relative;
+    border-radius: 5px;
+}
+
+.gradient_border::after {
+    content: '';
+    position: absolute;
+    top: calc(-1*5px);
+    left: calc(-1*5px);
+    height: calc(100% + 5px * 2);
+    width: calc(100% + 5px * 2);
+    background: linear-gradient(60deg, #108758, #09472E, #0D6E47,#5073b8, #19D489, #7BDCED, #129460, #07b39b, #6fba82);
+
+    border-radius: calc(2*5px);
+    z-index: -1;
+    animation:animate 5s ease alternate infinite;
+    background-size: 300% 300%;
+    box-shadow: 0 30px 60px 0 rgb(90 116 148 / 40%);
+
+}
+
+@keyframes animate{
+    0%{
+        background-position: 0% 50%;
+    }
+    50%{
+        background-position: 100% 50%;
+    }
+    100%{
+        background-position: 0% 50%;
+    }
+}
+
+
+/* buttons */
+#btn_section {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 200px;
+    margin: 2rem auto;
+}
+
+button {
+    margin: 20px;
+  }
+  .custom_btn {
+    width: auto;
+    height: 40px;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+     box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
+     7px 7px 20px 0px rgba(0,0,0,.1),
+     4px 4px 5px 0px rgba(0,0,0,.1);
+    outline: none;
+    z-index: 2;
+    margin: 0 auto;
+
+  }
+
+/* 9 */
+.btn_9 {
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .btn_9:after {
+    position: absolute;
+    content: " ";
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1fd1f9;
+    background-image: linear-gradient(315deg, #2FD492 0%, #5073b8 74%);
+    transition: all 0.3s ease;
+  }
+
+  .btn_9:hover {
+    background: transparent;
+    box-shadow:  4px 4px 6px 0 rgba(255,255,255,.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, .2),
+      inset -4px -4px 6px 0 rgba(255,255,255,.5),
+      inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+    color: white;
+  }
+  .btn_9:hover:after {
+    -webkit-transform: scale(2) rotate(180deg);
+    transform: scale(2) rotate(180deg);
+    box-shadow:  4px 4px 6px 0 rgba(255,255,255,.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, .2),
+      inset -4px -4px 6px 0 rgba(255,255,255,.5),
+      inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+  }

@@ -35,7 +35,7 @@ const EstablishmentSetup = () => {
     return(
         <div id={style.est_setup_background}>
             <h2 id={style.est_form_title}>{"Register Your Restaurant"}</h2>
-            <form id={style.est_setup_form}>
+            <form className={style.gradient_border} id={style.est_setup_form}>
                 {errors.map(e => (
                     <div key={e} className={style.error}>{e}</div>
                 ))}
@@ -51,7 +51,7 @@ const EstablishmentSetup = () => {
                 <input  onChange={e => setDaylightSavings(!daylightSavings)} type={"checkbox"} name={"daylight_savings"} value={daylightSavings}></input>
                 <h3 id={style.est_user_confirm}>{"Current User: "}<span>{user.name}</span></h3>
                 <p>{"Is this the correct user account to register your business to? The user account associated with your business cannot be changed once registeration is complete."}</p>
-                <button id={style.est_submit_button} onClick={handleSubmit} type={"submit"}>{"Register Business"}</button>
+                <button id={style.est_submit_button} className={`${style.custom_btn} ${style.btn_9}`} onClick={handleSubmit} type={"submit"}>{"Register Business"}</button>
 
             </form>
         </div>

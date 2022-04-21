@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 import { signUp, claimUser } from '../../store/session';
+import { getEstablishment } from '../../store/establishment';
+import { login } from '../../store/session';
 import style from './auth.module.css';
 
 const SignUpForm = () => {
@@ -43,6 +45,16 @@ const SignUpForm = () => {
     }
   };
 
+  const demoLogin = async (e) => {
+    e.preventDefault();
+    const data = await dispatch(login("establishment_demo@aa.io", 'password1'));
+    if (data.errors) {
+      return setErrors(data);
+    }
+    if (data.establishment_id) await dispatch(getEstablishment(data.establishment_id))
+    return
+  }
+
   const updateName = (e) => {
     setName(e.target.value);
   };
@@ -70,7 +82,7 @@ const SignUpForm = () => {
   return (
     <div id={style.signup_background}>
       <h2 id={style.est_form_title}>{"Sign-up"}</h2>
-      <form id={style.signup_block} onSubmit={updateUser ? onClaimUser : onSignUp}>
+      <form id={style.signup_block} className={style.gradient_border} onSubmit={updateUser ? onClaimUser : onSignUp}>
           {errors.map((error, ind) => (
             <div className={style.error} key={ind}>{error}</div>
           ))}
@@ -119,7 +131,13 @@ const SignUpForm = () => {
             setUpdateUser('');
           }} type='button'>Cancel and Change Number</button>
         </>}
-        {!updateUser && <button type='submit'>Sign Up</button>}
+        {!updateUser &&
+         <div id={style.btn_section}>
+            <button className={`${style.custom_btn} ${style.btn_9}`} type='submit'>Sign Up</button>
+            <button onClick={event => demoLogin(event)} className={`${style.custom_btn} ${style.btn_9}`}>Demo Login</button>
+          </div>
+          }
+
       </form>
     </div>
   );
