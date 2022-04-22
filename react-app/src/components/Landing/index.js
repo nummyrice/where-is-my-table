@@ -14,6 +14,8 @@ import githubLogo from './assets/github.png';
 import linkedinLogo from './assets/linkedin.png';
 import Selfie from './assets/nick_selfie.png'
 import "./VideoCarousel.css";
+import Video1 from './assets/TableGater_Guest_Features.mp4'
+import Video2 from './assets/TableGater_Restaurant_Features.mp4'
 
 
 
@@ -22,21 +24,15 @@ const Landing = () => {
   const videoProperties = [
     {
       id: 1,
-      title: "Video 1",
-      src:"https://www.youtube.com/watch?v=lRer6SbMCHw",
-      credit: "Video by cottonbro from Pexels",
+      title: "Guest Feautures",
+      src: Video1,
+      credit: "music by bensound.com",
     },
     {
       id: 2,
-      title: "Video 2",
-      src: "https://www.youtube.com/watch?v=lRer6SbMCHw",
-      credit: "Video by cottonbro from Pexels",
-    },
-    {
-      id: 3,
-      title: "Video 3",
-      src:"https://www.youtube.com/watch?v=lRer6SbMCHw",
-      credit: "Video by cottonbro from Pexels",
+      title: "Restaurant Features",
+      src: Video2,
+      credit: "music by bensound.com",
     },
   ];
 
@@ -52,7 +48,7 @@ const Landing = () => {
                 url={videoObj.src}
                 pip={true}
                 controls={true}
-                playing={true}
+                playing={false}
               />
               <Carousel.Caption>
                 <h3>{videoObj.title}</h3>

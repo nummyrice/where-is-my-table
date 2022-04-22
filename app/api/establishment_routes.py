@@ -30,7 +30,7 @@ def create_new_establishment():
         )
         db.session.add(new_establishment)
         db.session.commit()
-        return {"message": "so successfuly"}, 201
+        return new_establishment.to_dict(), 201
     return {'errors': validation_errors_to_error_messages(form.errors)}, 400
 
 @establishment_routes.route('edit', methods=['PUT'])

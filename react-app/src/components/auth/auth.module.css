@@ -268,3 +268,82 @@
       inset -4px -4px 6px 0 rgba(255,255,255,.5),
       inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
   }
+
+  #logout_container {
+      width: 300px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      height: 400px;
+      grid-template-areas:
+      "icon icon later ."
+      "icon icon . gater";
+      margin: 2rem auto;
+  }
+
+  #alligator_icon {
+      width: 200px;
+      grid-area: icon;
+      align-self: center;
+      animation: wiggle 1.5s infinite;
+  }
+
+  #later {
+      grid-area: later;
+      color: #e3e6e8;
+      font-size: 5rem;
+      font-family: bungee, sans-serif;
+  }
+
+  #gater {
+    grid-area: gater;
+    color: #e3e6e8;
+    font-size: 5rem;
+    font-family: bungee, sans-serif;
+
+}
+
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+   70% { transform: rotate(0deg); }
+   75% { transform: rotate(10deg); }
+   95% { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@media(min-width: 600px) {
+    #logout_container {
+        width: 600px;
+    }
+}
+
+.fade_in {
+    animation: fadeIn 1.5s;
+    opacity: 1;
+}
+
+.fade_in2 {
+    animation: fadeIn2 3s;
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+  from {
+  	opacity: 0;
+  }
+  to {
+    opacity: 1;
+ }
+}
+
+@keyframes fadeIn2 {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+      opacity: 1;
+   }
+  }
