@@ -9,30 +9,15 @@ import logo from './assets/Artboard1.png';
 import { ReactComponent as Dragon} from './assets/dragon-solid.svg';
 import { ReactComponent as Bird} from './assets/crow-solid.svg';
 import { ReactComponent as DropDownIcon } from './assets/bars-solid.svg';
-import { login, deleteUser } from '../../store/session';
+// import { login, deleteUser } from '../../store/session';
 import { getEstablishment } from '../../store/establishment';
 import { ReactComponent as AlligatorHead } from './assets/alligator-head.svg';
 import { ReactComponent as OpenMouth } from './assets/open-mouth.svg'
 
 const NavBar = () => {
-  const history = useHistory()
-  const dispatch = useDispatch()
   const user = useSelector(state => state.session?.user)
   const establishment = useSelector(state => state.establishment)
-  const demoGuestLogin = () => {
-    dispatch(login('guest_demo@aa.io', 'password4'))
-
-  };
-
-  const demoEstablishmentLogin = () => {
-    dispatch(login('establishment_demo@aa.io', 'password1'))
-    .then(data => {
-      if (data.establishment_id) dispatch(getEstablishment(data.establishment_id)).then(() => history.push('/establishment'))
-    })
-  };
-
-
-
+  console.log("establishment ", establishment)
 
   // ---------Responsive-navbar-active-animation-----------
   function test(){
@@ -76,7 +61,6 @@ const NavBar = () => {
     horiSelector.style.height = activeWidthNewAnimHeight + "px"
     horiSelector.style.width = activeWidthNewAnimWidth + "px"
   }})}
-
 	// var tabsNewAnim = $('#navbarSupportedContent');
 	// var selectorNewAnim = $('#navbarSupportedContent').find('li').length;
 	// var activeItemNewAnim = tabsNewAnim.find('.active');
@@ -157,10 +141,10 @@ function collapseExpand(event) {
   // if (user?.id === 1) return <Redirect to='/establishment'/>
   return (
     <nav className={`${style.navbar} ${style.navbar_expand_custom} ${style.navbar_mainbg}`}>
-        <Link className={style.home_navlink} to='/' exact="true">
+        <Link  style={{textDecoration: "none", color: "inherit"}}  className={style.home_navlink} to='/' exact="true">
           <AlligatorHead id={style.tableGater_icon}/>
+          <GaterSpeechBubble/>
         </Link>
-      <div></div>
       <button onClick={collapseExpand} className={style.navbar_toggler}
       type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <DropDownIcon/>
@@ -245,3 +229,14 @@ function collapseExpand(event) {
 }
 
 export default NavBar;
+
+
+function GaterSpeechBubble() {
+  return(
+    <div id={style.speech_container}>
+      <div id={style.speech_bubble}>
+        {"Welcome to TableGater"}
+      </div>
+    </div>
+  )
+}

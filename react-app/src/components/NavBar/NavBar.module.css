@@ -419,3 +419,31 @@ li {
 .nav_item {
 
 }
+
+#speech_container {
+max-height: 50px;
+}
+
+#speech_bubble {
+    background-color:#fff;
+    font-family: bungee, sans-serif;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 4px 5px 0 rgb(0 0 0 / 30%);
+    position: relative;
+    white-space: nowrap;
+
+}
+
+#speech_bubble::before {
+    content: '';
+    display: block;
+    width: 0;
+    position: absolute;
+    bottom: -25px;
+    left: 5px;
+    border-style: solid;
+    border-width: 15px;
+    border-color: #fff transparent transparent #fff;
+    transform: rotate(18deg);
+}

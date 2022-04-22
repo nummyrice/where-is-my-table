@@ -204,7 +204,7 @@ export default function reducer(state = initialState, action) {
             newState.daylight_savings = action.payload.daylightSavings
             return newState
         case UNSET_ESTABLISHMENT:
-            return {}
+            return null;
         case SET_SECTION:
             newState.sections = {...newState.sections, [action.payload.id]: action.payload}
             return newState
