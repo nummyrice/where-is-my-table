@@ -157,10 +157,10 @@ function collapseExpand(event) {
   // if (user?.id === 1) return <Redirect to='/establishment'/>
   return (
     <nav className={`${style.navbar} ${style.navbar_expand_custom} ${style.navbar_mainbg}`}>
-        <Link className={style.home_navlink} to='/' exact="true">
+        <Link  style={{textDecoration: "none", color: "inherit"}}  className={style.home_navlink} to='/' exact="true">
           <AlligatorHead id={style.tableGater_icon}/>
+          <GaterSpeechBubble/>
         </Link>
-      <div></div>
       <button onClick={collapseExpand} className={style.navbar_toggler}
       type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <DropDownIcon/>
@@ -245,3 +245,14 @@ function collapseExpand(event) {
 }
 
 export default NavBar;
+
+
+function GaterSpeechBubble() {
+  return(
+    <div id={style.speech_container}>
+      <div id={style.speech_bubble}>
+        {"Welcome to TableGater"}
+      </div>
+    </div>
+  )
+}
